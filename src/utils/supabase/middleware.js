@@ -6,9 +6,16 @@ export async function updateSession(request) {
     request,
   })
 
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!supabaseUrl || !supabaseKey) {
+    return supabaseResponse
+  }
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    supabaseUrl,
+    supabaseKey,
     {
       cookies: {
         getAll() {
@@ -28,9 +35,15 @@ export async function updateSession(request) {
   )
 
   // This is required to refresh the session and fetch user info
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  let user = null
+  try {
+    const {
+      data: { user: sessionUser },
+    } = await supabase.auth.getUser()
+    user = sessionUser
+  } catch (error) {
+    console.error('Error in middleware auth check:', error)
+  }
 
   // Route guarding
   const url = request.nextUrl.clone()
