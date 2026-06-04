@@ -1,0 +1,21 @@
+Problem Statement:
+
+It is noted that there is no individual financial planning web service available in Malaysia region. This service should cater to all the age groups and promote financial planning. Currently, people have no focus on where the money is actually spent and no clue about conserve and protect the money. Many people are financially ignorant.
+
+Goal:
+
+- To target young, middle aged and old 
+- To find out where he is spending?
+- To find out income, expenses, goal, responsibilities and how he wants to grow money?
+- To Provide inflow to outflow mapping/comparison.
+- To measure the user about where he stands? what does he want to do? 
+- To help user in extracting the right info from the user through the tool.
+- To Guide the user on investing their wealth and be calculative enough to tolerate inflation
+- To Educate user on what type of insurance he needs.
+- To provide awareness on retirement planning and help them to identify the corpus.
+- To help identify the legacy to leave to the children and offsprings.
+- To allocate coffine money
+- To budget for child pocket money.
+- To come up with a free, comprehensive version and then have upgraded paid services
+- To provide links to CRM to store and manage the users.
+- To provide the comprehensive financial report.    I also have detailed prompt as attached in the pdf. Please help in creating the proto type.
