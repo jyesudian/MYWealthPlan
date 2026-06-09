@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MY TrustPlan — Feature Summary Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        serif: ['Cormorant Garamond', 'serif'],
+                    },
+                    colors: {
+                        bg: '#0d0f14',
+                        surface: '#141720',
+                        surface2: '#1c2030',
+                        border: '#2a2f40',
+                        gold: '#d4a853',
+                        goldDim: 'rgba(212, 168, 83, 0.15)',
+                        text: '#e8e4db',
+                        textDim: '#7a7d8a',
+                        green: '#4caf82',
+                        red: '#e05c5c',
+                        blue: '#5b9bd5',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            background: #0d0f14; 
+            color: #e8e4db; 
+            font-family: 'Outfit', sans-serif; 
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse 60% 40% at 20% 10%, rgba(212, 168, 83, 0.04) 0%, transparent 60%),
+                        radial-gradient(ellipse 40% 60% at 85% 80%, rgba(91, 155, 213, 0.03) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="p-8 md:p-16 max-w-4xl mx-auto space-y-12 relative">
+    
+    <!-- Title Header -->
+    <div class="border-b border-border pb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10">
+        <div>
+            <div class="flex items-center gap-3 font-serif text-3xl font-bold text-gold tracking-wide">
+                <i class="fas fa-handshake"></i>
+                MY Trust<span class="text-white font-sans font-light text-xl">Plan</span>
+            </div>
+            <p class="text-xs uppercase tracking-widest text-textDim mt-2 font-semibold">Trust-Based Financial Planning System</p>
+        </div>
+        <div class="text-left md:text-right text-xs text-textDim">
+            <p class="font-semibold text-gold">PROTOTYPE PORTFOLIO SUMMARY</p>
+            <p class="mt-1">Generated June 2026</p>
+        </div>
+    </div>
+
+    <!-- Feature Pillars -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+        
+        <!-- Pillar 1 -->
+        <div class="bg-surface border border-border p-6 rounded-lg space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-goldDim flex items-center justify-center text-lg text-gold border border-gold/20">
+                    <i class="fas fa-percentage"></i>
+                </div>
+                <h3 class="font-serif text-lg text-white font-semibold">1. Relationship Trust Scorecard</h3>
+            </div>
+            <p class="text-xs text-textDim leading-relaxed">
+                Integrates the Maister-Green-Galford trust formula: 
+                <span class="text-gold font-serif font-bold text-[13px] block my-1">T = (Credibility + Reliability + Intimacy) / Self-Orientation</span>
+                Enables advisors to drag sliders to rate relationship safety and dynamically compute trustworthiness scores, providing improvement actions. Renders scorecards inside client profiles and printed reports.
+            </p>
+        </div>
+
+        <!-- Pillar 2 -->
+        <div class="bg-surface border border-border p-6 rounded-lg space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-goldDim flex items-center justify-center text-lg text-gold border border-gold/20">
+                    <i class="fas fa-calculator"></i>
+                </div>
+                <h3 class="font-serif text-lg text-white font-semibold">2. Simulator Sandbox (Real-Time SVG)</h3>
+            </div>
+            <p class="text-xs text-textDim leading-relaxed">
+                Allows advisors and clients to live-simulate parameters (target retirement age, savings rate, yields, inflation, and budget plans) with three real-time SVG charts:
+            </p>
+            <ul class="list-disc pl-4 text-[11px] text-textDim space-y-1">
+                <li><strong class="text-white">Projected Net Wealth Trend:</strong> An area line chart shifting colors (gold to red) when funds deplete, showing an animated warning node.</li>
+                <li><strong class="text-white">Milestones Timeline Ruler:</strong> Plots wedding, education, and properties.</li>
+                <li><strong class="text-white">Net Worth Donut:</strong> Displays assets-to-debt ratios.</li>
+            </ul>
+        </div>
+
+        <!-- Pillar 3 -->
+        <div class="bg-surface border border-border p-6 rounded-lg space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-goldDim flex items-center justify-center text-lg text-gold border border-gold/20">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <h3 class="font-serif text-lg text-white font-semibold">3. 3-Way Aesthetic Theme Switcher</h3>
+            </div>
+            <p class="text-xs text-textDim leading-relaxed">
+                Supports immediate UI skin shifts via standard CSS Custom Properties:
+            </p>
+            <ul class="list-disc pl-4 text-[11px] text-textDim space-y-1">
+                <li><strong class="text-white">Luxurious Dark:</strong> Premium slate and gold accents for digital tablets.</li>
+                <li><strong class="text-white">Professional Light:</strong> Warm cream and brown-gold text for high contrast.</li>
+                <li><strong class="text-white">Calming Pastel:</strong> Sage green-gray and emerald tones for approachability.</li>
+            </ul>
+        </div>
+
+        <!-- Pillar 4 -->
+        <div class="bg-surface border border-border p-6 rounded-lg space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-goldDim flex items-center justify-center text-lg text-gold border border-gold/20">
+                    <i class="fas fa-edit"></i>
+                </div>
+                <h3 class="font-serif text-lg text-white font-semibold">4. Custom Discovery Guides</h3>
+            </div>
+            <p class="text-xs text-textDim leading-relaxed">
+                Supports two entry processes: **Self-Guided (Client)** and **Advisor Direct Entry** modes. The Self-Guided mode includes alerts explaining *"Why we ask this"* (tax reliefs, EPF targets, LPA/Wasiat). Advisors can hover over the guide box and edit the text inline, saving changes instantly to local memory.
+            </p>
+        </div>
+
+        <!-- Pillar 5 -->
+        <div class="bg-surface border border-border p-6 rounded-lg space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-goldDim flex items-center justify-center text-lg text-gold border border-gold/20">
+                    <i class="fas fa-globe-asia"></i>
+                </div>
+                <h3 class="font-serif text-lg text-white font-semibold">5. Malaysian Specific Auditing</h3>
+            </div>
+            <p class="text-xs text-textDim leading-relaxed">
+                Audits EPF retirement thresholds, verifies 10x gross earnings guidelines for Sum Assured adequacy, flags active premium payments due within 30 days, tracks Debt Service Ratio (DSR) under central bank limits, and lists local Shariah estate planning recommendations (AmanahRaya Wasiat, Takaful).
+            </p>
+        </div>
+
+        <!-- Pillar 6 -->
+        <div class="bg-surface border border-border p-6 rounded-lg space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-goldDim flex items-center justify-center text-lg text-gold border border-gold/20">
+                    <i class="fas fa-print"></i>
+                </div>
+                <h3 class="font-serif text-lg text-white font-semibold">6. Luxury Print Engine</h3>
+            </div>
+            <p class="text-xs text-textDim leading-relaxed">
+                Swaps colors into a high-contrast ink-saving A4 report wrapper on print command, preserving logo headers, table borders, metric tables, and the trust scorecard section for formal meetings.
+            </p>
+        </div>
+
+    </div>
+
+    <!-- Footnotes/Callout -->
+    <div class="bg-surface border border-border p-6 rounded-lg flex gap-4 text-xs text-textMid relative z-10">
+        <span class="text-gold text-lg select-none mt-0.5">✦</span>
+        <div class="leading-relaxed">
+            <strong class="text-white">Prototype Status:</strong> The full working application, layout configurations, local storage hooks, and SVG timelines have been tested and deployed successfully. This feature document is compiled directly from the system specification sheets.
+        </div>
+    </div>
+
+</body>
+</html>
