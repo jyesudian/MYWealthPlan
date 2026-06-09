@@ -29,39 +29,91 @@
                         '3xl': ['2.125rem', { lineHeight: '2.6rem' }],  // ~34px
                     },
                     colors: {
-                        bg: '#0d0f14',
-                        surface: '#141720',
-                        surface2: '#1c2030',
-                        border: '#2a2f40',
-                        gold: '#d4a853',
-                        goldDim: 'rgba(212, 168, 83, 0.15)',
-                        goldGlow: 'rgba(212, 168, 83, 0.25)',
-                        text: '#e8e4db',
-                        textDim: '#7a7d8a',
-                        textMid: '#b0adb8',
-                        green: '#4caf82',
-                        red: '#e05c5c',
-                        amber: '#e09c3c',
-                        blue: '#5b9bd5',
+                        bg: 'var(--bg)',
+                        surface: 'var(--surface)',
+                        surface2: 'var(--surface2)',
+                        border: 'var(--border)',
+                        gold: 'var(--gold)',
+                        goldDim: 'var(--goldDim)',
+                        goldGlow: 'var(--goldGlow)',
+                        text: 'var(--text)',
+                        textDim: 'var(--textDim)',
+                        textMid: 'var(--textMid)',
+                        green: 'var(--green)',
+                        red: 'var(--red)',
+                        amber: 'var(--amber)',
+                        blue: 'var(--blue)',
                     }
                 }
             }
         }
     </script>
     <style>
+        :root, .theme-dark {
+            --bg: #0d0f14;
+            --surface: #141720;
+            --surface2: #1c2030;
+            --border: #2a2f40;
+            --gold: #d4a853;
+            --goldDim: rgba(212, 168, 83, 0.15);
+            --goldGlow: rgba(212, 168, 83, 0.25);
+            --text: #e8e4db;
+            --textDim: #7a7d8a;
+            --textMid: #b0adb8;
+            --green: #4caf82;
+            --red: #e05c5c;
+            --amber: #e09c3c;
+            --blue: #5b9bd5;
+        }
+
+        .theme-light {
+            --bg: #fcfbf9;
+            --surface: #ffffff;
+            --surface2: #f5f2eb;
+            --border: #dfdad0;
+            --gold: #997321;
+            --goldDim: rgba(153, 115, 33, 0.1);
+            --goldGlow: rgba(153, 115, 33, 0.2);
+            --text: #2c2823;
+            --textDim: #7c776e;
+            --textMid: #5c5852;
+            --green: #2e7d32;
+            --red: #c62828;
+            --amber: #ef6c00;
+            --blue: #1565c0;
+        }
+
+        .theme-pastel {
+            --bg: #f4f7f6;
+            --surface: #ffffff;
+            --surface2: #e6eee9;
+            --border: #cad6cf;
+            --gold: #4d7c71;
+            --goldDim: rgba(77, 124, 113, 0.1);
+            --goldGlow: rgba(77, 124, 113, 0.2);
+            --text: #1e2d28;
+            --textDim: #687a73;
+            --textMid: #4a5752;
+            --green: #388e3c;
+            --red: #d32f2f;
+            --amber: #f57c00;
+            --blue: #1976d2;
+        }
+
         body { 
-            background: #0d0f14; 
-            color: #e8e4db; 
+            background: var(--bg); 
+            color: var(--text); 
             font-family: 'Outfit', sans-serif; 
             font-weight: 400;
             min-height: 100vh;
             overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
         }
         body::before {
             content: '';
             position: fixed;
             inset: 0;
-            background: radial-gradient(ellipse 60% 40% at 20% 10%, rgba(212, 168, 83, 0.05) 0%, transparent 60%),
+            background: radial-gradient(ellipse 60% 40% at 20% 10%, var(--goldDim) 0%, transparent 60%),
                         radial-gradient(ellipse 40% 60% at 85% 80%, rgba(91, 155, 213, 0.04) 0%, transparent 60%);
             pointer-events: none;
             z-index: 0;
@@ -73,12 +125,12 @@
         }
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #2a2f40; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #d4a853; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
         
         /* Custom UI sliders and switches */
         input[type=range] {
-            accent-color: #d4a853;
+            accent-color: var(--gold);
             cursor: pointer;
         }
 
@@ -712,11 +764,38 @@
             const [formMode, setFormMode] = useState('guided'); // 'guided' or 'advisor'
             const [guidedStep, setGuidedStep] = useState(0);
             const [showBookingModal, setShowBookingModal] = useState(false);
+            
+            // Theme, Customizable Guides & Trust scorecard states
+            const [theme, setTheme] = useState(() => localStorage.getItem('fin_theme') || 'dark');
+            const [customComments, setCustomComments] = useState(() => {
+                const saved = localStorage.getItem('fin_custom_comments');
+                return saved ? JSON.parse(saved) : {};
+            });
+            const saveCustomComment = (stepIdx, newText) => {
+                setCustomComments(prev => {
+                    const updated = { ...prev, [stepIdx]: newText };
+                    localStorage.setItem('fin_custom_comments', JSON.stringify(updated));
+                    return updated;
+                });
+            };
+            const [trustScores, setTrustScores] = useState({
+                credibility: 8,
+                reliability: 8,
+                intimacy: 8,
+                selfOrientation: 3
+            });
 
             // Recalculate on any clientData change
             useEffect(() => {
                 setCalculated(calculateFinancials(clientData));
             }, [clientData]);
+
+            // Apply theme dynamically to root element
+            useEffect(() => {
+                document.documentElement.classList.remove('theme-dark', 'theme-light', 'theme-pastel');
+                document.documentElement.classList.add(`theme-${theme}`);
+                localStorage.setItem('fin_theme', theme);
+            }, [theme]);
 
             // Adjust root html font size dynamically based on session role
             useEffect(() => {
@@ -777,6 +856,8 @@
                 { id: 'insurance', icon: 'fa-shield-alt', label: 'Insurance & Protection' },
                 { id: 'retirement', icon: 'fa-umbrella-beach', label: 'Retirement Projection' },
                 { id: 'estate', icon: 'fa-scroll', label: 'Estate & Wasiat' },
+                { id: 'sandbox', icon: 'fa-calculator', label: 'Interactive Sandbox' },
+                { id: 'trust', icon: 'fa-percentage', label: 'Trust Scorecard' },
                 { id: 'report', icon: 'fa-file-invoice-dollar', label: 'Financial Report' },
                 { id: 'advisor', icon: 'fa-users', label: 'Advisor Portal' },
                 { id: 'premium', icon: 'fa-crown', label: 'Premium Upgrade' }
@@ -799,9 +880,12 @@
                     {/* Sidebar Navigation */}
                     <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-surface border-r border-border transform ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative lg:translate-x-0 transition duration-300 ease-in-out shadow-2xl flex flex-col no-print`}>
                         <div className="p-6 border-b border-border flex justify-between items-center bg-bg/50">
-                            <div className="font-serif text-2xl font-bold flex items-center gap-3 text-gold tracking-wide">
-                                <i className="fas fa-leaf text-gold animate-pulse"></i>
-                                MY Wealth<span className="text-white font-sans font-light text-lg">Plan</span>
+                            <div className="flex flex-col">
+                                <div className="font-serif text-2xl font-bold flex items-center gap-3 text-gold tracking-wide">
+                                    <i className="fas fa-handshake text-gold"></i>
+                                    MY Trust<span className="text-white font-sans font-light text-lg">Plan</span>
+                                </div>
+                                <span className="text-[8px] uppercase tracking-widest text-textDim mt-1 font-sans font-bold">Trust-Based Planning System</span>
                             </div>
                             <button className="lg:hidden text-textDim hover:text-white" onClick={() => setMobileMenuOpen(false)}>
                                 <i className="fas fa-times text-xl"></i>
@@ -864,6 +948,26 @@
                                 >
                                     <i className="fas fa-sign-out-alt mr-1.5"></i> Log Out
                                 </button>
+                                <div className="flex bg-surface2 border border-border p-0.5 rounded-lg text-xs">
+                                    <button 
+                                        onClick={() => setTheme('dark')} 
+                                        className={`px-2 py-1 rounded text-[10px] font-semibold transition-all ${theme === 'dark' ? 'bg-gold text-bg' : 'text-textDim hover:text-text'}`}
+                                    >
+                                        Dark
+                                    </button>
+                                    <button 
+                                        onClick={() => setTheme('light')} 
+                                        className={`px-2 py-1 rounded text-[10px] font-semibold transition-all ${theme === 'light' ? 'bg-gold text-bg' : 'text-textDim hover:text-text'}`}
+                                    >
+                                        Light
+                                    </button>
+                                    <button 
+                                        onClick={() => setTheme('pastel')} 
+                                        className={`px-2 py-1 rounded text-[10px] font-semibold transition-all ${theme === 'pastel' ? 'bg-gold text-bg' : 'text-textDim hover:text-text'}`}
+                                    >
+                                        Pastel
+                                    </button>
+                                </div>
                                 <span className="h-4 w-px bg-border"></span>
                                 <div className="text-right hidden sm:block">
                                     <span className="text-[10px] text-textDim block font-medium uppercase tracking-wider font-sans">Calculated Score</span>
@@ -908,6 +1012,8 @@
                                         setStep={setGuidedStep}
                                         saveDraft={saveDraft}
                                         session={session}
+                                        customComments={customComments}
+                                        saveCustomComment={saveCustomComment}
                                     />
                                 )}
                                 {activeTab === 'goals' && (
@@ -938,10 +1044,24 @@
                                         calculated={calculated} 
                                     />
                                 )}
+                                {activeTab === 'sandbox' && (
+                                    <SandboxView 
+                                        clientData={clientData} 
+                                        calculated={calculated} 
+                                    />
+                                )}
+                                {activeTab === 'trust' && (
+                                    <TrustScorecardView 
+                                        trustScores={trustScores} 
+                                        setTrustScores={setTrustScores} 
+                                        clientData={clientData} 
+                                    />
+                                )}
                                 {activeTab === 'report' && (
                                     <ReportView 
                                         clientData={clientData} 
                                         calculated={calculated} 
+                                        trustScores={trustScores}
                                     />
                                 )}
                                 {activeTab === 'advisor' && (
@@ -1296,10 +1416,30 @@
             step, 
             setStep,
             saveDraft,
-            session
+            session,
+            customComments,
+            saveCustomComment
         }) => {
             const isCFP = session && session.role === 'advisor';
             const activeFormMode = isCFP ? 'advisor' : formMode;
+
+            const [editingComment, setEditingComment] = useState(false);
+            const [commentDraft, setCommentDraft] = useState('');
+
+            // Reset editing mode when step changes
+            useEffect(() => {
+                setEditingComment(false);
+            }, [step]);
+
+            const handleStartEdit = () => {
+                setCommentDraft(getExplanatoryAlert(step));
+                setEditingComment(true);
+            };
+
+            const handleSaveEdit = () => {
+                saveCustomComment(step, commentDraft);
+                setEditingComment(false);
+            };
 
             const steps = [
                 { id: 'personal', label: 'Identity', icon: '👤', desc: 'Personal details under BNM Guidelines.' },
@@ -1324,6 +1464,9 @@
 
             // Explanatory alerts for Self-Guided Client Mode
             const getExplanatoryAlert = (currentStep) => {
+                if (customComments && customComments[currentStep] !== undefined) {
+                    return customComments[currentStep];
+                }
                 switch(currentStep) {
                     case 0:
                         return "NRIC details and residential addresses are required for regulatory KYC compliance matching Bank Negara Malaysia guidelines. Your preferred name will appear in printed reports.";
@@ -1408,10 +1551,38 @@
                             <div className="lg:col-span-3 space-y-6">
                                 {/* Context Prompt (Why Ask Alert) */}
                                 {step < 9 && (
-                                    <div className="bg-goldDim border border-gold/30 rounded-lg p-4 flex gap-3 text-xs text-textMid leading-relaxed">
-                                        <span className="text-gold text-base select-none mt-0.5">💡</span>
-                                        <div>
-                                            <strong className="text-white font-medium">Why we ask this:</strong> {getExplanatoryAlert(step)}
+                                    <div className="bg-goldDim border border-gold/30 rounded-lg p-4 text-xs text-textMid leading-relaxed relative group">
+                                        <div className="flex justify-between items-start gap-4">
+                                            <div className="flex gap-3 flex-1">
+                                                <span className="text-gold text-base select-none mt-0.5">💡</span>
+                                                <div className="flex-1">
+                                                    <strong className="text-white font-medium">Why we ask this:</strong>{' '}
+                                                    {editingComment ? (
+                                                        <div className="mt-2 space-y-2">
+                                                            <textarea
+                                                                value={commentDraft}
+                                                                onChange={(e) => setCommentDraft(e.target.value)}
+                                                                className="w-full bg-surface border border-border rounded p-2 text-white outline-none focus:border-gold h-20 resize-none font-sans"
+                                                            />
+                                                            <div className="flex gap-2">
+                                                                <button onClick={handleSaveEdit} className="bg-gold text-bg px-2.5 py-1 rounded font-semibold text-[10px] hover:bg-yellow-600 transition-colors">Save</button>
+                                                                <button onClick={() => setEditingComment(false)} className="border border-border px-2.5 py-1 rounded text-[10px] text-textDim hover:text-white transition-colors">Cancel</button>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <span>{getExplanatoryAlert(step)}</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            {!editingComment && (
+                                                <button 
+                                                    onClick={handleStartEdit} 
+                                                    className="opacity-0 group-hover:opacity-100 transition-opacity text-gold hover:text-white text-[10px] font-semibold flex items-center gap-1 bg-surface2 px-2 py-1 border border-border rounded whitespace-nowrap"
+                                                    title="Edit Explanatory Comment"
+                                                >
+                                                    <i className="fas fa-edit"></i> Edit Guide
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 )}
@@ -3044,6 +3215,465 @@
         };
 
         /* =========================================================================
+           INTERACTIVE SANDBOX VIEW (IMPACT CALCULATORS & SVG CHARTS)
+           ========================================================================= */
+        const SandboxView = ({ clientData, calculated }) => {
+            // Initialize sandbox parameters from client profile
+            const [curAge, setCurAge] = useState(38);
+            const [retAge, setRetAge] = useState(parseInt(clientData.retireAge) || 60);
+            const [initSavings, setInitSavings] = useState(clientData.savings + clientData.epf);
+            const [monthlySave, setMonthlySave] = useState(calculated.monthlySurplus > 0 ? Math.round(calculated.monthlySurplus) : 1500);
+            const [roi, setRoi] = useState(6); // 6% annual growth default
+            const [retBudget, setRetBudget] = useState(8000); // RM 8,000/month post-retirement
+            const [inflation, setInflation] = useState(3); // 3% inflation default
+
+            // Calculate Retirement Wealth Curve
+            const projectedYears = [];
+            let currentWealth = initSavings;
+            let runOutAge = null;
+
+            for (let age = curAge; age <= 85; age++) {
+                projectedYears.push({ age, wealth: currentWealth });
+                
+                // Growth phase (Pre-retirement)
+                if (age < retAge) {
+                    currentWealth = currentWealth * (1 + roi / 100) + (monthlySave * 12);
+                } 
+                // Decumulation phase (Post-retirement)
+                else {
+                    const yearsInRetirement = age - retAge;
+                    const adjustedAnnualBudget = (retBudget * 12) * Math.pow(1 + inflation / 100, yearsInRetirement);
+                    currentWealth = currentWealth * (1 + roi / 100) - adjustedAnnualBudget;
+                }
+
+                if (currentWealth < 0) {
+                    currentWealth = 0;
+                    if (runOutAge === null) {
+                        runOutAge = age;
+                    }
+                }
+            }
+
+            // SVG Line Chart Helpers
+            const maxWealth = Math.max(...projectedYears.map(y => y.wealth), 100000);
+            const chartWidth = 460;
+            const chartHeight = 160;
+            const padding = { top: 15, right: 15, bottom: 25, left: 55 };
+
+            const getX = (age) => {
+                return padding.left + ((age - curAge) / (85 - curAge)) * (chartWidth - padding.left - padding.right);
+            };
+
+            const getY = (wealth) => {
+                return padding.top + (1 - (wealth / maxWealth)) * (chartHeight - padding.top - padding.bottom);
+            };
+
+            // Build path d attribute
+            let pathD = "";
+            let areaD = "";
+            if (projectedYears.length > 0) {
+                pathD = `M ${getX(projectedYears[0].age)} ${getY(projectedYears[0].wealth)}`;
+                areaD = `M ${getX(projectedYears[0].age)} ${chartHeight - padding.bottom}`;
+                
+                projectedYears.forEach(y => {
+                    const x = getX(y.age);
+                    const yPos = getY(y.wealth);
+                    pathD += ` L ${x} ${yPos}`;
+                    areaD += ` L ${x} ${yPos}`;
+                });
+                
+                areaD += ` L ${getX(projectedYears[projectedYears.length - 1].age)} ${chartHeight - padding.bottom} Z`;
+            }
+
+            // Build Milestones for Timeline Ruler
+            const milestones = [
+                ...(clientData.eduGoals || []).map(g => ({ ...g, category: 'Children Education', icon: 'fa-graduation-cap', year: new Date().getFullYear() + 10, color: 'text-blue' })),
+                ...(clientData.purchases || []).map(g => {
+                    const cat = mCategoryMapping(g) || 'Other Milestone';
+                    const icon = cat === 'Vehicle Purchase' ? 'fa-car' : cat === 'Home Buying' ? 'fa-home' : cat === 'Foreign Trips' ? 'fa-plane-departure' : cat === 'Children Wedding' ? 'fa-ring' : cat === 'Retirement Corpus Creation' ? 'fa-umbrella-beach' : 'fa-bullseye';
+                    const col = cat === 'Home Buying' ? 'text-gold' : 'text-amber';
+                    return { ...g, category: cat, icon, year: g.year, color: col };
+                })
+            ];
+
+            // Helper to map category names securely
+            function mCategoryMapping(g) {
+                if (g.category) return g.category;
+                const type = g.type || '';
+                if (type === 'Car') return 'Vehicle Purchase';
+                if (type === 'House' || type === 'Home') return 'Home Buying';
+                if (type === 'Travel' || type === 'Trip' || type === 'Holiday') return 'Foreign Trips';
+                if (type === 'Wedding') return 'Children Wedding';
+                if (type === 'Retirement') return 'Retirement Corpus Creation';
+                return 'Other Milestone';
+            }
+
+            // SVG Donut Chart for Assets & Liabilities
+            const totalAssets = clientData.savings + clientData.epf + (clientData.properties || []).reduce((acc, p) => acc + (p.value || 0), 0);
+            const totalLiabs = (clientData.loans || []).reduce((acc, l) => acc + (l.balance || 0), 0);
+            const netWorth = totalAssets - totalLiabs;
+            
+            const totalSum = totalAssets + totalLiabs;
+            const assetPct = totalSum > 0 ? (totalAssets / totalSum) * 100 : 100;
+            const liabPct = totalSum > 0 ? (totalLiabs / totalSum) * 100 : 0;
+
+            const radius = 40;
+            const circumference = 2 * Math.PI * radius;
+            const assetStrokeDash = circumference * (assetPct / 100);
+            const liabStrokeDash = circumference * (liabPct / 100);
+            
+            return (
+                <div className="space-y-6 animate-fade-in">
+                    <div>
+                        <span className="text-xs font-semibold tracking-wider text-gold uppercase">Simulator Sandbox</span>
+                        <h1 className="text-3xl font-serif font-light text-white mt-1">Interactive Impact Sandbox</h1>
+                        <p className="text-textDim text-sm mt-1">Adjust retirement savings parameters, interest rates, and inflation to view immediate impacts on your timeline.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Simulation Controls */}
+                        <Card className="lg:col-span-1 space-y-5">
+                            <h3 className="font-serif text-lg text-white border-b border-border pb-2.5">Simulation Sliders</h3>
+                            
+                            <div className="space-y-4 text-xs font-sans">
+                                <div className="space-y-1.5">
+                                    <div className="flex justify-between">
+                                        <span className="text-textDim font-medium">Current Age: <strong className="text-white">{curAge} yrs</strong></span>
+                                    </div>
+                                    <input type="range" min="20" max="70" value={curAge} onChange={(e) => {
+                                        const val = parseInt(e.target.value);
+                                        setCurAge(val);
+                                        if (val >= retAge) setRetAge(val + 1);
+                                    }} className="w-full" />
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <div className="flex justify-between">
+                                        <span className="text-textDim font-medium">Retirement Target Age: <strong className="text-gold">{retAge} yrs</strong></span>
+                                    </div>
+                                    <input type="range" min={curAge + 1} max="80" value={retAge} onChange={(e) => setRetAge(parseInt(e.target.value))} className="w-full" />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-textDim font-medium">Initial Savings (Cash + EPF) (RM)</label>
+                                    <input type="number" value={initSavings} onChange={(e) => setInitSavings(parseFloat(e.target.value) || 0)} className="w-full bg-surface2 border border-border rounded px-3 py-2 text-white outline-none focus:border-gold" />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-textDim font-medium">Monthly Additional Savings (RM)</label>
+                                    <input type="number" value={monthlySave} onChange={(e) => setMonthlySave(parseFloat(e.target.value) || 0)} className="w-full bg-surface2 border border-border rounded px-3 py-2 text-white outline-none focus:border-gold" />
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <div className="flex justify-between">
+                                        <span className="text-textDim font-medium">Annual Investment Yield (ROI): <strong className="text-green">{roi}%</strong></span>
+                                    </div>
+                                    <input type="range" min="1" max="15" step="0.5" value={roi} onChange={(e) => setRoi(parseFloat(e.target.value))} className="w-full" />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-textDim font-medium">Post-Retirement Monthly Budget (RM)</label>
+                                    <input type="number" value={retBudget} onChange={(e) => setRetBudget(parseFloat(e.target.value) || 0)} className="w-full bg-surface2 border border-border rounded px-3 py-2 text-white outline-none focus:border-gold" />
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <div className="flex justify-between">
+                                        <span className="text-textDim font-medium">Assumed Inflation Rate: <strong className="text-red">{inflation}%</strong></span>
+                                    </div>
+                                    <input type="range" min="0" max="8" step="0.5" value={inflation} onChange={(e) => setInflation(parseFloat(e.target.value))} className="w-full" />
+                                </div>
+                            </div>
+                        </Card>
+
+                        {/* Interactive Dynamic Charts */}
+                        <div className="lg:col-span-2 space-y-6">
+                            {/* Wealth Trend SVG Area Chart */}
+                            <Card className="flex flex-col justify-between">
+                                <div>
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div>
+                                            <h3 className="font-serif text-lg text-white">Projected Net Wealth Trend</h3>
+                                            <p className="text-xs text-textDim">Asset accumulation trajectory up to age 85</p>
+                                        </div>
+                                        {runOutAge !== null ? (
+                                            <span className="text-[10px] font-bold uppercase px-2.5 py-1 rounded bg-red/10 border border-red/20 text-red flex items-center gap-1.5">
+                                                <i className="fas fa-exclamation-triangle"></i> Funds deplete at Age {runOutAge}
+                                            </span>
+                                        ) : (
+                                            <span className="text-[10px] font-bold uppercase px-2.5 py-1 rounded bg-green/10 border border-green/20 text-green flex items-center gap-1.5">
+                                                <i className="fas fa-shield-alt"></i> Sustainable to Age 85
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    {/* SVG Line Drawing */}
+                                    <div className="relative mt-2">
+                                        <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} className="w-full h-auto overflow-visible font-sans text-[9px] fill-none stroke-none">
+                                            {/* Grid Lines */}
+                                            <line x1={padding.left} y1={getY(maxWealth)} x2={chartWidth - padding.right} y2={getY(maxWealth)} stroke="var(--border)" strokeWidth="0.5" strokeDasharray="3 3" />
+                                            <line x1={padding.left} y1={getY(maxWealth / 2)} x2={chartWidth - padding.right} y2={getY(maxWealth / 2)} stroke="var(--border)" strokeWidth="0.5" strokeDasharray="3 3" />
+                                            <line x1={padding.left} y1={getY(0)} x2={chartWidth - padding.right} y2={getY(0)} stroke="var(--border)" strokeWidth="1" />
+
+                                            {/* Area Under Curve */}
+                                            <path d={areaD} fill={runOutAge ? 'rgba(224, 92, 92, 0.08)' : 'rgba(212, 168, 83, 0.08)'} />
+                                            
+                                            {/* Wealth Line Path */}
+                                            <path d={pathD} stroke={runOutAge ? '#e05c5c' : '#d4a853'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+
+                                            {/* Y-Axis Labels */}
+                                            <text x={padding.left - 8} y={getY(maxWealth) + 3} textAnchor="end" fill="var(--textDim)">{fmt(maxWealth)}</text>
+                                            <text x={padding.left - 8} y={getY(maxWealth / 2) + 3} textAnchor="end" fill="var(--textDim)">{fmt(maxWealth / 2)}</text>
+                                            <text x={padding.left - 8} y={getY(0) + 3} textAnchor="end" fill="var(--textDim)">RM 0</text>
+
+                                            {/* X-Axis Labels (Ages) */}
+                                            <text x={getX(curAge)} y={chartHeight - 8} textAnchor="middle" fill="var(--textDim)">Age {curAge}</text>
+                                            <text x={getX(retAge)} y={chartHeight - 8} textAnchor="middle" fill="var(--gold)" fontWeight="bold">Age {retAge}</text>
+                                            <text x={getX(85)} y={chartHeight - 8} textAnchor="middle" fill="var(--textDim)">Age 85</text>
+
+                                            {/* Vertical Line for Retirement age */}
+                                            <line x1={getX(retAge)} y1={padding.top} x2={getX(retAge)} y2={chartHeight - padding.bottom} stroke="var(--gold)" strokeWidth="1" strokeDasharray="2 2" />
+
+                                            {/* Wealth Run-Out Indicator Node */}
+                                            {runOutAge !== null && (
+                                                <g>
+                                                    <circle cx={getX(runOutAge)} cy={getY(0)} r="4" fill="#e05c5c" />
+                                                    <circle cx={getX(runOutAge)} cy={getY(0)} r="8" stroke="#e05c5c" strokeWidth="1.5" className="animate-ping" fill="none" />
+                                                </g>
+                                            )}
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div className="mt-4 border-t border-border/60 pt-4 flex gap-4 text-xs font-sans text-textMid leading-relaxed">
+                                    <i className="fas fa-info-circle text-gold mt-0.5"></i>
+                                    <div>
+                                        {runOutAge !== null ? (
+                                            <span>At your current parameters, wealth will deplete at **Age {runOutAge}**. Consider raising monthly contributions by **RM {Math.round((retBudget * 12) / 24).toLocaleString('en-MY')}** or postponing retirement to cover the gap.</span>
+                                        ) : (
+                                            <span>Your retirement fund is sustainable! At Age 85, you are projected to retain a legacy surplus of **{fmt(projectedYears[projectedYears.length - 1].wealth)}** for heirs.</span>
+                                        )}
+                                    </div>
+                                </div>
+                            </Card>
+
+                            {/* Donut and Milestone Timeline Ruler in a Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Asset/Liability Donut Chart */}
+                                <Card className="flex flex-col justify-between">
+                                    <h3 className="font-serif text-base text-white mb-2">Net Worth Composition</h3>
+                                    <div className="flex items-center gap-4 py-2">
+                                        {/* SVG Donut */}
+                                        <svg viewBox="0 0 100 100" className="w-24 h-24 transform -rotate-90">
+                                            {/* Asset Circle */}
+                                            <circle cx="50" cy="50" r={radius} fill="transparent" stroke="var(--gold)" strokeWidth="10" strokeDasharray={`${assetStrokeDash} ${circumference}`} />
+                                            {/* Liability Circle */}
+                                            <circle cx="50" cy="50" r={radius} fill="transparent" stroke="#e05c5c" strokeWidth="10" strokeDasharray={`${liabStrokeDash} ${circumference}`} strokeDashoffset={-assetStrokeDash} />
+                                        </svg>
+                                        
+                                        <div className="space-y-1.5 text-xs font-sans">
+                                            <div className="flex items-center gap-2">
+                                                <span className="w-3 h-3 rounded-full bg-gold"></span>
+                                                <span className="text-textDim">Assets: <strong className="text-white">{assetPct.toFixed(0)}%</strong></span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <span className="w-3 h-3 rounded-full bg-red"></span>
+                                                <span className="text-textDim">Liabilities: <strong className="text-white">{liabPct.toFixed(0)}%</strong></span>
+                                            </div>
+                                            <div className="border-t border-border/60 pt-1.5 mt-1 font-semibold text-white">
+                                                Net Worth: {fmt(netWorth)}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Card>
+
+                                {/* Milestone timeline ruler */}
+                                <Card className="flex flex-col justify-between">
+                                    <h3 className="font-serif text-base text-white mb-2">Milestones Timeline Ruler</h3>
+                                    
+                                    <div className="relative py-4 pr-2 pl-4">
+                                        {milestones.length === 0 ? (
+                                            <p className="text-xs text-textDim text-center py-4 font-sans">No active milestones declared. Add milestones in Goal Planning tab.</p>
+                                        ) : (
+                                            <div className="relative font-sans text-[10px] space-y-4">
+                                                {/* Vertical line connecting milestones */}
+                                                <div className="absolute left-3.5 top-2 bottom-2 w-0.5 bg-border"></div>
+
+                                                {milestones.slice(0, 3).map((m, idx) => (
+                                                    <div key={idx} className="flex items-start gap-4 relative">
+                                                        <div className={`w-7 h-7 rounded-full bg-surface2 border border-border flex items-center justify-center ${m.color} z-10 text-xs`}>
+                                                            <i className={`fas ${m.icon}`}></i>
+                                                        </div>
+                                                        <div className="min-w-0 flex-1">
+                                                            <div className="flex justify-between font-semibold">
+                                                                <span className="text-white truncate">{m.type || m.name || 'Milestone'}</span>
+                                                                <span className="text-gold">{m.year || 2030}</span>
+                                                            </div>
+                                                            <p className="text-[10px] text-textDim truncate">{fmt(m.cost || m.fund)} required</p>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </Card>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        /* =========================================================================
+           TRUST EQUATION SCORECARD VIEW
+           ========================================================================= */
+        const TrustScorecardView = ({ trustScores, setTrustScores, clientData }) => {
+            const { credibility, reliability, intimacy, selfOrientation } = trustScores;
+
+            // Compute Trustworthiness Score
+            const trustScore = (credibility + reliability + intimacy) / Math.max(0.1, selfOrientation);
+            
+            // Determine level and color
+            let trustLevel = "Low Trust Integration";
+            let gaugeColor = "bg-red";
+            let borderGlow = "border-red/30 shadow-[0_0_15px_rgba(224,92,92,0.1)]";
+            let description = "Self-orientation dominates the relationship. Focus on client-first auditing and transparency to build connection.";
+
+            if (trustScore >= 15) {
+                trustLevel = "Trusted Advisor Relationship (Elite)";
+                gaugeColor = "bg-green";
+                borderGlow = "border-green/30 shadow-[0_0_20px_rgba(76,175,130,0.15)]";
+                description = "High intimacy and credibility combined with deep client-first alignment. This creates safe disclosures and highly effective plans.";
+            } else if (trustScore >= 5) {
+                trustLevel = "Transactional Credibility (Balanced)";
+                gaugeColor = "bg-amber";
+                borderGlow = "border-gold/30 shadow-[0_0_15px_rgba(212,168,83,0.1)]";
+                description = "A reliable advisory state, though intimacy can be increased through active listening, or self-focus can be lowered by decoupling sales incentives.";
+            }
+
+            const handleSliderChange = (key, val) => {
+                setTrustScores(prev => ({
+                    ...prev,
+                    [key]: val
+                }));
+            };
+
+            return (
+                <div className="space-y-6 animate-fade-in">
+                    <div>
+                        <span className="text-xs font-semibold tracking-wider text-gold uppercase">Trust Analytics</span>
+                        <h1 className="text-3xl font-serif font-light text-white mt-1">Trust Equation Scorecard</h1>
+                        <p className="text-textDim text-sm mt-1">Model client-advisor trust values using the Maister-Green-Galford formula.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Interactive Sliders */}
+                        <Card className="lg:col-span-1 space-y-4 text-xs font-sans">
+                            <h3 className="font-serif text-lg text-white border-b border-border pb-2">Rate Trust Factors</h3>
+                            
+                            <div className="space-y-3.5">
+                                <div className="space-y-1">
+                                    <div className="flex justify-between">
+                                        <span className="text-textDim font-medium">Credibility (C): <strong className="text-white">{credibility}/10</strong></span>
+                                    </div>
+                                    <input type="range" min="1" max="10" value={credibility} onChange={(e) => handleSliderChange('credibility', parseInt(e.target.value))} className="w-full" />
+                                    <p className="text-[10px] text-textDim leading-tight">Credentials, qualifications, and clarity of financial explanations.</p>
+                                </div>
+
+                                <div className="space-y-1">
+                                    <div className="flex justify-between">
+                                        <span className="text-textDim font-medium">Reliability (R): <strong className="text-white">{reliability}/10</strong></span>
+                                    </div>
+                                    <input type="range" min="1" max="10" value={reliability} onChange={(e) => handleSliderChange('reliability', parseInt(e.target.value))} className="w-full" />
+                                    <p className="text-[10px] text-textDim leading-tight">Prompt report delivery, follow-up, and keeping plan commitments.</p>
+                                </div>
+
+                                <div className="space-y-1">
+                                    <div className="flex justify-between">
+                                        <span className="text-textDim font-medium">Intimacy (I): <strong className="text-white">{intimacy}/10</strong></span>
+                                    </div>
+                                    <input type="range" min="1" max="10" value={intimacy} onChange={(e) => handleSliderChange('intimacy', parseInt(e.target.value))} className="w-full" />
+                                    <p className="text-[10px] text-textDim leading-tight">Safety in disclosing personal details (KYC/nric), cash concerns, and health status.</p>
+                                </div>
+
+                                <div className="space-y-1">
+                                    <div className="flex justify-between">
+                                        <span className="text-textDim font-medium">Self-Orientation (S): <strong className={selfOrientation > 4 ? 'text-red' : 'text-green'}>{selfOrientation}/10</strong></span>
+                                    </div>
+                                    <input type="range" min="1" max="10" value={selfOrientation} onChange={(e) => handleSliderChange('selfOrientation', parseInt(e.target.value))} className="w-full" />
+                                    <p className="text-[10px] text-textDim leading-tight">Lower is better. Focuses on client interest vs. commission product pushing.</p>
+                                </div>
+                            </div>
+                        </Card>
+
+                        {/* Equation Panel and Gauge */}
+                        <div className="lg:col-span-2 space-y-6">
+                            {/* Equation Visualization */}
+                            <Card className={`border ${borderGlow} transition-all duration-300`}>
+                                <h3 className="font-serif text-lg text-white mb-4">The Trust Equation</h3>
+                                
+                                <div className="flex flex-col items-center justify-center py-6 bg-surface2/30 border border-border/40 rounded-lg">
+                                    <div className="flex items-center gap-6 font-serif text-xl md:text-3xl text-white">
+                                        <div className="flex flex-col items-center text-gold">
+                                            <span>T</span>
+                                            <span className="text-[10px] uppercase font-sans text-textDim tracking-widest mt-1">Trust</span>
+                                        </div>
+                                        <div className="text-textDim font-sans font-light">=</div>
+                                        
+                                        <div className="flex flex-col items-center">
+                                            <div className="flex items-center gap-2.5 pb-2 border-b border-border/85">
+                                                <span title="Credibility" className="hover:text-gold transition-colors">{credibility}</span>
+                                                <span className="text-textDim text-sm font-sans">+</span>
+                                                <span title="Reliability" className="hover:text-gold transition-colors">{reliability}</span>
+                                                <span className="text-textDim text-sm font-sans">+</span>
+                                                <span title="Intimacy" className="hover:text-gold transition-colors">{intimacy}</span>
+                                            </div>
+                                            <div className="pt-2 text-red" title="Self-Orientation">
+                                                {selfOrientation}
+                                            </div>
+                                        </div>
+
+                                        <div className="text-textDim font-sans font-light">=</div>
+                                        
+                                        <div className="text-gold font-bold text-3xl md:text-4xl">
+                                            {trustScore.toFixed(1)}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="text-center mt-6 space-y-1.5 px-4">
+                                        <h4 className="font-serif text-base text-white">{trustLevel}</h4>
+                                        <p className="text-xs text-textDim max-w-md font-sans">{description}</p>
+                                    </div>
+                                </div>
+                            </Card>
+
+                            {/* Trust score explanation and guide card */}
+                            <Card className="space-y-4">
+                                <h3 className="font-serif text-base text-gold">Trust Equation Improvement Guide</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-sans text-textMid leading-relaxed">
+                                    <div className="p-3 bg-surface2/50 rounded-lg border border-border/40 space-y-1.5">
+                                        <h4 className="font-semibold text-white">Credibility & Reliability Actions</h4>
+                                        <ul className="list-disc pl-4 space-y-1 text-textDim">
+                                            <li>Acquire specialist Malaysian certifications (CFP / IFP).</li>
+                                            <li>Utilize high-precision statement audits for EPF and tax reliefs.</li>
+                                            <li>Share visual calculators like the interactive sandbox to build credentials.</li>
+                                        </ul>
+                                    </div>
+                                    <div className="p-3 bg-surface2/50 rounded-lg border border-border/40 space-y-1.5">
+                                        <h4 className="font-semibold text-white">Intimacy & Self-Orientation Actions</h4>
+                                        <ul className="list-disc pl-4 space-y-1 text-textDim">
+                                            <li>Discuss client concerns privately (PDPA security compliance).</li>
+                                            <li>Lower Self-Orientation: Keep advisor commissions hidden/neutralized.</li>
+                                            <li>Focus recommendations on client-defined milestone gaps (e.g. wedding/trips).</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </Card>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        /* =========================================================================
            RETIREMENT VIEW WITH DYNAMIC SVG CHART
            ========================================================================= */
         const RetirementView = ({ clientData, setClientData, calculated }) => {
@@ -3307,7 +3937,7 @@
         /* =========================================================================
            FINANCIAL REPORT VIEW (PRINT FRIENDLY)
            ========================================================================= */
-        const ReportView = ({ clientData, calculated }) => {
+        const ReportView = ({ clientData, calculated, trustScores }) => {
             return (
                 <div className="space-y-8 animate-fade-in">
                     {/* Header Controls (no-print) */}
@@ -3444,6 +4074,41 @@
                                 </table>
                             </div>
                         </div>
+
+                        {/* Advisor Trust Scorecard Section */}
+                        {trustScores && (
+                            <div className="border-t border-border/60 pt-6 space-y-4">
+                                <h3 className="font-serif text-lg text-gold font-semibold uppercase tracking-wider">Advisor Relationship Trust Scorecard</h3>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-sans text-textMid bg-surface2/30 border border-border/60 p-4 rounded-lg">
+                                    <div>
+                                        <span className="text-textDim block uppercase font-medium">Credibility (C)</span>
+                                        <span className="text-sm font-bold text-white">{trustScores.credibility}/10</span>
+                                    </div>
+                                    <div>
+                                        <span className="text-textDim block uppercase font-medium">Reliability (R)</span>
+                                        <span className="text-sm font-bold text-white">{trustScores.reliability}/10</span>
+                                    </div>
+                                    <div>
+                                        <span className="text-textDim block uppercase font-medium">Intimacy (I)</span>
+                                        <span className="text-sm font-bold text-white">{trustScores.intimacy}/10</span>
+                                    </div>
+                                    <div>
+                                        <span className="text-textDim block uppercase font-medium">Self-Orientation (S)</span>
+                                        <span className={`text-sm font-bold ${trustScores.selfOrientation > 4 ? 'text-red' : 'text-green'}`}>{trustScores.selfOrientation}/10</span>
+                                    </div>
+                                </div>
+                                <div className="flex justify-between items-center bg-goldDim/30 border border-gold/20 p-3 rounded-lg text-xs font-sans">
+                                    <div className="font-serif">
+                                        <span className="text-gold font-bold">TRUST EQUATION RESULT:</span>{' '}
+                                        <span className="text-white">T = (C + R + I) / S =</span>{' '}
+                                        <strong className="text-gold text-sm font-sans">{((trustScores.credibility + trustScores.reliability + trustScores.intimacy) / Math.max(0.1, trustScores.selfOrientation)).toFixed(1)}</strong>
+                                    </div>
+                                    <div className="text-[10px] uppercase font-bold text-textDim tracking-wider">
+                                        Trust-Based Advisory System
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Regulatory disclaimer */}
                         <div className="border-t border-border/60 pt-6 text-[10px] text-textDim leading-relaxed">
