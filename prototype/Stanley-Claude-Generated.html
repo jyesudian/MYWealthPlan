@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Financial Portrait</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0f14;--surface:#141720;--surface2:#1c2030;--border:#2a2f40;
+  --gold:#d4a853;--gold-dim:rgba(212,168,83,.15);--gold-glow:rgba(212,168,83,.25);
+  --text:#e8e4db;--text-dim:#7a7d8a;--text-mid:#b0adb8;
+  --green:#4caf82;--red:#e05c5c;--amber:#e09c3c;--blue:#5b9bd5;
+  --radius:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(212,168,83,.06) 0%,transparent 60%),radial-gradient(ellipse 40% 60% at 85% 80%,rgba(91,155,213,.05) 0%,transparent 60%);pointer-events:none;z-index:0;}
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;}
+.topnav{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--border);background:rgba(13,15,20,.85);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;}
+.nav-brand{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;color:var(--gold);letter-spacing:.04em;}
+.nav-dots{display:flex;align-items:center;gap:5px;}
+.nav-dot{width:7px;height:7px;border-radius:50%;background:var(--border);cursor:pointer;transition:all .3s;}
+.nav-dot.done{background:var(--gold);opacity:.55;}
+.nav-dot.active{background:var(--gold);box-shadow:0 0 10px var(--gold-glow);transform:scale(1.35);}
+.nav-save{font-size:12px;color:var(--text-dim);background:none;border:1px solid var(--border);border-radius:var(--radius);padding:6px 14px;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;}
+.nav-save:hover{border-color:var(--gold);color:var(--gold);}
+.step-track{padding:0 28px;background:rgba(13,15,20,.6);border-bottom:1px solid var(--border);display:flex;align-items:stretch;overflow-x:auto;scrollbar-width:none;}
+.step-track::-webkit-scrollbar{display:none;}
+.step-tab{display:flex;align-items:center;gap:9px;padding:13px 18px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:all .25s;color:var(--text-dim);font-size:12px;}
+.step-tab:hover{color:var(--text-mid);}
+.step-tab.active{border-bottom-color:var(--gold);color:var(--gold);}
+.step-tab.done{color:var(--text-mid);}
+.step-tab.done .snum,.step-tab.active .snum{background:var(--gold);color:var(--bg);}
+.step-tab.active .snum{box-shadow:0 0 12px var(--gold-glow);}
+.snum{width:21px;height:21px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;transition:all .3s;}
+.content{flex:1;padding:36px 20px 80px;display:flex;justify-content:center;}
+.panel{width:100%;max-width:700px;animation:fu .32s ease;}
+@keyframes fu{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.step-hd{margin-bottom:32px;}
+.eyebrow{font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.step-title{font-family:'Cormorant Garamond',serif;font-size:clamp(26px,4vw,40px);font-weight:300;line-height:1.15;margin-bottom:8px;}
+.step-sub{font-size:14px;color:var(--text-dim);line-height:1.7;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:18px;}
+.ctitle{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.ctitle::after{content:'';flex:1;height:1px;background:var(--border);}
+.g{display:grid;gap:14px;margin-bottom:14px;}
+.g2{grid-template-columns:1fr 1fr;}
+.g3{grid-template-columns:1fr 1fr 1fr;}
+.g1{grid-template-columns:1fr;}
+.f{display:flex;flex-direction:column;gap:6px;}
+.lbl{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);}
+.req{color:var(--gold);margin-left:2px;}
+.hint{font-size:11px;color:var(--text-dim);line-height:1.5;margin-top:1px;}
+input[type=text],input[type=email],input[type=tel],input[type=number],input[type=date],select,textarea{
+  font-family:'Outfit',sans-serif;font-size:14px;font-weight:300;color:var(--text);
+  background:var(--surface2);border:1px solid var(--border);border-radius:4px;
+  padding:9px 12px;outline:none;width:100%;transition:border-color .2s,box-shadow .2s;}
+input::placeholder,textarea::placeholder{color:var(--text-dim);opacity:.5;}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim);background:var(--bg);}
+select option{background:var(--surface2);}
+textarea{resize:vertical;min-height:78px;}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;}
+.pills input{display:none;}
+.pills label{font-size:12px;font-weight:400;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 13px;cursor:pointer;transition:all .2s;color:var(--text-mid);text-transform:none;letter-spacing:0;}
+.pills input:checked+label{background:var(--gold-dim);color:var(--gold);border-color:var(--gold);}
+.rep-item{border:1px solid var(--border);border-radius:4px;padding:15px;margin-bottom:9px;background:rgba(255,255,255,.02);position:relative;}
+.rem{position:absolute;top:9px;right:9px;background:none;border:1px solid var(--border);border-radius:3px;font-size:10px;color:var(--text-dim);font-family:'Outfit',sans-serif;padding:2px 8px;cursor:pointer;transition:all .2s;}
+.rem:hover{border-color:var(--red);color:var(--red);}
+.addrow{display:inline-flex;align-items:center;gap:6px;background:none;border:1px dashed var(--border);border-radius:4px;color:var(--text-dim);font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;padding:7px 15px;cursor:pointer;transition:all .2s;margin-top:3px;}
+.addrow:hover{border-color:var(--gold);color:var(--gold);}
+.div{border:none;border-top:1px solid var(--border);margin:18px 0;}
+.sl-row{display:flex;align-items:center;gap:12px;}
+input[type=range]{flex:1;accent-color:var(--gold);cursor:pointer;background:transparent;border:none;box-shadow:none;padding:0;height:4px;}
+.sl-val{font-size:14px;font-weight:500;color:var(--gold);min-width:42px;text-align:right;}
+.btn-row{display:flex;justify-content:space-between;align-items:center;margin-top:32px;gap:12px;}
+.btn{font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;letter-spacing:.06em;padding:12px 26px;border-radius:var(--radius);cursor:pointer;transition:all .2s;border:none;}
+.btn-ghost{background:none;border:1px solid var(--border);color:var(--text-mid);}
+.btn-ghost:hover{border-color:var(--text-mid);color:var(--text);}
+.btn-primary{background:var(--gold);color:var(--bg);font-weight:600;box-shadow:0 4px 20px var(--gold-dim);}
+.btn-primary:hover{background:#e0b55a;transform:translateY(-1px);box-shadow:0 6px 24px var(--gold-glow);}
+.btn-finish{background:none;border:1px solid var(--green);color:var(--green);}
+.btn-finish:hover{background:rgba(76,175,130,.1);}
+/* RESULTS */
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px;}
+.rc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;position:relative;overflow:hidden;}
+.rc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.rc.pos::before{background:linear-gradient(90deg,var(--green),transparent);}
+.rc.neg::before{background:linear-gradient(90deg,var(--red),transparent);}
+.rc.warn::before{background:linear-gradient(90deg,var(--amber),transparent);}
+.rc.info::before{background:linear-gradient(90deg,var(--blue),transparent);}
+.rc.gold::before{background:linear-gradient(90deg,var(--gold),transparent);}
+.rl{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:7px;}
+.rv{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;line-height:1;margin-bottom:5px;}
+.rv.pos{color:var(--green);}.rv.neg{color:var(--red);}.rv.warn{color:var(--amber);}.rv.gld{color:var(--gold);}
+.rdesc{font-size:12px;color:var(--text-dim);line-height:1.5;}
+.rbadge{display:inline-block;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:10px;margin-top:7px;}
+.bg{background:rgba(76,175,130,.15);color:var(--green);}
+.bw{background:rgba(224,156,60,.15);color:var(--amber);}
+.bb{background:rgba(224,92,92,.15);color:var(--red);}
+.bi{background:rgba(91,155,213,.15);color:var(--blue);}
+.gw{margin:7px 0 3px;}.gt{height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.gf{height:100%;border-radius:3px;transition:width 1s cubic-bezier(.4,0,.2,1);}
+.gf.gn{background:linear-gradient(90deg,#3d9b6a,#4caf82);}.gf.ga{background:linear-gradient(90deg,#c07c20,#e09c3c);}.gf.gr{background:linear-gradient(90deg,#b03030,#e05c5c);}.gf.gg{background:linear-gradient(90deg,#a07820,#d4a853);}
+.stbl{width:100%;border-collapse:collapse;font-size:13px;}
+.stbl tr{border-bottom:1px solid var(--border);}
+.stbl tr:last-child{border-bottom:none;}
+.stbl td{padding:9px 4px;color:var(--text-mid);}
+.stbl td:last-child{text-align:right;font-weight:500;color:var(--text);}
+.stbl .tr-tot td{color:var(--text);font-weight:500;padding-top:13px;border-top:1px solid var(--gold);border-bottom:none;}
+.insight{background:var(--gold-dim);border:1px solid rgba(212,168,83,.3);border-radius:var(--radius);padding:16px 18px;margin-bottom:14px;display:flex;gap:13px;}
+.iico{font-size:19px;flex-shrink:0;margin-top:1px;}
+.itxt{font-size:13px;color:var(--text-mid);line-height:1.65;}
+.itxt strong{color:var(--text);font-weight:500;}
+.alert{background:rgba(224,92,92,.07);border:1px solid rgba(224,92,92,.22);border-radius:var(--radius);padding:16px 18px;margin-bottom:14px;display:flex;gap:13px;}
+.atxt{font-size:13px;color:var(--text-mid);line-height:1.65;}
+.atxt strong{color:var(--red);font-weight:500;}
+.wmark{text-align:center;padding:18px;font-size:11px;color:var(--text-dim);border-top:1px solid var(--border);margin-top:28px;}
+@media(max-width:600px){.g2,.g3,.rgrid{grid-template-columns:1fr;}.step-track,.topnav{padding-left:14px;padding-right:14px;}.content{padding:22px 14px 60px;}}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="topnav">
+  <div class="nav-brand">Financial Portrait</div>
+  <div class="nav-dots" id="navDots"></div>
+  <button class="nav-save" onclick="saveDraft()">Save Draft</button>
+</nav>
+<div class="step-track" id="stepTrack"></div>
+<div class="content"><div class="panel" id="panel"></div></div>
+</div>
+<script>
+const STEPS=[
+  {icon:'👤',label:'Identity',   ey:'Step 1 of 10',ti:'Who Are You?',           su:'Your personal details — the foundation of your financial portrait.'},
+  {icon:'🏠',label:'Family',     ey:'Step 2 of 10',ti:'Your Family Circle',      su:'Tell us about the people who matter most in your life.'},
+  {icon:'💼',label:'Income',     ey:'Step 3 of 10',ti:'Work & Earnings',          su:'How you earn and what drives your financial engine.'},
+  {icon:'💰',label:'Assets',     ey:'Step 4 of 10',ti:'What You Own',             su:'Savings, investments, properties — your wealth base.'},
+  {icon:'📋',label:'Liabilities',ey:'Step 5 of 10',ti:'What You Owe',             su:'Loans and obligations — transparency here protects you best.'},
+  {icon:'🛡️',label:'Insurance',  ey:'Step 6 of 10',ti:'Your Protection',          su:'Existing coverage and where the gaps might be.'},
+  {icon:'❤️',label:'Health',     ey:'Step 7 of 10',ti:'Your Wellbeing',           su:'A brief health snapshot — relevant for coverage and planning.'},
+  {icon:'🎯',label:'Goals',      ey:'Step 8 of 10',ti:'Dreams & Destinations',   su:"What you're building towards — retirement, family, legacy."},
+  {icon:'⚖️',label:'Risk',       ey:'Step 9 of 10',ti:'Your Investment Persona', su:'How you feel about risk shapes every recommendation we make.'},
+  {icon:'📊',label:'Results',    ey:'Step 10 of 10',ti:'Your Financial Portrait',su:'A calculated snapshot of where you stand today.'},
+];
+const D={
+  fullName:'',preferredName:'',nric:'',dob:'',gender:'',email:'',phone:'',address:'',nationality:'',marital:'',
+  spouseName:'',spouseNric:'',spouseDob:'',
+  kids:[],parents:[],
+  empType:'',industry:'',employer:'',jobTitle:'',monthlyIncome:0,otherIncome:0,
+  bizName:'',bizReg:'',bizType:'',bizRevenue:0,
+  savings:0,epf:0,unitTrusts:0,stocks:0,bonds:0,otherInvest:0,properties:[],
+  loans:[],monthlyExpenses:0,creditCard:0,
+  coverageTypes:[],policies:[],medLimit:'',groupBenefits:'',
+  healthStatus:'',smokes:'',conditions:'',familyHistory:'',
+  lifeGoals:[],retireAge:60,retireIncome:0,retireStyle:'',purchases:[],eduGoals:[],
+  riskDrop:'',riskApproach:'',timeHorizon:'',investPct:10,
+  hasWill:'',hasLpa:'',hasTrust:'',hasBeneficiary:'',additionalNotes:'',
+};
+let cur=0,kc=0,pc=0,propc=0,lc=0,polc=0,prc=0,ec=0;
+
+function ni(id,ph,val){return `<input type="number" id="${id}" placeholder="${ph}" value="${val||''}" oninput="D.${id}=parseFloat(this.value)||0;recalc()">`;}
+function ti(id,ph,val){return `<input type="text" id="${id}" placeholder="${ph}" value="${val||''}" oninput="D.${id}=this.value">`;}
+function di(id,val){return `<input type="date" id="${id}" value="${val||''}" oninput="D.${id}=this.value">`;}
+function ei(id,ph,val){return `<input type="email" id="${id}" placeholder="${ph}" value="${val||''}" oninput="D.${id}=this.value">`;}
+function pi(id,ph,val){return `<input type="tel" id="${id}" placeholder="${ph}" value="${val||''}" oninput="D.${id}=this.value">`;}
+function ta(id,ph,val){return `<textarea id="${id}" placeholder="${ph}" oninput="D.${id}=this.value">${val||''}</textarea>`;}
+function pills(nm,opts,cur,multi){
+  return '<div class="pills">'+opts.map((o,i)=>{
+    const type=multi?'checkbox':'radio';const id=nm+'_'+i;
+    const chk=multi?(cur||[]).includes(o):(cur===o)?'checked':'';
+    const cb=multi
+      ?`onchange="if(this.checked){if(!D.${nm})D.${nm}=[];if(!D.${nm}.includes('${o}'))D.${nm}.push('${o}');}else{D.${nm}=(D.${nm}||[]).filter(x=>x!=='${o}');}recalc()"`
+      :`onchange="D.${nm}='${o}';recalc()"`;
+    return `<input type="${type}" name="${nm}" id="${id}" ${chk} ${cb}><label for="${id}">${o}</label>`;
+  }).join('')+'</div>';
+}
+function f(label,inp,hint,req){return `<div class="f"><label class="lbl">${label}${req?'<span class="req">*</span>':''}</label>${inp}${hint?`<span class="hint">${hint}</span>`:''}</div>`;}
+function g2(a,b){return `<div class="g g2">${a}${b}</div>`;}
+function g3(a,b,c){return `<div class="g g3">${a}${b}${c}</div>`;}
+function g1(a){return `<div class="g g1">${a}</div>`;}
+
+function stepHTML(n){
+  switch(n){
+  case 0:return`
+    <div class="card"><div class="ctitle">Personal Details</div>
+    ${g2(f('Full Name',ti('fullName','As per NRIC / Passport',D.fullName),'',true),f('Preferred Name',ti('preferredName','What should we call you?',D.preferredName)))}
+    ${g3(f('NRIC / Passport No.',ti('nric','e.g. 901231-14-1234',D.nric),'',true),f('Date of Birth',di('dob',D.dob)),f('Gender',pills('gender',['Male','Female','Prefer not to say'],D.gender)))}
+    ${g2(f('Email Address',ei('email','your@email.com',D.email)),f('Mobile Number',pi('phone','+60 12-345 6789',D.phone)))}
+    ${g1(f('Residential Address',ta('address','Street, city, postcode...',D.address)))}
+    ${g2(f('Nationality',ti('nationality','e.g. Malaysian',D.nationality)),f('Marital Status',pills('marital',['Single','Married','Divorced','Widowed'],D.marital)))}
+    </div>`;
+  case 1:return`
+    <div class="card"><div class="ctitle">Spouse / Partner</div>
+    ${g3(f('Full Name',ti('spouseName',"Spouse's name",D.spouseName)),f('NRIC / ID',ti('spouseNric','ID number',D.spouseNric)),f('Date of Birth',di('spouseDob',D.spouseDob)))}
+    </div>
+    <div class="card"><div class="ctitle">Children</div>
+    <div id="kidsRep">${D.kids.map((k,i)=>kidRowHTML(k,i)).join('')}</div>
+    <button class="addrow" onclick="addKid()">＋ Add a Child</button></div>
+    <div class="card"><div class="ctitle">Parents &amp; Dependants</div>
+    <div id="parsRep">${D.parents.map((p,i)=>parRowHTML(p,i)).join('')}</div>
+    <button class="addrow" onclick="addPar()">＋ Add a Parent / Dependant</button></div>`;
+  case 2:return`
+    <div class="card"><div class="ctitle">Employment</div>
+    ${g2(f('Employment Status',pills('empType',['Employed','Self-Employed','Business Owner','Retired'],D.empType)),f('Industry / Sector',ti('industry','e.g. Healthcare, Finance',D.industry)))}
+    ${g2(f('Employer / Company',ti('employer','Where you work',D.employer)),f('Job Title',ti('jobTitle','e.g. Senior Manager',D.jobTitle)))}
+    ${g2(f('Monthly Gross Income (RM)',ni('monthlyIncome','e.g. 8500',D.monthlyIncome),'Salary + allowances + regular bonuses'),f('Other Monthly Income (RM)',ni('otherIncome','Rental, freelance, dividends...',D.otherIncome)))}
+    </div>
+    <div class="card"><div class="ctitle">Business Details <span style="font-weight:300;color:var(--text-dim);text-transform:none;letter-spacing:0;font-size:11px;margin-left:6px">(if applicable)</span></div>
+    ${g2(f('Business Name',ti('bizName','Registered name',D.bizName)),f('Registration No.',ti('bizReg','SSM number',D.bizReg)))}
+    ${g2(f('Business Type',pills('bizType',['Sole Prop.','Partnership','Sdn Bhd','Berhad'],D.bizType)),f('Annual Revenue (RM)',ni('bizRevenue','Approximate turnover',D.bizRevenue)))}
+    </div>`;
+  case 3:return`
+    <div class="card"><div class="ctitle">Cash &amp; Savings</div>
+    ${g2(f('Total Bank Savings / Deposits (RM)',ni('savings','Current + fixed deposits',D.savings)),f('EPF / Retirement Fund (RM)',ni('epf','Latest statement balance',D.epf)))}
+    </div>
+    <div class="card"><div class="ctitle">Investments</div>
+    ${g2(f('Unit Trusts / Mutual Funds (RM)',ni('unitTrusts','Current value',D.unitTrusts)),f('Stocks / Shares (RM)',ni('stocks','Portfolio value',D.stocks)))}
+    ${g2(f('Bonds / Sukuk (RM)',ni('bonds','Total value',D.bonds)),f('Other Investments (RM)',ni('otherInvest','Crypto, gold, PE...',D.otherInvest)))}
+    </div>
+    <div class="card"><div class="ctitle">Properties</div>
+    <div id="propRep">${D.properties.map((p,i)=>propRowHTML(p,i)).join('')}</div>
+    <button class="addrow" onclick="addProp()">＋ Add a Property</button></div>`;
+  case 4:return`
+    <div class="card"><div class="ctitle">Loans</div>
+    <p class="hint" style="margin-bottom:14px">Being transparent here helps us size the right protection for you.</p>
+    <div id="loansRep">${D.loans.map((l,i)=>loanRowHTML(l,i)).join('')}</div>
+    <button class="addrow" onclick="addLoan()">＋ Add a Loan</button></div>
+    <div class="card"><div class="ctitle">Monthly Obligations</div>
+    ${g2(f('Total Monthly Living Expenses (RM)',ni('monthlyExpenses','Household, food, utilities, lifestyle...',D.monthlyExpenses),'Estimate all monthly outgoings'),f('Credit Card Outstanding (RM)',ni('creditCard','Total unpaid balance across all cards',D.creditCard)))}
+    </div>`;
+  case 5:return`
+    <div class="card"><div class="ctitle">Coverage Types</div>
+    ${f('What types of coverage do you currently have?',pills('coverageTypes',['Life','Medical / Hospitalisation','Critical Illness','Personal Accident','General (Motor/Home)','None yet'],D.coverageTypes,true))}
+    </div>
+    <div class="card"><div class="ctitle">Life &amp; Investment-Linked Policies</div>
+    <div id="polsRep">${D.policies.map((p,i)=>polRowHTML(p,i)).join('')}</div>
+    <button class="addrow" onclick="addPol()">＋ Add a Policy</button></div>
+    <div class="card"><div class="ctitle">Other Coverage</div>
+    ${g2(f('Medical Card Annual Limit (RM)',ti('medLimit','e.g. 150000',D.medLimit)),f('Employer Group Benefits?',pills('groupBenefits',['Yes','No','Not sure'],D.groupBenefits)))}
+    </div>`;
+  case 6:return`
+    <div class="card"><div class="ctitle">Health Status</div>
+    ${g2(f('How would you describe your current health?',pills('healthStatus',['Excellent','Good','Average','Managing a condition'],D.healthStatus)),f('Do you smoke?',pills('smokes',['Yes','No','Ex-smoker'],D.smokes)))}
+    ${g1(f('Any pre-existing medical conditions?',ta('conditions','e.g. diabetes, hypertension — or write "None".',D.conditions)))}
+    ${g1(f('Family medical history (optional)',ta('familyHistory','Any hereditary conditions in your immediate family?',D.familyHistory)))}
+    </div>`;
+  case 7:return`
+    <div class="card"><div class="ctitle">Life Goals</div>
+    ${f('What are your top financial goals?',pills('lifeGoals',['Comfortable Retirement',"Children's Education",'Buy a Home','Buy a Car','Grow My Business','Build Emergency Fund','Travel & Experiences','Leave a Legacy'],D.lifeGoals,true))}
+    </div>
+    <div class="card"><div class="ctitle">Retirement</div>
+    ${g3(f('Target Retirement Age',ni('retireAge','e.g. 60',D.retireAge)),f('Desired Monthly Income in Retirement (RM)',ni('retireIncome','What you\'d like to live on',D.retireIncome)),f('Retirement Lifestyle',pills('retireStyle',['Modest','Comfortable','Affluent'],D.retireStyle)))}
+    </div>
+    <div class="card"><div class="ctitle">Planned Purchases</div>
+    <div id="pursRep">${D.purchases.map((p,i)=>purRowHTML(p,i)).join('')}</div>
+    <button class="addrow" onclick="addPur()">＋ Add a Purchase Goal</button></div>
+    <div class="card"><div class="ctitle">Education Goals</div>
+    <div id="edusRep">${D.eduGoals.map((e,i)=>eduRowHTML(e,i)).join('')}</div>
+    <button class="addrow" onclick="addEdu()">＋ Add an Education Goal</button></div>`;
+  case 8:return`
+    <div class="card"><div class="ctitle">Investment Behaviour</div>
+    ${g2(f('If your portfolio dropped 20%, you would…',pills('riskDrop',['Sell immediately','Wait and see','Hold my ground','Buy more — great opportunity!'],D.riskDrop)),f('Your investment approach leans towards…',pills('riskApproach',['Capital preservation','Steady income','Balanced growth','Aggressive growth'],D.riskApproach)))}
+    ${g2(f('Investment Time Horizon',pills('timeHorizon',['Short (<3 yrs)','Medium (3–7 yrs)','Long (7+ yrs)'],D.timeHorizon)),f('% of monthly income comfortable investing',`<div class="sl-row"><input type="range" min="0" max="50" value="${D.investPct}" oninput="D.investPct=parseInt(this.value);document.getElementById('ipv').textContent=this.value+'%';recalc()"><span class="sl-val" id="ipv">${D.investPct}%</span></div>`,'Percentage of monthly income'))}
+    </div>
+    <div class="card"><div class="ctitle">Legacy &amp; Estate</div>
+    ${g2(f('Do you have a valid Will (Wasiat)?',pills('hasWill',['Yes','No','In progress'],D.hasWill)),f('Lasting Power of Attorney (LPA)?',pills('hasLpa',['Yes','No','Not sure what this is'],D.hasLpa)))}
+    ${g2(f('Trust set up?',pills('hasTrust',['Yes','No'],D.hasTrust)),f('Beneficiaries nominated for EPF &amp; policies?',pills('hasBeneficiary',['Yes, all done','Some, not all','Not yet'],D.hasBeneficiary)))}
+    ${g1(f("Anything else you'd like us to know?",ta('additionalNotes','Upcoming life changes, specific concerns, questions for your advisor...',D.additionalNotes)))}
+    </div>`;
+  case 9: return buildResults();
+  }
+}
+
+function kidRowHTML(k,i){kc++;const id=kc;return`<div class="rep-item" id="kid_${id}"><button class="rem" onclick="document.getElementById('kid_${id}').remove()">✕</button><div class="g g3"><div class="f"><label class="lbl">Name</label><input type="text" placeholder="Child's name" value="${k.name||''}" oninput="D.kids[${i}].name=this.value"></div><div class="f"><label class="lbl">NRIC / ID</label><input type="text" placeholder="ID" value="${k.nric||''}" oninput="D.kids[${i}].nric=this.value"></div><div class="f"><label class="lbl">Date of Birth</label><input type="date" value="${k.dob||''}" oninput="D.kids[${i}].dob=this.value"></div></div></div>`;}
+function parRowHTML(p,i){pc++;const id=pc;return`<div class="rep-item" id="par_${id}"><button class="rem" onclick="document.getElementById('par_${id}').remove()">✕</button><div class="g g2"><div class="f"><label class="lbl">Name</label><input type="text" placeholder="Name" value="${p.name||''}" oninput="D.parents[${i}].name=this.value"></div><div class="f"><label class="lbl">Relationship</label><div class="pills"><input type="radio" name="parrel_${id}" id="prr${id}f" ${p.rel==='Father'?'checked':''} onchange="D.parents[${i}].rel='Father'"><label for="prr${id}f">Father</label><input type="radio" name="parrel_${id}" id="prr${id}m" ${p.rel==='Mother'?'checked':''} onchange="D.parents[${i}].rel='Mother'"><label for="prr${id}m">Mother</label><input type="radio" name="parrel_${id}" id="prr${id}o" ${p.rel==='Other'?'checked':''} onchange="D.parents[${i}].rel='Other'"><label for="prr${id}o">Other</label></div></div></div><div class="g g2"><div class="f"><label class="lbl">NRIC / ID</label><input type="text" placeholder="ID" value="${p.nric||''}" oninput="D.parents[${i}].nric=this.value"></div><div class="f"><label class="lbl">Financially dependent on you?</label><div class="pills"><input type="radio" name="pardep_${id}" id="pde${id}y" ${p.dep==='Yes'?'checked':''} onchange="D.parents[${i}].dep='Yes'"><label for="pde${id}y">Yes</label><input type="radio" name="pardep_${id}" id="pde${id}n" ${p.dep==='No'?'checked':''} onchange="D.parents[${i}].dep='No'"><label for="pde${id}n">No</label></div></div></div></div>`;}
+function propRowHTML(p,i){propc++;const id=propc;return`<div class="rep-item" id="prop_${id}"><button class="rem" onclick="document.getElementById('prop_${id}').remove();recalc()">✕</button><div class="g g2"><div class="f"><label class="lbl">Description</label><input type="text" placeholder="e.g. Condo in PJ" value="${p.desc||''}" oninput="D.properties[${i}].desc=this.value"></div><div class="f"><label class="lbl">Market Value (RM)</label><input type="number" placeholder="0" value="${p.value||''}" oninput="D.properties[${i}].value=parseFloat(this.value)||0;recalc()"></div></div><div class="g g2"><div class="f"><label class="lbl">Usage</label><div class="pills"><input type="radio" name="pu_${id}" id="pu${id}o" ${p.use==='Own Stay'?'checked':''} onchange="D.properties[${i}].use='Own Stay'"><label for="pu${id}o">Own Stay</label><input type="radio" name="pu_${id}" id="pu${id}i" ${p.use==='Investment'?'checked':''} onchange="D.properties[${i}].use='Investment'"><label for="pu${id}i">Investment</label><input type="radio" name="pu_${id}" id="pu${id}b" ${p.use==='Business'?'checked':''} onchange="D.properties[${i}].use='Business'"><label for="pu${id}b">Business</label></div></div><div class="f"><label class="lbl">Monthly Rental (RM)</label><input type="number" placeholder="0" value="${p.rental||''}" oninput="D.properties[${i}].rental=parseFloat(this.value)||0;recalc()"></div></div></div>`;}
+function loanRowHTML(l,i){lc++;const id=lc;return`<div class="rep-item" id="loan_${id}"><button class="rem" onclick="document.getElementById('loan_${id}').remove();recalc()">✕</button><div class="g g3"><div class="f"><label class="lbl">Loan Type</label><div class="pills"><input type="radio" name="lt_${id}" id="lt${id}h" ${l.type==='Home'?'checked':''} onchange="D.loans[${i}].type='Home'"><label for="lt${id}h">Home</label><input type="radio" name="lt_${id}" id="lt${id}c" ${l.type==='Car'?'checked':''} onchange="D.loans[${i}].type='Car'"><label for="lt${id}c">Car</label><input type="radio" name="lt_${id}" id="lt${id}p" ${l.type==='Personal'?'checked':''} onchange="D.loans[${i}].type='Personal'"><label for="lt${id}p">Personal</label><input type="radio" name="lt_${id}" id="lt${id}b" ${l.type==='Business'?'checked':''} onchange="D.loans[${i}].type='Business'"><label for="lt${id}b">Business</label></div></div><div class="f"><label class="lbl">Outstanding (RM)</label><input type="number" placeholder="0" value="${l.balance||''}" oninput="D.loans[${i}].balance=parseFloat(this.value)||0;recalc()"></div><div class="f"><label class="lbl">Monthly Repayment (RM)</label><input type="number" placeholder="0" value="${l.monthly||''}" oninput="D.loans[${i}].monthly=parseFloat(this.value)||0;recalc()"></div></div></div>`;}
+function polRowHTML(p,i){polc++;const id=polc;return`<div class="rep-item" id="pol_${id}"><button class="rem" onclick="document.getElementById('pol_${id}').remove();recalc()">✕</button><div class="g g3"><div class="f"><label class="lbl">Insurer</label><input type="text" placeholder="e.g. AIA, Prudential" value="${p.name||''}" oninput="D.policies[${i}].name=this.value"></div><div class="f"><label class="lbl">Sum Assured (RM)</label><input type="number" placeholder="0" value="${p.sum||''}" oninput="D.policies[${i}].sum=parseFloat(this.value)||0;recalc()"></div><div class="f"><label class="lbl">Monthly Premium (RM)</label><input type="number" placeholder="0" value="${p.prem||''}" oninput="D.policies[${i}].prem=parseFloat(this.value)||0;recalc()"></div></div></div>`;}
+function purRowHTML(p,i){prc++;const id=prc;return`<div class="rep-item" id="pur_${id}"><button class="rem" onclick="document.getElementById('pur_${id}').remove();recalc()">✕</button><div class="g g3"><div class="f"><label class="lbl">Purchase Type</label><div class="pills"><input type="radio" name="pt_${id}" id="pt${id}c" ${p.type==='Car'?'checked':''} onchange="D.purchases[${i}].type='Car'"><label for="pt${id}c">Car</label><input type="radio" name="pt_${id}" id="pt${id}h" ${p.type==='House'?'checked':''} onchange="D.purchases[${i}].type='House'"><label for="pt${id}h">House</label><input type="radio" name="pt_${id}" id="pt${id}t" ${p.type==='Travel'?'checked':''} onchange="D.purchases[${i}].type='Travel'"><label for="pt${id}t">Travel</label><input type="radio" name="pt_${id}" id="pt${id}o" ${p.type==='Other'?'checked':''} onchange="D.purchases[${i}].type='Other'"><label for="pt${id}o">Other</label></div></div><div class="f"><label class="lbl">Estimated Cost (RM)</label><input type="number" placeholder="0" value="${p.cost||''}" oninput="D.purchases[${i}].cost=parseFloat(this.value)||0;recalc()"></div><div class="f"><label class="lbl">Target Year</label><input type="number" placeholder="2028" value="${p.year||''}" oninput="D.purchases[${i}].year=this.value"></div></div></div>`;}
+function eduRowHTML(e,i){ec++;const id=ec;return`<div class="rep-item" id="edu_${id}"><button class="rem" onclick="document.getElementById('edu_${id}').remove();recalc()">✕</button><div class="g g3"><div class="f"><label class="lbl">For whom?</label><input type="text" placeholder="Child's name" value="${e.name||''}" oninput="D.eduGoals[${i}].name=this.value"></div><div class="f"><label class="lbl">Level</label><div class="pills"><input type="radio" name="el_${id}" id="el${id}s" ${e.level==='School'?'checked':''} onchange="D.eduGoals[${i}].level='School'"><label for="el${id}s">School</label><input type="radio" name="el_${id}" id="el${id}c" ${e.level==='College'?'checked':''} onchange="D.eduGoals[${i}].level='College'"><label for="el${id}c">College</label><input type="radio" name="el_${id}" id="el${id}u" ${e.level==='University'?'checked':''} onchange="D.eduGoals[${i}].level='University'"><label for="el${id}u">University</label><input type="radio" name="el_${id}" id="el${id}o" ${e.level==='Overseas'?'checked':''} onchange="D.eduGoals[${i}].level='Overseas'"><label for="el${id}o">Overseas</label></div></div><div class="f"><label class="lbl">Target Fund (RM)</label><input type="number" placeholder="0" value="${e.fund||''}" oninput="D.eduGoals[${i}].fund=parseFloat(this.value)||0;recalc()"></div></div></div>`;}
+
+function addKid(){const i=D.kids.length;D.kids.push({});kc++;const id=kc;const d=document.createElement('div');d.id='kid_'+id;d.className='rep-item';d.innerHTML=`<button class="rem" onclick="document.getElementById('kid_${id}').remove()">✕</button><div class="g g3"><div class="f"><label class="lbl">Name</label><input type="text" placeholder="Child's name" oninput="D.kids[${i}].name=this.value"></div><div class="f"><label class="lbl">NRIC / ID</label><input type="text" placeholder="ID" oninput="D.kids[${i}].nric=this.value"></div><div class="f"><label class="lbl">Date of Birth</label><input type="date" oninput="D.kids[${i}].dob=this.value"></div></div>`;document.getElementById('kidsRep').appendChild(d);}
+function addPar(){const i=D.parents.length;D.parents.push({});pc++;const id=pc;const d=document.createElement('div');d.id='par_'+id;d.className='rep-item';d.innerHTML=`<button class="rem" onclick="document.getElementById('par_${id}').remove()">✕</button><div class="g g2"><div class="f"><label class="lbl">Name</label><input type="text" placeholder="Name" oninput="D.parents[${i}].name=this.value"></div><div class="f"><label class="lbl">Relationship</label><div class="pills"><input type="radio" name="parrel_${id}" id="prr${id}f" onchange="D.parents[${i}].rel='Father'"><label for="prr${id}f">Father</label><input type="radio" name="parrel_${id}" id="prr${id}m" onchange="D.parents[${i}].rel='Mother'"><label for="prr${id}m">Mother</label><input type="radio" name="parrel_${id}" id="prr${id}o" onchange="D.parents[${i}].rel='Other'"><label for="prr${id}o">Other</label></div></div></div><div class="g g2"><div class="f"><label class="lbl">NRIC / ID</label><input type="text" placeholder="ID" oninput="D.parents[${i}].nric=this.value"></div><div class="f"><label class="lbl">Financially dependent?</label><div class="pills"><input type="radio" name="pardep_${id}" id="pde${id}y" onchange="D.parents[${i}].dep='Yes'"><label for="pde${id}y">Yes</label><input type="radio" name="pardep_${id}" id="pde${id}n" onchange="D.parents[${i}].dep='No'"><label for="pde${id}n">No</label></div></div></div>`;document.getElementById('parsRep').appendChild(d);}
+function addProp(){const i=D.properties.length;D.properties.push({});propc++;const id=propc;const d=document.createElement('div');d.id='prop_'+id;d.className='rep-item';d.innerHTML=`<button class="rem" onclick="document.getElementById('prop_${id}').remove();recalc()">✕</button><div class="g g2"><div class="f"><label class="lbl">Description</label><input type="text" placeholder="e.g. Terrace in Subang" oninput="D.properties[${i}].desc=this.value"></div><div class="f"><label class="lbl">Market Value (RM)</label><input type="number" placeholder="0" oninput="D.properties[${i}].value=parseFloat(this.value)||0;recalc()"></div></div><div class="g g2"><div class="f"><label class="lbl">Usage</label><div class="pills"><input type="radio" name="pu_${id}" id="pu${id}o" onchange="D.properties[${i}].use='Own Stay'"><label for="pu${id}o">Own Stay</label><input type="radio" name="pu_${id}" id="pu${id}i" onchange="D.properties[${i}].use='Investment'"><label for="pu${id}i">Investment</label><input type="radio" name="pu_${id}" id="pu${id}b" onchange="D.properties[${i}].use='Business'"><label for="pu${id}b">Business</label></div></div><div class="f"><label class="lbl">Monthly Rental (RM)</label><input type="number" placeholder="0" oninput="D.properties[${i}].rental=parseFloat(this.value)||0;recalc()"></div></div>`;document.getElementById('propRep').appendChild(d);}
+function addLoan(){const i=D.loans.length;D.loans.push({});lc++;const id=lc;const d=document.createElement('div');d.id='loan_'+id;d.className='rep-item';d.innerHTML=`<button class="rem" onclick="document.getElementById('loan_${id}').remove();recalc()">✕</button><div class="g g3"><div class="f"><label class="lbl">Loan Type</label><div class="pills"><input type="radio" name="lt_${id}" id="lt${id}h" onchange="D.loans[${i}].type='Home'"><label for="lt${id}h">Home</label><input type="radio" name="lt_${id}" id="lt${id}c" onchange="D.loans[${i}].type='Car'"><label for="lt${id}c">Car</label><input type="radio" name="lt_${id}" id="lt${id}p" onchange="D.loans[${i}].type='Personal'"><label for="lt${id}p">Personal</label><input type="radio" name="lt_${id}" id="lt${id}b" onchange="D.loans[${i}].type='Business'"><label for="lt${id}b">Business</label></div></div><div class="f"><label class="lbl">Outstanding (RM)</label><input type="number" placeholder="0" oninput="D.loans[${i}].balance=parseFloat(this.value)||0;recalc()"></div><div class="f"><label class="lbl">Monthly Repayment (RM)</label><input type="number" placeholder="0" oninput="D.loans[${i}].monthly=parseFloat(this.value)||0;recalc()"></div></div>`;document.getElementById('loansRep').appendChild(d);}
+function addPol(){const i=D.policies.length;D.policies.push({});polc++;const id=polc;const d=document.createElement('div');d.id='pol_'+id;d.className='rep-item';d.innerHTML=`<button class="rem" onclick="document.getElementById('pol_${id}').remove();recalc()">✕</button><div class="g g3"><div class="f"><label class="lbl">Insurer</label><input type="text" placeholder="e.g. AIA, Great Eastern" oninput="D.policies[${i}].name=this.value"></div><div class="f"><label class="lbl">Sum Assured (RM)</label><input type="number" placeholder="0" oninput="D.policies[${i}].sum=parseFloat(this.value)||0;recalc()"></div><div class="f"><label class="lbl">Monthly Premium (RM)</label><input type="number" placeholder="0" oninput="D.policies[${i}].prem=parseFloat(this.value)||0;recalc()"></div></div>`;document.getElementById('polsRep').appendChild(d);}
+function addPur(){const i=D.purchases.length;D.purchases.push({});prc++;const id=prc;const d=document.createElement('div');d.id='pur_'+id;d.className='rep-item';d.innerHTML=`<button class="rem" onclick="document.getElementById('pur_${id}').remove();recalc()">✕</button><div class="g g3"><div class="f"><label class="lbl">Purchase Type</label><div class="pills"><input type="radio" name="pt_${id}" id="pt${id}c" onchange="D.purchases[${i}].type='Car'"><label for="pt${id}c">Car</label><input type="radio" name="pt_${id}" id="pt${id}h" onchange="D.purchases[${i}].type='House'"><label for="pt${id}h">House</label><input type="radio" name="pt_${id}" id="pt${id}t" onchange="D.purchases[${i}].type='Travel'"><label for="pt${id}t">Travel</label><input type="radio" name="pt_${id}" id="pt${id}o" onchange="D.purchases[${i}].type='Other'"><label for="pt${id}o">Other</label></div></div><div class="f"><label class="lbl">Estimated Cost (RM)</label><input type="number" placeholder="0" oninput="D.purchases[${i}].cost=parseFloat(this.value)||0;recalc()"></div><div class="f"><label class="lbl">Target Year</label><input type="number" placeholder="2028" oninput="D.purchases[${i}].year=this.value"></div></div>`;document.getElementById('pursRep').appendChild(d);}
+function addEdu(){const i=D.eduGoals.length;D.eduGoals.push({});ec++;const id=ec;const d=document.createElement('div');d.id='edu_'+id;d.className='rep-item';d.innerHTML=`<button class="rem" onclick="document.getElementById('edu_${id}').remove();recalc()">✕</button><div class="g g3"><div class="f"><label class="lbl">For whom?</label><input type="text" placeholder="Child's name" oninput="D.eduGoals[${i}].name=this.value"></div><div class="f"><label class="lbl">Level</label><div class="pills"><input type="radio" name="el_${id}" id="el${id}s" onchange="D.eduGoals[${i}].level='School'"><label for="el${id}s">School</label><input type="radio" name="el_${id}" id="el${id}c" onchange="D.eduGoals[${i}].level='College'"><label for="el${id}c">College</label><input type="radio" name="el_${id}" id="el${id}u" onchange="D.eduGoals[${i}].level='University'"><label for="el${id}u">University</label><input type="radio" name="el_${id}" id="el${id}o" onchange="D.eduGoals[${i}].level='Overseas'"><label for="el${id}o">Overseas</label></div></div><div class="f"><label class="lbl">Target Fund (RM)</label><input type="number" placeholder="0" oninput="D.eduGoals[${i}].fund=parseFloat(this.value)||0;recalc()"></div></div>`;document.getElementById('edusRep').appendChild(d);}
+
+// ── CALCULATIONS ──
+function calc(){
+  const ti=(D.monthlyIncome||0)+(D.otherIncome||0);
+  const pv=D.properties.reduce((s,p)=>s+(p.value||0),0);
+  const ta=(D.savings||0)+(D.epf||0)+(D.unitTrusts||0)+(D.stocks||0)+(D.bonds||0)+(D.otherInvest||0)+pv;
+  const lb=D.loans.reduce((s,l)=>s+(l.balance||0),0);
+  const tl=lb+(D.creditCard||0);
+  const nw=ta-tl;
+  const lm=D.loans.reduce((s,l)=>s+(l.monthly||0),0);
+  const dsr=ti>0?(lm/ti)*100:0;
+  const sa=D.policies.reduce((s,p)=>s+(p.sum||0),0);
+  const ai=ti*12;
+  const pn=ai*10;
+  const pg=pn-sa;
+  const et=(D.monthlyExpenses||0)*6;
+  const ea=D.savings||0;
+  const ec2=et>0?(ea/et)*100:100;
+  const rc=(D.retireIncome||0)*12*25;
+  const ms=ti-lm-(D.monthlyExpenses||0);
+  return{ti,pv,ta,lb,tl,nw,lm,dsr,sa,ai,pn,pg,et,ea,ec:ec2,rc,ms};
+}
+function fmt(n){
+  if(!n&&n!==0)return'—';
+  if(Math.abs(n)>=1e6)return'RM '+(n/1e6).toFixed(2)+'M';
+  if(Math.abs(n)>=1e3)return'RM '+(n/1e3).toFixed(1)+'K';
+  return'RM '+Math.round(n).toLocaleString();
+}
+
+function buildResults(){
+  const R=calc();
+  const nm=D.preferredName||D.fullName||'Client';
+  const nwc=R.nw>=0?'pos':'neg';
+  const nwb=R.nw>500000?'bg':R.nw>0?'bi':'bb';
+  const nwl=R.nw>500000?'Strong Position':R.nw>0?'Positive Net Worth':'Liabilities Exceed Assets';
+  const dsrc=R.dsr<30?'pos':R.dsr<40?'warn':'neg';
+  const dsrb=R.dsr<30?'bg':R.dsr<40?'bw':'bb';
+  const dsrl=R.dsr<30?'Healthy (<30%)':R.dsr<40?'Caution (30–40%)':'High Risk (>40%)';
+  const dsrg=R.dsr<30?'gn':R.dsr<40?'ga':'gr';
+  const dsrw=Math.min(100,(R.dsr/60)*100);
+  const pgc=R.pg<=0?'pos':'neg';
+  const pgb=R.pg<=0?'bg':R.pg<R.ai*5?'bw':'bb';
+  const pgl=R.pg<=0?'Fully Covered':R.pg<R.ai*5?'Partial Gap':'Significant Gap';
+  const ecc=R.ec>=100?'pos':R.ec>=50?'warn':'neg';
+  const ecb=R.ec>=100?'bg':R.ec>=50?'bw':'bb';
+  const ecl=R.ec>=100?'Target Met':`${Math.round(R.ec)}% of 6-Month Target`;
+  const ecg=R.ec>=100?'gn':R.ec>=50?'ga':'gr';
+  const ecw=Math.min(100,R.ec);
+  const svc=R.ms>=0?'pos':'neg';
+  const svb=R.ms>0?'bg':'bb';
+  const svl=R.ms>0?'Positive Cash Flow':'Cash Flow Deficit';
+  return`
+  <div class="insight"><span class="iico">✦</span><div class="itxt">Hello, <strong>${nm}</strong>. Here is your calculated financial portrait. These metrics are for advisory purposes and should be reviewed with your financial planner.</div></div>
+  <div class="rgrid">
+    <div class="rc ${nwc}"><div class="rl">Net Worth</div><div class="rv ${nwc}">${fmt(R.nw)}</div><div class="rdesc">Total Assets minus Total Liabilities</div><span class="rbadge ${nwb}">${nwl}</span></div>
+    <div class="rc ${pgc}"><div class="rl">Life Coverage Gap</div><div class="rv ${pgc}">${R.pg<=0?'No Gap':fmt(R.pg)}</div><div class="rdesc">10× annual income rule. Need: ${fmt(R.pn)} · Have: ${fmt(R.sa)}</div><span class="rbadge ${pgb}">${pgl}</span></div>
+    <div class="rc ${dsrc}"><div class="rl">Debt Service Ratio (DSR)</div><div class="rv ${dsrc}">${R.dsr.toFixed(1)}%</div><div class="gw"><div class="gt"><div class="gf ${dsrg}" style="width:${dsrw}%"></div></div></div><div class="rdesc">Monthly loan repayments ÷ gross income. Bank threshold ~60–70%.</div><span class="rbadge ${dsrb}">${dsrl}</span></div>
+    <div class="rc ${ecc}"><div class="rl">Emergency Fund</div><div class="rv ${ecc}">${fmt(R.ea)}</div><div class="gw"><div class="gt"><div class="gf ${ecg}" style="width:${ecw}%"></div></div></div><div class="rdesc">6-month target: ${fmt(R.et)}</div><span class="rbadge ${ecb}">${ecl}</span></div>
+    <div class="rc ${svc}"><div class="rl">Monthly Surplus / Deficit</div><div class="rv ${svc}">${fmt(R.ms)}</div><div class="rdesc">Income minus loan repayments and living expenses</div><span class="rbadge ${svb}">${svl}</span></div>
+    <div class="rc gold"><div class="rl">Retirement Corpus Needed</div><div class="rv gld">${R.rc>0?fmt(R.rc):'—'}</div><div class="rdesc">25× desired annual retirement income (${fmt((D.retireIncome||0)*12)} p.a.)</div><span class="rbadge bi">25× Rule of Thumb</span></div>
+  </div>
+  <div class="card"><div class="ctitle">Financial Breakdown</div>
+  <table class="stbl">
+    <tr><td>💰 Total Assets</td><td>${fmt(R.ta)}</td></tr>
+    <tr><td>&nbsp;&nbsp;&nbsp;↳ Cash &amp; Savings (incl. EPF)</td><td>${fmt((D.savings||0)+(D.epf||0))}</td></tr>
+    <tr><td>&nbsp;&nbsp;&nbsp;↳ Investments</td><td>${fmt((D.unitTrusts||0)+(D.stocks||0)+(D.bonds||0)+(D.otherInvest||0))}</td></tr>
+    <tr><td>&nbsp;&nbsp;&nbsp;↳ Properties</td><td>${fmt(R.pv)}</td></tr>
+    <tr><td>📋 Total Liabilities</td><td style="color:var(--red)">${fmt(R.tl)}</td></tr>
+    <tr><td>&nbsp;&nbsp;&nbsp;↳ Loan Balances</td><td style="color:var(--red)">${fmt(R.lb)}</td></tr>
+    <tr><td>&nbsp;&nbsp;&nbsp;↳ Credit Card Outstanding</td><td style="color:var(--red)">${fmt(D.creditCard||0)}</td></tr>
+    <tr class="tr-tot"><td>Net Worth</td><td style="color:${R.nw>=0?'var(--green)':'var(--red)'}">${fmt(R.nw)}</td></tr>
+  </table>
+  <hr class="div">
+  <table class="stbl">
+    <tr><td>📈 Monthly Gross Income</td><td>${fmt(R.ti)}</td></tr>
+    <tr><td>🏦 Monthly Loan Repayments</td><td style="color:var(--red)">${fmt(R.lm)}</td></tr>
+    <tr><td>🏠 Monthly Living Expenses</td><td style="color:var(--red)">${fmt(D.monthlyExpenses||0)}</td></tr>
+    <tr class="tr-tot"><td>Monthly Surplus / Deficit</td><td style="color:${R.ms>=0?'var(--green)':'var(--red)'}">${fmt(R.ms)}</td></tr>
+  </table></div>
+  ${R.pg>0?`<div class="alert"><span class="iico">⚠️</span><div class="atxt"><strong>Coverage Gap Detected</strong><br>Your current sum assured of ${fmt(R.sa)} falls ${fmt(R.pg)} short of the 10× annual income benchmark (${fmt(R.pn)}). This should be a priority discussion with your advisor.</div></div>`:''}
+  ${R.dsr>40?`<div class="alert"><span class="iico">🔴</span><div class="atxt"><strong>High Debt Service Ratio</strong><br>Your DSR of ${R.dsr.toFixed(1)}% exceeds the 40% caution threshold. This may limit your ability to take on new financing and warrants a debt review.</div></div>`:''}
+  ${R.ec<50?`<div class="alert"><span class="iico">🟡</span><div class="atxt"><strong>Emergency Fund Below Target</strong><br>Your savings cover only ${Math.round(R.ec)}% of the recommended 6-month buffer (${fmt(R.et)}). Building this is a foundational priority.</div></div>`:''}
+  <div class="insight"><span class="iico">📩</span><div class="itxt"><strong>What happens next?</strong> Your advisor will review this portrait and contact you within 1 business day with personalised recommendations. All data is handled in strict accordance with <strong>PDPA 2010</strong>.</div></div>
+  <div class="wmark">Financial Portrait v1.0 · ${new Date().toLocaleDateString('en-MY',{year:'numeric',month:'long',day:'numeric'})} · For advisory use only · PDPA 2010 Protected</div>`;
+}
+
+function recalc(){if(cur===9){document.getElementById('panel').innerHTML=fullPanelHTML(9);triggerGauges();}}
+function triggerGauges(){setTimeout(()=>document.querySelectorAll('.gf').forEach(g=>{const w=g.style.width;g.style.width='0';setTimeout(()=>g.style.width=w,60);}),150);}
+
+function fullPanelHTML(n){
+  const s=STEPS[n];
+  const back=n>0?`<button class="btn btn-ghost" onclick="go(${n-1})">← Back</button>`:`<span></span>`;
+  const next=n<9?`<button class="btn btn-primary" onclick="go(${n+1})">Continue →</button>`:`<button class="btn btn-finish" onclick="window.print()">📄 Save / Print Portrait</button>`;
+  return`<div class="step-hd"><div class="eyebrow">${s.ey}</div><h1 class="step-title">${s.ti}</h1><p class="step-sub">${s.su}</p></div>${stepHTML(n)}<div class="btn-row">${back}${next}</div>`;
+}
+
+function go(n){
+  cur=n;kc=0;pc=0;propc=0;lc=0;polc=0;prc=0;ec=0;
+  buildNav();
+  document.getElementById('panel').innerHTML=fullPanelHTML(n);
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(n===9)triggerGauges();
+}
+
+function buildNav(){
+  document.getElementById('navDots').innerHTML=STEPS.map((_,i)=>`<div class="nav-dot ${i<cur?'done':i===cur?'active':''}" onclick="go(${i})" title="${STEPS[i].label}"></div>`).join('');
+  document.getElementById('stepTrack').innerHTML=STEPS.map((s,i)=>`<div class="step-tab ${i<cur?'done':i===cur?'active':''}" onclick="go(${i})"><span class="snum">${i<cur?'✓':(i+1)}</span>${s.icon} ${s.label}</div>`).join('');
+  const tabs=document.querySelectorAll('.step-tab');
+  if(tabs[cur])tabs[cur].scrollIntoView({inline:'center',behavior:'smooth'});
+}
+
+function saveDraft(){
+  try{localStorage.setItem('fp_v1',JSON.stringify(D));alert('Draft saved to your browser.');}
+  catch(e){alert('Could not save — please screenshot the results page.');}
+}
+
+go(0);
+</script>
+</body>
+</html>
