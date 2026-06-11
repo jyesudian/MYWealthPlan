@@ -857,7 +857,7 @@
                 { id: 'retirement', icon: 'fa-umbrella-beach', label: 'Retirement Projection' },
                 { id: 'estate', icon: 'fa-scroll', label: 'Estate & Wasiat' },
                 { id: 'sandbox', icon: 'fa-calculator', label: 'Interactive Sandbox' },
-                { id: 'trust', icon: 'fa-percentage', label: 'Trust Scorecard' },
+                { id: 'trust', icon: 'fa-percentage', label: 'Trust Assessment' },
                 { id: 'report', icon: 'fa-file-invoice-dollar', label: 'Financial Report' },
                 { id: 'advisor', icon: 'fa-users', label: 'Advisor Portal' }
             ];
@@ -865,7 +865,7 @@
             // Filter navbar based on authentication role
             const visibleNavItems = navItems.filter(item => {
                 if (!session) return false;
-                if (session.role === 'client' && item.id === 'advisor') return false; // Hide Advisor Portal from Clients
+                if (session.role === 'client' && (item.id === 'advisor' || item.id === 'trust')) return false; // Hide Advisor Portal and Trust Assessment from Clients
                 return true;
             });
 
@@ -1061,6 +1061,7 @@
                                         clientData={clientData} 
                                         calculated={calculated} 
                                         trustScores={trustScores}
+                                        session={session}
                                     />
                                 )}
                                 {activeTab === 'advisor' && (
@@ -3522,9 +3523,29 @@
            TRUST EQUATION SCORECARD VIEW
            ========================================================================= */
         const TrustScorecardView = ({ trustScores, setTrustScores, clientData }) => {
-            const { credibility, reliability, intimacy, selfOrientation } = trustScores;
+            const [answers, setAnswers] = useState(() => ({
+                q1: trustScores.credibility || 7,
+                q2: trustScores.reliability || 7,
+                q3: trustScores.reliability || 7,
+                q4: trustScores.intimacy || 7,
+                q5: trustScores.selfOrientation || 5
+            }));
 
-            // Compute Trustworthiness Score
+            // Sync answers to parent trustScores state
+            useEffect(() => {
+                const c = answers.q1;
+                const r = Math.round((answers.q2 + answers.q3) / 2);
+                const i = answers.q4;
+                const s = answers.q5;
+                setTrustScores({
+                    credibility: c,
+                    reliability: r,
+                    intimacy: i,
+                    selfOrientation: s
+                });
+            }, [answers]);
+
+            const { credibility, reliability, intimacy, selfOrientation } = trustScores;
             const trustScore = (credibility + reliability + intimacy) / Math.max(0.1, selfOrientation);
             
             // Determine level and color
@@ -3545,63 +3566,114 @@
                 description = "A reliable advisory state, though intimacy can be increased through active listening, or self-focus can be lowered by decoupling sales incentives.";
             }
 
-            const handleSliderChange = (key, val) => {
-                setTrustScores(prev => ({
-                    ...prev,
-                    [key]: val
-                }));
-            };
+            const questions = [
+                {
+                    id: 'q1',
+                    label: '1. Transparency & Disclosures (Credibility)',
+                    desc: "Evaluate the client's transparency and accuracy in disclosing assets, liabilities, and documentation.",
+                    options: [
+                        { val: 10, label: 'Complete disclosures with verified paperwork (EPF, tax portals, bank books).' },
+                        { val: 7, label: 'Good disclosures, but requires minor follow-up to acquire secondary documentation.' },
+                        { val: 4, label: 'Guarded or reluctant to share external asset allocations, liabilities, or business revenues.' },
+                        { val: 1, label: 'High levels of denial, withholding information, or presenting contradictory statements.' }
+                    ]
+                },
+                {
+                    id: 'q2',
+                    label: '2. Financial Discipline (Reliability)',
+                    desc: "Analyze the client's consistency in keeping savings commitments, debt repayment, and budget rules.",
+                    options: [
+                        { val: 10, label: 'Superb discipline; consistently hits savings targets and keeps DSR within strict targets.' },
+                        { val: 7, label: 'Moderate discipline; saves periodically but has occasional deviations/impulse spends.' },
+                        { val: 4, label: 'Struggles with financial limits, maintains high credit card utilization or debt load.' },
+                        { val: 1, label: 'Chronic overspending, relies on high-interest loans, and shows negative monthly surplus.' }
+                    ]
+                },
+                {
+                    id: 'q3',
+                    label: '3. Engagement & Responsiveness (Reliability)',
+                    desc: "Measure client activity during scheduled reviews and promptness in responding to advisory tasks.",
+                    options: [
+                        { val: 10, label: 'Proactive engagement; responds immediately, attends all reviews, and takes ownership.' },
+                        { val: 7, label: 'Collaborative but passive; responds within reasonable time, follows advisor directives.' },
+                        { val: 4, label: 'Regularly reschedules, delays submitting KYC forms or insurance requirements.' },
+                        { val: 1, label: 'Unresponsive; ignores review cycles, hard to contact, showing general disinterest.' }
+                    ]
+                },
+                {
+                    id: 'q4',
+                    label: '4. Openness & Vulnerability (Intimacy)',
+                    desc: "Check the client's comfort levels in sharing personal legacy goals, medical history, and family estate concerns.",
+                    options: [
+                        { val: 10, label: 'Complete trust; shares deep family legacy worries, health risks, and business transition fears.' },
+                        { val: 7, label: 'Speaks openly about general goals but holds back on private family bottlenecks.' },
+                        { val: 4, label: 'Guarded; prefers generic calculators over customizing plans for family/estate issues.' },
+                        { val: 1, label: 'Extremely closed; rejects legacy discussions, refuses health disclosure and family detail inputs.' }
+                    ]
+                },
+                {
+                    id: 'q5',
+                    label: '5. Planning Horizon & Orientation (Self-Orientation)',
+                    desc: "Assess the client's interest in sustainable long-term legacy plans versus short-term high-yield products.",
+                    options: [
+                        { val: 2, label: 'Long-term focused; prioritizes estate protection, insurance gap fills, and steady retirement.' },
+                        { val: 5, label: 'Balanced; understands legacy/protection but exhibits recurring interest in high-yield assets.' },
+                        { val: 8, label: 'Yield-seeking; pushes for high-yield returns, showing low interest in wills, wasiat, or medical cards.' },
+                        { val: 10, label: 'Highly transactional/speculative; ignores risk buffers entirely to trade in speculative schemes.' }
+                    ]
+                }
+            ];
 
             return (
                 <div className="space-y-6 animate-fade-in">
                     <div>
                         <span className="text-xs font-semibold tracking-wider text-gold uppercase">Trust Analytics</span>
-                        <h1 className="text-3xl font-serif font-light text-white mt-1">Trust Equation Scorecard</h1>
-                        <p className="text-textDim text-sm mt-1">Model client-advisor trust values using the Maister-Green-Galford formula.</p>
+                        <h1 className="text-3xl font-serif font-light text-white mt-1">Advisor Trust Assessment</h1>
+                        <p className="text-textDim text-sm mt-1">Complete this scorecard during client consultations to evaluate trust metrics and long-term planning behavior.</p>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Interactive Sliders */}
-                        <Card className="lg:col-span-1 space-y-4 text-xs font-sans">
-                            <h3 className="font-serif text-lg text-white border-b border-border pb-2">Rate Trust Factors</h3>
-                            
-                            <div className="space-y-3.5">
-                                <div className="space-y-1">
-                                    <div className="flex justify-between">
-                                        <span className="text-textDim font-medium">Credibility (C): <strong className="text-white">{credibility}/10</strong></span>
-                                    </div>
-                                    <input type="range" min="1" max="10" value={credibility} onChange={(e) => handleSliderChange('credibility', parseInt(e.target.value))} className="w-full" />
-                                    <p className="text-[10px] text-textDim leading-tight">Credentials, qualifications, and clarity of financial explanations.</p>
+                        {/* Interactive Questionnaire */}
+                        <div className="lg:col-span-2 space-y-6">
+                            <Card className="space-y-6 text-xs font-sans">
+                                <h3 className="font-serif text-lg text-white border-b border-border pb-2">Client Trust & Discipline Assessment</h3>
+                                <div className="space-y-6">
+                                    {questions.map((q) => (
+                                        <div key={q.id} className="space-y-2.5">
+                                            <h4 className="text-white font-medium text-xs tracking-wide">{q.label}</h4>
+                                            <p className="text-[11px] text-textDim leading-relaxed">{q.desc}</p>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                {q.options.map((opt) => {
+                                                    const isSelected = answers[q.id] === opt.val;
+                                                    return (
+                                                        <button
+                                                            key={opt.val}
+                                                            type="button"
+                                                            onClick={() => setAnswers(prev => ({ ...prev, [q.id]: opt.val }))}
+                                                            className={`p-3 text-left rounded-lg border text-[11px] leading-relaxed transition-all duration-200 ${
+                                                                isSelected 
+                                                                    ? 'bg-goldDim/20 border-gold text-white font-medium shadow-lg shadow-gold/5' 
+                                                                    : 'bg-surface2/30 border-border/60 text-textDim hover:border-border hover:bg-surface2/50 hover:text-white'
+                                                            }`}
+                                                        >
+                                                            <div className="flex items-start justify-between gap-2">
+                                                                <span>{opt.label}</span>
+                                                                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded flex-shrink-0 ${isSelected ? 'bg-gold/25 text-gold border border-gold/30' : 'bg-surface border-border/60 text-textDim border'}`}>
+                                                                    Score: {opt.val}
+                                                                </span>
+                                                            </div>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
-
-                                <div className="space-y-1">
-                                    <div className="flex justify-between">
-                                        <span className="text-textDim font-medium">Reliability (R): <strong className="text-white">{reliability}/10</strong></span>
-                                    </div>
-                                    <input type="range" min="1" max="10" value={reliability} onChange={(e) => handleSliderChange('reliability', parseInt(e.target.value))} className="w-full" />
-                                    <p className="text-[10px] text-textDim leading-tight">Prompt report delivery, follow-up, and keeping plan commitments.</p>
-                                </div>
-
-                                <div className="space-y-1">
-                                    <div className="flex justify-between">
-                                        <span className="text-textDim font-medium">Intimacy (I): <strong className="text-white">{intimacy}/10</strong></span>
-                                    </div>
-                                    <input type="range" min="1" max="10" value={intimacy} onChange={(e) => handleSliderChange('intimacy', parseInt(e.target.value))} className="w-full" />
-                                    <p className="text-[10px] text-textDim leading-tight">Safety in disclosing personal details (KYC/nric), cash concerns, and health status.</p>
-                                </div>
-
-                                <div className="space-y-1">
-                                    <div className="flex justify-between">
-                                        <span className="text-textDim font-medium">Self-Orientation (S): <strong className={selfOrientation > 4 ? 'text-red' : 'text-green'}>{selfOrientation}/10</strong></span>
-                                    </div>
-                                    <input type="range" min="1" max="10" value={selfOrientation} onChange={(e) => handleSliderChange('selfOrientation', parseInt(e.target.value))} className="w-full" />
-                                    <p className="text-[10px] text-textDim leading-tight">Lower is better. Focuses on client interest vs. commission product pushing.</p>
-                                </div>
-                            </div>
-                        </Card>
+                            </Card>
+                        </div>
 
                         {/* Equation Panel and Gauge */}
-                        <div className="lg:col-span-2 space-y-6">
+                        <div className="lg:col-span-1 space-y-6">
                             {/* Equation Visualization */}
                             <Card className={`border ${borderGlow} transition-all duration-300`}>
                                 <h3 className="font-serif text-lg text-white mb-4">The Trust Equation</h3>
@@ -3644,7 +3716,7 @@
                             {/* Trust score explanation and guide card */}
                             <Card className="space-y-4">
                                 <h3 className="font-serif text-base text-gold">Trust Equation Improvement Guide</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-sans text-textMid leading-relaxed">
+                                <div className="grid grid-cols-1 gap-4 text-xs font-sans text-textMid leading-relaxed">
                                     <div className="p-3 bg-surface2/50 rounded-lg border border-border/40 space-y-1.5">
                                         <h4 className="font-semibold text-white">Credibility & Reliability Actions</h4>
                                         <ul className="list-disc pl-4 space-y-1 text-textDim">
@@ -3933,7 +4005,7 @@
         /* =========================================================================
            FINANCIAL REPORT VIEW (PRINT FRIENDLY)
            ========================================================================= */
-        const ReportView = ({ clientData, calculated, trustScores }) => {
+        const ReportView = ({ clientData, calculated, trustScores, session }) => {
             return (
                 <div className="space-y-8 animate-fade-in">
                     {/* Header Controls (no-print) */}
@@ -4072,7 +4144,7 @@
                         </div>
 
                         {/* Advisor Trust Scorecard Section */}
-                        {trustScores && (
+                        {session?.role === 'advisor' && trustScores && (
                             <div className="border-t border-border/60 pt-6 space-y-4">
                                 <h3 className="font-serif text-lg text-gold font-semibold uppercase tracking-wider">Advisor Relationship Trust Scorecard</h3>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-sans text-textMid bg-surface2/30 border border-border/60 p-4 rounded-lg">
