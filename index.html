@@ -859,8 +859,7 @@
                 { id: 'sandbox', icon: 'fa-calculator', label: 'Interactive Sandbox' },
                 { id: 'trust', icon: 'fa-percentage', label: 'Trust Scorecard' },
                 { id: 'report', icon: 'fa-file-invoice-dollar', label: 'Financial Report' },
-                { id: 'advisor', icon: 'fa-users', label: 'Advisor Portal' },
-                { id: 'premium', icon: 'fa-crown', label: 'Premium Upgrade' }
+                { id: 'advisor', icon: 'fa-users', label: 'Advisor Portal' }
             ];
 
             // Filter navbar based on authentication role
@@ -1068,9 +1067,6 @@
                                     <AdvisorPortalView 
                                         loadClientProfile={loadClientProfile} 
                                     />
-                                )}
-                                {activeTab === 'premium' && (
-                                    <PremiumPlansView />
                                 )}
                             </div>
                         </main>
@@ -4189,70 +4185,6 @@
                 </div>
             );
         };
-
-        /* =========================================================================
-           PREMIUM UPGRADE PLANS VIEW
-           ========================================================================= */
-        const PremiumPlansView = () => {
-            return (
-                <div className="space-y-6 animate-fade-in text-center max-w-4xl mx-auto pt-6">
-                    <span className="text-xs font-semibold tracking-wider text-gold uppercase">Exclusive Access</span>
-                    <h1 className="text-4xl font-serif text-white font-light">Upgrade Your Financial Journey</h1>
-                    <p className="text-textDim text-sm max-w-2xl mx-auto leading-relaxed">
-                        Unlock advanced AI-driven scenario modeling, direct 1-on-1 advisor consultations, and automated estate transfer tracking under Islamic and Civil wills.
-                    </p>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12 text-left">
-                        {/* Basic Plan */}
-                        <Card className="border border-border/80 flex flex-col justify-between p-8">
-                            <div>
-                                <h3 className="font-serif text-xl text-white">Basic Portfolio</h3>
-                                <p className="text-xs text-textDim mt-1">Holistic standard score estimation</p>
-                                <div className="my-6">
-                                    <h4 className="text-4xl font-serif font-bold text-white">RM 0</h4>
-                                    <span className="text-[10px] text-textDim">Free Forever</span>
-                                </div>
-                                <hr className="border-border my-6" />
-                                <ul className="space-y-4 text-xs text-textMid">
-                                    <li className="flex items-center gap-3"><i className="fas fa-check text-green"></i> 1 Active Client Profile</li>
-                                    <li className="flex items-center gap-3"><i className="fas fa-check text-green"></i> Standard DSR & Net Worth Calculator</li>
-                                    <li className="flex items-center gap-3"><i className="fas fa-check text-green"></i> Emergency Fund Indicators</li>
-                                </ul>
-                            </div>
-                            <button disabled className="w-full mt-8 bg-surface2 border border-border text-textDim text-xs font-semibold py-3 rounded-lg cursor-not-allowed">
-                                Current Basic Plan
-                            </button>
-                        </Card>
-
-                        {/* Premium Plan */}
-                        <Card className="border-2 border-gold shadow-xl shadow-gold/5 flex flex-col justify-between p-8 relative">
-                            <div className="absolute top-0 right-0 bg-gold text-bg text-[9px] font-bold px-3 py-1 rounded-bl uppercase tracking-wider">
-                                Recommended
-                            </div>
-                            <div>
-                                <h3 className="font-serif text-xl text-gold font-semibold">Premium Pro Advisor</h3>
-                                <p className="text-xs text-textDim mt-1">Enterprise scale dynamic client planning</p>
-                                <div className="my-6">
-                                    <h4 className="text-4xl font-serif font-bold text-gold">RM 49<span className="text-xs font-sans font-light text-textDim">/month</span></h4>
-                                    <span className="text-[10px] text-textDim">Billed annually (Includes tax relief)</span>
-                                </div>
-                                <hr className="border-border my-6" />
-                                <ul className="space-y-4 text-xs text-textMid">
-                                    <li className="flex items-center gap-3"><i className="fas fa-check text-gold"></i> Unlimited Client Profile Slots</li>
-                                    <li className="flex items-center gap-3"><i className="fas fa-check text-gold"></i> Live EPF Sync & projection models</li>
-                                    <li className="flex items-center gap-3"><i className="fas fa-check text-gold"></i> Wasiat (Wills) & Power of Attorney Draft Templates</li>
-                                    <li className="flex items-center gap-3"><i className="fas fa-check text-gold"></i> Dynamic Salesforce/HubSpot Pipeline sync</li>
-                                </ul>
-                            </div>
-                            <button className="w-full mt-8 bg-gold hover:bg-yellow-600 text-bg text-xs font-semibold py-3 rounded-lg shadow-lg shadow-gold/20 transition-all duration-200">
-                                Upgrade Account Now
-                            </button>
-                        </Card>
-                    </div>
-                </div>
-            );
-        };
-
         /* =========================================================================
            CRM BOOKING MODAL
            ========================================================================= */
