@@ -223,6 +223,320 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
+        const LANG_DICT = {
+            en: {
+                dashboard: 'Dashboard',
+                discovery: 'Discovery Form',
+                goals: 'Goal Planning',
+                insurance: 'Insurance & Protection',
+                retirement: 'Retirement Projection',
+                estate: 'Estate & Wasiat',
+                sandbox: 'Interactive Sandbox',
+                trust: 'Trust Assessment',
+                report: 'Financial Report',
+                advisor: 'Advisor Portal',
+                
+                holistic_summary: 'Holistic Summary',
+                welcome_back: 'Welcome back',
+                snapshot: 'Here is a snapshot of your calculated financial health.',
+                view_full_statement: 'View Full Statement',
+                financial_health: 'Financial Health',
+                net_worth: 'Net Worth',
+                monthly_savings_rate: 'Monthly Savings Rate',
+                debt_service_ratio: 'Debt Service Ratio',
+                assets: 'Assets',
+                liab: 'Liabilities',
+                surplus: 'Surplus',
+                target: 'Target',
+                loan_pay: 'Loan Pay',
+                alert_limit: 'Alert limit',
+                net_worth_allocation: 'Net Worth Asset Allocation',
+                calculated_from: 'Calculated from current real estate, EPF and deposits',
+                
+                save_draft: 'Save Draft',
+                log_out: 'Log Out',
+                active_profile: 'Active Profile',
+                calculated_score: 'Calculated Score',
+                
+                trust_eq_title: 'The Trust Equation',
+                trust_eq_guide: 'Trust Equation Improvement Guide',
+                trust_analytics: 'Trust Analytics',
+                advisor_trust_assessment: 'Advisor Trust Assessment',
+                trust_assessment_desc: 'Complete this scorecard during client consultations to evaluate trust metrics and long-term planning behavior.',
+                client_trust_discipline_assessment: 'Client Trust & Discipline Assessment',
+                trust_eq_result: 'TRUST EQUATION RESULT',
+                advisor_relationship_trust_scorecard: 'Advisor Relationship Trust Scorecard'
+            },
+            ms: {
+                dashboard: 'Papan Pemuka',
+                discovery: 'Borang Penemuan',
+                goals: 'Perancangan Matlamat',
+                insurance: 'Insurans & Perlindungan',
+                retirement: 'Unjuran Persaraan',
+                estate: 'Harta Pusaka & Wasiat',
+                sandbox: 'Kotak Pasir Interaktif',
+                trust: 'Penilaian Kepercayaan',
+                report: 'Laporan Kewangan',
+                advisor: 'Portal Penasihat',
+                
+                holistic_summary: 'Ringkasan Holistik',
+                welcome_back: 'Selamat kembali',
+                snapshot: 'Berikut adalah gambaran kesihatan kewangan anda.',
+                view_full_statement: 'Lihat Penyata Penuh',
+                financial_health: 'Kesihatan Kewangan',
+                net_worth: 'Nilai Bersih',
+                monthly_savings_rate: 'Kadar Simpanan Bulanan',
+                debt_service_ratio: 'Nisbah Khidmat Hutang',
+                assets: 'Aset',
+                liab: 'Liabiliti',
+                surplus: 'Lebihan',
+                target: 'Sasaran',
+                loan_pay: 'Bayaran Pinjaman',
+                alert_limit: 'Had amaran',
+                net_worth_allocation: 'Peruntukan Aset Nilai Bersih',
+                calculated_from: 'Dikira daripada hartanah semasa, KWSP dan deposit',
+                
+                save_draft: 'Simpan Draf',
+                log_out: 'Log Keluar',
+                active_profile: 'Profil Aktif',
+                calculated_score: 'Skor Pengiraan',
+
+                trust_eq_title: 'Persamaan Kepercayaan',
+                trust_eq_guide: 'Panduan Penambahbaikan Persamaan Kepercayaan',
+                trust_analytics: 'Analisis Kepercayaan',
+                advisor_trust_assessment: 'Penilaian Kepercayaan Penasihat',
+                trust_assessment_desc: 'Lengkapkan kad skor ini semasa perundingan pelanggan untuk menilai metrik kepercayaan dan tingkah laku perancangan jangka panjang.',
+                client_trust_discipline_assessment: 'Penilaian Kepercayaan & Disiplin Pelanggan',
+                trust_eq_result: 'KEPUTUSAN PERSAMAAN KEPERCAYAAN',
+                advisor_relationship_trust_scorecard: 'Kad Skor Kepercayaan Hubungan Penasihat'
+            },
+            zh: {
+                dashboard: '仪表盘',
+                discovery: '客户发现表',
+                goals: '目标规划',
+                insurance: '保险与保障',
+                retirement: '退休规划',
+                estate: '遗产与遗嘱',
+                sandbox: '互动沙盒',
+                trust: '信任度评估',
+                report: '财务报告',
+                advisor: '顾问门户',
+                
+                holistic_summary: '整体摘要',
+                welcome_back: '欢迎回来',
+                snapshot: '这是您计算出的财务健康快照。',
+                view_full_statement: '查看完整明细',
+                financial_health: '财务健康',
+                net_worth: '净资产',
+                monthly_savings_rate: '月储蓄率',
+                debt_service_ratio: '偿债率',
+                assets: '总资产',
+                liab: '总负债',
+                surplus: '盈余',
+                target: '目标',
+                loan_pay: '月还款',
+                alert_limit: '警戒线',
+                net_worth_allocation: '净资产资产配置',
+                calculated_from: '根据当前的房产、公积金和存款计算',
+                
+                save_draft: '保存草稿',
+                log_out: '退出登录',
+                active_profile: '激活的档案',
+                calculated_score: '计算得分',
+
+                trust_eq_title: '信任度公式',
+                trust_eq_guide: '信任度公式提升指南',
+                trust_analytics: '信任度分析',
+                advisor_trust_assessment: '顾问信任度评估',
+                trust_assessment_desc: '在客户咨询期间完成此评分卡，以评估信任指标和长期规划行为。',
+                client_trust_discipline_assessment: '客户信任与纪律评估',
+                trust_eq_result: '信任度计算结果',
+                advisor_relationship_trust_scorecard: '顾问关系信任评分卡'
+            }
+        };
+
+        const t = (key, lang = 'en') => {
+            return (LANG_DICT[lang] && LANG_DICT[lang][key]) || LANG_DICT['en'][key] || key;
+        };
+
+        const getQuestions = (l) => {
+            if (l === 'ms') {
+                return [
+                    {
+                        id: 'q1',
+                        label: '1. Ketelusan & Pendedahan (Kredibiliti)',
+                        desc: "Nilaikan ketelusan dan ketepatan pelanggan dalam mendedahkan aset, liabiliti, dan dokumentasi.",
+                        options: [
+                            { val: 10, label: 'Pendedahan lengkap dengan dokumen yang disahkan (KWSP, portal cukai, penyata bank).' },
+                            { val: 7, label: 'Pendedahan yang baik, tetapi memerlukan susulan kecil untuk mendapatkan dokumen sokongan.' },
+                            { val: 4, label: 'Berhati-hati atau enggan berkongsi maklumat aset luar, liabiliti, atau hasil perniagaan.' },
+                            { val: 1, label: 'Tahap penafian yang tinggi, menyembunyikan maklumat, atau memberikan kenyataan yang bercanggah.' }
+                        ]
+                    },
+                    {
+                        id: 'q2',
+                        label: '2. Disiplin Kewangan (Kebolehpercayaan)',
+                        desc: "Menganalisis konsistensi pelanggan dalam mematuhi komitmen simpanan, pembayaran balik hutang, dan peraturan bajet.",
+                        options: [
+                            { val: 10, label: 'Disiplin yang sangat baik; konsisten mencapai sasaran simpanan dan mengekalkan nisbah khidmat hutang (DSR).' },
+                            { val: 7, label: 'Disiplin sederhana; menyimpan secara berkala tetapi mempunyai sisihan sesekali/perbelanjaan impulsif.' },
+                            { val: 4, label: 'Bergelut dengan had kewangan, mengekalkan penggunaan kad kredit atau beban hutang yang tinggi.' },
+                            { val: 1, label: 'Pengurusan aliran tunai yang teruk, bergantung pada pinjaman faedah tinggi, dan menunjukkan lebihan bulanan negatif.' }
+                        ]
+                    },
+                    {
+                        id: 'q3',
+                        label: '3. Penglibatan & Tindak Balas (Kebolehpercayaan)',
+                        desc: "Mengukur aktiviti pelanggan semasa tinjauan yang dijadualkan dan kesegeraan dalam bertindak balas kepada tugasan nasihat.",
+                        options: [
+                            { val: 10, label: 'Penglibatan proaktif; bertindak balas dengan segera, menghadiri semua tinjauan, dan mengambil tanggungjawab.' },
+                            { val: 7, label: 'Bekerjasama tetapi pasif; bertindak balas dalam masa yang munasabah, mengikut arahan penasihat.' },
+                            { val: 4, label: 'Kerap menjadualkan semula, melambatkan penyerahan borang KYC atau keperluan insurans.' },
+                            { val: 1, label: 'Tidak responsif; mengabaikan kitaran tinjauan, sukar dihubungi, menunjukkan ketidakminatan umum.' }
+                        ]
+                    },
+                    {
+                        id: 'q4',
+                        label: '4. Keterbukaan & Kerentanan (Kemesraan)',
+                        desc: "Semak tahap keselesaan pelanggan dalam berkongsi matlamat harta pusaka peribadi, sejarah perubatan, dan kebimbangan warisan keluarga.",
+                        options: [
+                            { val: 10, label: 'Kepercayaan penuh; berkongsi kebimbangan warisan keluarga, risiko kesihatan, dan ketakutan peralihan perniagaan.' },
+                            { val: 7, label: 'Bercakap secara terbuka tentang matlamat umum tetapi merahsiakan masalah peribadi keluarga.' },
+                            { val: 4, label: 'Berhati-hati; lebih suka kalkulator generik daripada menyesuaikan rancangan untuk isu keluarga/harta pusaka.' },
+                            { val: 1, label: 'Sangat tertutup; menolak perbincangan warisan, enggan mendedahkan kesihatan dan butiran keluarga.' }
+                        ]
+                    },
+                    {
+                        id: 'q5',
+                        label: '5. Horizon & Orientasi Perancangan (Orientasi Diri)',
+                        desc: "Menilai minat pelanggan dalam rancangan warisan jangka panjang yang mampan berbanding produk/pulangan hasil tinggi jangka pendek.",
+                        options: [
+                            { val: 2, label: 'Fokus jangka panjang; mengutamakan perlindungan harta pusaka, jurang insurans, dan persaraan yang stabil.' },
+                            { val: 5, label: 'Seimbang; memahami warisan/perlindungan tetapi mempamerkan minat berulang dalam aset hasil tinggi.' },
+                            { val: 8, label: 'Mencari pulangan; menuntut pulangan cepat, menunjukkan minat yang rendah terhadap wasiat atau kad perubatan.' },
+                            { val: 10, label: 'Sangat transaksional/spekulatif; mengabaikan penampan risiko sepenuhnya untuk berdagang dalam skim spekulatif.' }
+                        ]
+                    }
+                ];
+            } else if (l === 'zh') {
+                return [
+                    {
+                        id: 'q1',
+                        label: '1. 透明度与披露 (公信力)',
+                        desc: "评估客户在披露资产、负债和相关证明文件时的透明度和准确性。",
+                        options: [
+                            { val: 10, label: '完全披露，并提供经核实的证明文件 (公积金EPF、税务门户、银行对账单)。' },
+                            { val: 7, label: '披露良好，但需要进行少量的跟进以获取辅助性证明文件。' },
+                            { val: 4, label: '有所保留，或不愿分享外部资产配置、负债或业务收入的完整细节。' },
+                            { val: 1, label: '高度防范，隐瞒信息，或提供自相矛盾的陈述。' }
+                        ]
+                    },
+                    {
+                        id: 'q2',
+                        label: '2. 财务纪律 (可靠度)',
+                        desc: "分析客户在保持储蓄承诺、债务偿还和预算执行方面的一致性。",
+                        options: [
+                            { val: 10, label: '极佳的纪律；始终如一地达到储蓄目标，并将偿债率限制在严格的指标内。' },
+                            { val: 7, label: '中等纪律；能定期储蓄，但偶尔会出现偏离/冲动消费。' },
+                            { val: 4, label: '在财务限额上挣扎，保持较高的信用卡使用率或债务负担。' },
+                            { val: 1, label: '长期的现金流管理不善，依赖高息贷款，月度盈余为负。' }
+                        ]
+                    },
+                    {
+                        id: 'q3',
+                        label: '3. 互动与参与度 (可靠度)',
+                        desc: "衡量客户在定期财务审查中的积极程度以及对咨询任务的回应速度。",
+                        options: [
+                            { val: 10, label: '主动参与；立即响应，参加所有审查会议，并主动承担后续工作。' },
+                            { val: 7, label: '配合但被动；在合理时间内作出回应，遵循顾问的指示。' },
+                            { val: 4, label: '经常重新安排时间，推迟提交KYC表格或保险承保要求。' },
+                            { val: 1, label: '无响应；忽略审查周期，难以联系，表现出普遍的冷淡。' }
+                        ]
+                    },
+                    {
+                        id: 'q4',
+                        label: '4. 关系开放度 (亲密度)',
+                        desc: "评估客户在分享个人遗产目标、医疗历史和家庭财产继承忧虑时的信任程度。",
+                        options: [
+                            { val: 10, label: '完全信任；敞开心扉讨论家庭遗产担忧、健康风险和业务交接忧虑。' },
+                            { val: 7, label: '愿意公开讨论一般目标，但在私人家庭内部瓶颈上有所保留。' },
+                            { val: 4, label: '防范度高；更倾向于使用通用计算器，而非定制解决家庭/遗产问题的方案。' },
+                            { val: 1, label: '极其封闭；拒绝遗产讨论，拒绝透露健康状况和家庭细节。' }
+                        ]
+                    },
+                    {
+                        id: 'q5',
+                        label: '5. 规划眼光与倾向 (自我导向)',
+                        desc: "评估客户对可持续长期遗产规划的兴趣，还是偏好短期高收益产品/回报。",
+                        options: [
+                            { val: 2, label: '注重长期；优先考虑财产保护、填补保险缺口以及稳定的退休生活。' },
+                            { val: 5, label: '平衡型；了解遗产/保障的重要性，但对高收益资产表现出持续的兴趣。' },
+                            { val: 8, label: '追求收益；极力追求短期收益，对遗嘱(Wasiat)或医疗卡表现出极低兴趣。' },
+                            { val: 10, label: '高度投机性；完全忽略风险缓冲，参与投机性的金融计划。' }
+                        ]
+                    }
+                ];
+            }
+            // default to English (en)
+            return [
+                {
+                    id: 'q1',
+                    label: '1. Transparency & Disclosures (Credibility)',
+                    desc: "Evaluate the client's transparency and accuracy in disclosing assets, liabilities, and documentation.",
+                    options: [
+                        { val: 10, label: 'Complete disclosures with verified paperwork (EPF, tax portals, bank books).' },
+                        { val: 7, label: 'Good disclosures, but requires minor follow-up to acquire secondary documentation.' },
+                        { val: 4, label: 'Guarded or reluctant to share external asset allocations, liabilities, or business revenues.' },
+                        { val: 1, label: 'High levels of denial, withholding information, or presenting contradictory statements.' }
+                    ]
+                },
+                {
+                    id: 'q2',
+                    label: '2. Financial Discipline (Reliability)',
+                    desc: "Analyze the client's consistency in keeping savings commitments, debt repayment, and budget rules.",
+                    options: [
+                        { val: 10, label: 'Superb discipline; consistently hits savings targets and keeps DSR within strict targets.' },
+                        { val: 7, label: 'Moderate discipline; saves periodically but has occasional deviations/impulse spends.' },
+                        { val: 4, label: 'Struggles with financial limits, maintains high credit card utilization or debt load.' },
+                        { val: 1, label: 'Chronic overspending, relies on high-interest loans, and shows negative monthly surplus.' }
+                    ]
+                },
+                {
+                    id: 'q3',
+                    label: '3. Engagement & Responsiveness (Reliability)',
+                    desc: "Measure client activity during scheduled reviews and promptness in responding to advisory tasks.",
+                    options: [
+                        { val: 10, label: 'Proactive engagement; responds immediately, attends all reviews, and takes ownership.' },
+                        { val: 7, label: 'Collaborative but passive; responds within reasonable time, follows advisor directives.' },
+                        { val: 4, label: 'Regularly reschedules, delays submitting KYC forms or insurance requirements.' },
+                        { val: 1, label: 'Unresponsive; ignores review cycles, hard to contact, showing general disinterest.' }
+                    ]
+                },
+                {
+                    id: 'q4',
+                    label: '4. Openness & Vulnerability (Intimacy)',
+                    desc: "Check the client's comfort levels in sharing personal legacy goals, medical history, and family estate concerns.",
+                    options: [
+                        { val: 10, label: 'Complete trust; shares deep family legacy worries, health risks, and business transition fears.' },
+                        { val: 7, label: 'Speaks openly about general goals but holds back on private family bottlenecks.' },
+                        { val: 4, label: 'Guarded; prefers generic calculators over customizing plans for family/estate issues.' },
+                        { val: 1, label: 'Extremely closed; rejects legacy discussions, refuses health disclosure and family detail inputs.' }
+                    ]
+                },
+                {
+                    id: 'q5',
+                    label: '5. Planning Horizon & Orientation (Self-Orientation)',
+                    desc: "Assess the client's interest in sustainable long-term legacy plans versus short-term high-yield products.",
+                    options: [
+                        { val: 2, label: 'Long-term focused; prioritizes estate protection, insurance gap fills, and steady retirement.' },
+                        { val: 5, label: 'Balanced; understands legacy/protection but exhibits recurring interest in high-yield assets.' },
+                        { val: 8, label: 'Yield-seeking; pushes for high-yield returns, showing low interest in wills, wasiat, or medical cards.' },
+                        { val: 10, label: 'Highly transactional/speculative; ignores risk buffers entirely to trade in speculative schemes.' }
+                    ]
+                }
+            ];
+        };
+
         // Custom UI Card Component
         const Card = ({ children, className = "", style = {}, overflow = "overflow-hidden" }) => (
             <div 
@@ -767,6 +1081,7 @@
             
             // Theme, Customizable Guides & Trust scorecard states
             const [theme, setTheme] = useState(() => localStorage.getItem('fin_theme') || 'dark');
+            const [lang, setLang] = useState('en');
             const [customComments, setCustomComments] = useState(() => {
                 const saved = localStorage.getItem('fin_custom_comments');
                 return saved ? JSON.parse(saved) : {};
@@ -850,16 +1165,16 @@
 
             // Shared Nav Items
             const navItems = [
-                { id: 'dashboard', icon: 'fa-chart-pie', label: 'Dashboard' },
-                { id: 'discovery', icon: 'fa-compass', label: 'Discovery Form' },
-                { id: 'goals', icon: 'fa-bullseye', label: 'Goal Planning' },
-                { id: 'insurance', icon: 'fa-shield-alt', label: 'Insurance & Protection' },
-                { id: 'retirement', icon: 'fa-umbrella-beach', label: 'Retirement Projection' },
-                { id: 'estate', icon: 'fa-scroll', label: 'Estate & Wasiat' },
-                { id: 'sandbox', icon: 'fa-calculator', label: 'Interactive Sandbox' },
-                { id: 'trust', icon: 'fa-percentage', label: 'Trust Assessment' },
-                { id: 'report', icon: 'fa-file-invoice-dollar', label: 'Financial Report' },
-                { id: 'advisor', icon: 'fa-users', label: 'Advisor Portal' }
+                { id: 'dashboard', icon: 'fa-chart-pie', label: t('dashboard', lang) },
+                { id: 'discovery', icon: 'fa-compass', label: t('discovery', lang) },
+                { id: 'goals', icon: 'fa-bullseye', label: t('goals', lang) },
+                { id: 'insurance', icon: 'fa-shield-alt', label: t('insurance', lang) },
+                { id: 'retirement', icon: 'fa-umbrella-beach', label: t('retirement', lang) },
+                { id: 'estate', icon: 'fa-scroll', label: t('estate', lang) },
+                { id: 'sandbox', icon: 'fa-calculator', label: t('sandbox', lang) },
+                { id: 'trust', icon: 'fa-percentage', label: t('trust', lang) },
+                { id: 'report', icon: 'fa-file-invoice-dollar', label: t('report', lang) },
+                { id: 'advisor', icon: 'fa-users', label: t('advisor', lang) }
             ];
 
             // Filter navbar based on authentication role
@@ -939,13 +1254,13 @@
                                     onClick={saveDraft}
                                     className="bg-surface2 hover:bg-goldDim border border-border hover:border-gold/30 text-xs font-semibold px-4 py-2 rounded-lg text-text hover:text-gold transition-all duration-200"
                                 >
-                                    <i className="fas fa-cloud-upload-alt mr-1.5"></i> Save Draft
+                                    <i className="fas fa-cloud-upload-alt mr-1.5"></i> {t('save_draft', lang)}
                                 </button>
                                 <button 
                                     onClick={() => setSession(null)}
                                     className="bg-red/10 hover:bg-red/20 border border-red/30 text-xs font-semibold px-4 py-2 rounded-lg text-red transition-all duration-200"
                                 >
-                                    <i className="fas fa-sign-out-alt mr-1.5"></i> Log Out
+                                    <i className="fas fa-sign-out-alt mr-1.5"></i> {t('log_out', lang)}
                                 </button>
                                 <div className="flex bg-surface2 border border-border p-0.5 rounded-lg text-xs">
                                     <button 
@@ -968,8 +1283,29 @@
                                     </button>
                                 </div>
                                 <span className="h-4 w-px bg-border"></span>
+                                <div className="flex bg-surface2 border border-border p-0.5 rounded-lg text-xs">
+                                    <button 
+                                        onClick={() => setLang('en')} 
+                                        className={`px-2 py-1 rounded text-[10px] font-semibold transition-all ${lang === 'en' ? 'bg-gold text-bg' : 'text-textDim hover:text-text'}`}
+                                    >
+                                        EN
+                                    </button>
+                                    <button 
+                                        onClick={() => setLang('ms')} 
+                                        className={`px-2 py-1 rounded text-[10px] font-semibold transition-all ${lang === 'ms' ? 'bg-gold text-bg' : 'text-textDim hover:text-text'}`}
+                                    >
+                                        BM
+                                    </button>
+                                    <button 
+                                        onClick={() => setLang('zh')} 
+                                        className={`px-2 py-1 rounded text-[10px] font-semibold transition-all ${lang === 'zh' ? 'bg-gold text-bg' : 'text-textDim hover:text-text'}`}
+                                    >
+                                        中文
+                                    </button>
+                                </div>
+                                <span className="h-4 w-px bg-border"></span>
                                 <div className="text-right hidden sm:block">
-                                    <span className="text-[10px] text-textDim block font-medium uppercase tracking-wider font-sans">Calculated Score</span>
+                                    <span className="text-[10px] text-textDim block font-medium uppercase tracking-wider font-sans">{t('calculated_score', lang)}</span>
                                     <span className="text-sm font-bold text-gold">{calculated.healthScore}/100</span>
                                 </div>
                                 <div className="w-8 h-8 rounded-full bg-goldDim/80 border border-gold/20 flex items-center justify-center text-xs font-bold text-gold flex-shrink-0">
@@ -997,6 +1333,7 @@
                                             setActiveTab={setActiveTab}
                                             setShowBookingModal={setShowBookingModal} 
                                             session={session}
+                                            lang={lang}
                                         />
                                     )
                                 )}
@@ -1054,6 +1391,7 @@
                                         trustScores={trustScores} 
                                         setTrustScores={setTrustScores} 
                                         clientData={clientData} 
+                                        lang={lang}
                                     />
                                 )}
                                 {activeTab === 'report' && (
@@ -1062,6 +1400,7 @@
                                         calculated={calculated} 
                                         trustScores={trustScores}
                                         session={session}
+                                        lang={lang}
                                     />
                                 )}
                                 {activeTab === 'advisor' && (
@@ -1087,7 +1426,7 @@
         /* =========================================================================
            DASHBOARD VIEW
            ========================================================================= */
-        const DashboardView = ({ clientData, calculated, setActiveTab, setShowBookingModal, session }) => {
+        const DashboardView = ({ clientData, calculated, setActiveTab, setShowBookingModal, session, lang }) => {
             const hasShortfalls = calculated.lifeGap > 0 || calculated.dsr > 40 || calculated.emergencyFundPct < 100;
             
             // Find mapped advisor
@@ -1098,15 +1437,15 @@
                 <div className="space-y-8 animate-fade-in">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
-                            <span className="text-xs font-semibold tracking-wider text-gold uppercase">Holistic Summary</span>
-                            <h1 className="text-3xl font-serif font-light text-white mt-1">Welcome back, {clientData.preferredName || 'Client'}</h1>
-                            <p className="text-textDim text-sm mt-1">Here is a snapshot of your calculated financial health.</p>
+                            <span className="text-xs font-semibold tracking-wider text-gold uppercase">{t('holistic_summary', lang)}</span>
+                            <h1 className="text-3xl font-serif font-light text-white mt-1">{t('welcome_back', lang)}, {clientData.preferredName || 'Client'}</h1>
+                            <p className="text-textDim text-sm mt-1">{t('snapshot', lang)}</p>
                         </div>
                         <button 
                             onClick={() => setActiveTab('report')}
                             className="bg-gold hover:bg-yellow-600 text-bg px-5 py-2.5 rounded-lg text-sm font-semibold tracking-wide shadow-lg shadow-gold/10 transition-all duration-200"
                         >
-                            <i className="fas fa-file-invoice-dollar mr-2"></i> View Full Statement
+                            <i className="fas fa-file-invoice-dollar mr-2"></i> {t('view_full_statement', lang)}
                         </button>
                     </div>
 
@@ -1116,7 +1455,7 @@
                             <div className="flex justify-between items-start">
                                 <div>
                                     <p className="text-xs text-textDim uppercase tracking-wider font-semibold flex items-center gap-1.5 group relative cursor-pointer">
-                                        Financial Health
+                                        {t('financial_health', lang)}
                                         <i className="fas fa-info-circle text-[10px] text-gold/80 hover:text-white"></i>
                                         <span className="pointer-events-none absolute bottom-full mb-2 left-0 w-64 bg-surface2 border border-border text-text text-[10px] p-2.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity z-50 shadow-xl leading-relaxed normal-case font-normal">
                                             A calculated score out of 100 based on your DSR, savings rate, emergency reserve liquidity, life coverage sufficiency, and legacy planning.
@@ -1141,7 +1480,7 @@
                             <div className="flex justify-between items-start">
                                 <div>
                                     <p className="text-xs text-textDim uppercase tracking-wider font-semibold flex items-center gap-1.5 group relative cursor-pointer">
-                                        Net Worth
+                                        {t('net_worth', lang)}
                                         <i className="fas fa-info-circle text-[10px] text-gold/80 hover:text-white"></i>
                                         <span className="pointer-events-none absolute bottom-full mb-2 left-0 w-64 bg-surface2 border border-border text-text text-[10px] p-2.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity z-50 shadow-xl leading-relaxed normal-case font-normal">
                                             The value of your total assets (cash, EPF, investments, properties) minus your total liabilities (outstanding mortgages, auto loans, credit cards).
@@ -1156,8 +1495,8 @@
                                 </div>
                             </div>
                             <div className="mt-4 flex gap-4 text-xs text-textDim">
-                                <div>Assets: <span className="text-white font-medium">{fmt(calculated.totalAssets)}</span></div>
-                                <div>Liab: <span className="text-red font-medium">{fmt(calculated.totalLiabilities)}</span></div>
+                                <div>{t('assets', lang)}: <span className="text-white font-medium">{fmt(calculated.totalAssets)}</span></div>
+                                <div>{t('liab', lang)}: <span className="text-red font-medium">{fmt(calculated.totalLiabilities)}</span></div>
                             </div>
                         </Card>
 
@@ -1165,7 +1504,7 @@
                             <div className="flex justify-between items-start">
                                 <div>
                                     <p className="text-xs text-textDim uppercase tracking-wider font-semibold flex items-center gap-1.5 group relative cursor-pointer">
-                                        Monthly Savings Rate
+                                        {t('monthly_savings_rate', lang)}
                                         <i className="fas fa-info-circle text-[10px] text-gold/80 hover:text-white"></i>
                                         <span className="pointer-events-none absolute bottom-full mb-2 left-0 w-64 bg-surface2 border border-border text-text text-[10px] p-2.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity z-50 shadow-xl leading-relaxed normal-case font-normal">
                                             The percentage of your monthly gross income saved after all loans and living expenses are deducted. A savings rate of 20% or more is recommended.
@@ -1182,8 +1521,8 @@
                             <div className="mt-4">
                                 <ProgressBar progress={calculated.savingsRate} colorClass="from-green to-emerald-400" />
                                 <div className="flex justify-between text-[10px] text-textDim mt-1">
-                                    <span>Surplus: {fmt(calculated.monthlySurplus)}</span>
-                                    <span>Target: 20%</span>
+                                    <span>{t('surplus', lang)}: {fmt(calculated.monthlySurplus)}</span>
+                                    <span>{t('target', lang)}: 20%</span>
                                 </div>
                             </div>
                         </Card>
@@ -1192,7 +1531,7 @@
                             <div className="flex justify-between items-start">
                                 <div>
                                     <p className="text-xs text-textDim uppercase tracking-wider font-semibold flex items-center gap-1.5 group relative cursor-pointer">
-                                        Debt Service Ratio
+                                        {t('debt_service_ratio', lang)}
                                         <i className="fas fa-info-circle text-[10px] text-gold/80 hover:text-white"></i>
                                         <span className="pointer-events-none absolute bottom-full mb-2 left-0 w-64 bg-surface2 border border-border text-text text-[10px] p-2.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity z-50 shadow-xl leading-relaxed normal-case font-normal">
                                             The ratio of monthly loan payments to your gross monthly income. In Malaysia, bank guidelines recommend keeping DSR below 60% for loan approvals.
@@ -1209,8 +1548,8 @@
                             <div className="mt-4">
                                 <ProgressBar progress={calculated.dsr} colorClass="from-amber to-yellow-500" />
                                 <div className="flex justify-between text-[10px] text-textDim mt-1">
-                                    <span>Loan Pay: {fmt(calculated.loansMonthly)}/mo</span>
-                                    <span>Alert limit: 40%</span>
+                                    <span>{t('loan_pay', lang)}: {fmt(calculated.loansMonthly)}/mo</span>
+                                    <span>{t('alert_limit', lang)}: 40%</span>
                                 </div>
                             </div>
                         </Card>
@@ -1223,8 +1562,8 @@
                             <Card>
                                 <div className="flex justify-between items-center mb-6">
                                     <div>
-                                        <h3 className="font-serif text-lg text-white">Net Worth Asset Allocation</h3>
-                                        <p className="text-xs text-textDim">Calculated from current real estate, EPF and deposits</p>
+                                        <h3 className="font-serif text-lg text-white">{t('net_worth_allocation', lang)}</h3>
+                                        <p className="text-xs text-textDim">{t('calculated_from', lang)}</p>
                                     </div>
                                     <button 
                                         onClick={() => setActiveTab('discovery')} 
@@ -3522,7 +3861,7 @@
         /* =========================================================================
            TRUST EQUATION SCORECARD VIEW
            ========================================================================= */
-        const TrustScorecardView = ({ trustScores, setTrustScores, clientData }) => {
+        const TrustScorecardView = ({ trustScores, setTrustScores, clientData, lang }) => {
             const [answers, setAnswers] = useState(() => ({
                 q1: trustScores.credibility || 7,
                 q2: trustScores.reliability || 7,
@@ -3566,77 +3905,21 @@
                 description = "A reliable advisory state, though intimacy can be increased through active listening, or self-focus can be lowered by decoupling sales incentives.";
             }
 
-            const questions = [
-                {
-                    id: 'q1',
-                    label: '1. Transparency & Disclosures (Credibility)',
-                    desc: "Evaluate the client's transparency and accuracy in disclosing assets, liabilities, and documentation.",
-                    options: [
-                        { val: 10, label: 'Complete disclosures with verified paperwork (EPF, tax portals, bank books).' },
-                        { val: 7, label: 'Good disclosures, but requires minor follow-up to acquire secondary documentation.' },
-                        { val: 4, label: 'Guarded or reluctant to share external asset allocations, liabilities, or business revenues.' },
-                        { val: 1, label: 'High levels of denial, withholding information, or presenting contradictory statements.' }
-                    ]
-                },
-                {
-                    id: 'q2',
-                    label: '2. Financial Discipline (Reliability)',
-                    desc: "Analyze the client's consistency in keeping savings commitments, debt repayment, and budget rules.",
-                    options: [
-                        { val: 10, label: 'Superb discipline; consistently hits savings targets and keeps DSR within strict targets.' },
-                        { val: 7, label: 'Moderate discipline; saves periodically but has occasional deviations/impulse spends.' },
-                        { val: 4, label: 'Struggles with financial limits, maintains high credit card utilization or debt load.' },
-                        { val: 1, label: 'Chronic overspending, relies on high-interest loans, and shows negative monthly surplus.' }
-                    ]
-                },
-                {
-                    id: 'q3',
-                    label: '3. Engagement & Responsiveness (Reliability)',
-                    desc: "Measure client activity during scheduled reviews and promptness in responding to advisory tasks.",
-                    options: [
-                        { val: 10, label: 'Proactive engagement; responds immediately, attends all reviews, and takes ownership.' },
-                        { val: 7, label: 'Collaborative but passive; responds within reasonable time, follows advisor directives.' },
-                        { val: 4, label: 'Regularly reschedules, delays submitting KYC forms or insurance requirements.' },
-                        { val: 1, label: 'Unresponsive; ignores review cycles, hard to contact, showing general disinterest.' }
-                    ]
-                },
-                {
-                    id: 'q4',
-                    label: '4. Openness & Vulnerability (Intimacy)',
-                    desc: "Check the client's comfort levels in sharing personal legacy goals, medical history, and family estate concerns.",
-                    options: [
-                        { val: 10, label: 'Complete trust; shares deep family legacy worries, health risks, and business transition fears.' },
-                        { val: 7, label: 'Speaks openly about general goals but holds back on private family bottlenecks.' },
-                        { val: 4, label: 'Guarded; prefers generic calculators over customizing plans for family/estate issues.' },
-                        { val: 1, label: 'Extremely closed; rejects legacy discussions, refuses health disclosure and family detail inputs.' }
-                    ]
-                },
-                {
-                    id: 'q5',
-                    label: '5. Planning Horizon & Orientation (Self-Orientation)',
-                    desc: "Assess the client's interest in sustainable long-term legacy plans versus short-term high-yield products.",
-                    options: [
-                        { val: 2, label: 'Long-term focused; prioritizes estate protection, insurance gap fills, and steady retirement.' },
-                        { val: 5, label: 'Balanced; understands legacy/protection but exhibits recurring interest in high-yield assets.' },
-                        { val: 8, label: 'Yield-seeking; pushes for high-yield returns, showing low interest in wills, wasiat, or medical cards.' },
-                        { val: 10, label: 'Highly transactional/speculative; ignores risk buffers entirely to trade in speculative schemes.' }
-                    ]
-                }
-            ];
+            const questions = getQuestions(lang);
 
             return (
                 <div className="space-y-6 animate-fade-in">
                     <div>
-                        <span className="text-xs font-semibold tracking-wider text-gold uppercase">Trust Analytics</span>
-                        <h1 className="text-3xl font-serif font-light text-white mt-1">Advisor Trust Assessment</h1>
-                        <p className="text-textDim text-sm mt-1">Complete this scorecard during client consultations to evaluate trust metrics and long-term planning behavior.</p>
+                        <span className="text-xs font-semibold tracking-wider text-gold uppercase">{t('trust_analytics', lang)}</span>
+                        <h1 className="text-3xl font-serif font-light text-white mt-1">{t('advisor_trust_assessment', lang)}</h1>
+                        <p className="text-textDim text-sm mt-1">{t('trust_assessment_desc', lang)}</p>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         {/* Interactive Questionnaire */}
                         <div className="lg:col-span-2 space-y-6">
                             <Card className="space-y-6 text-xs font-sans">
-                                <h3 className="font-serif text-lg text-white border-b border-border pb-2">Client Trust & Discipline Assessment</h3>
+                                <h3 className="font-serif text-lg text-white border-b border-border pb-2">{t('client_trust_discipline_assessment', lang)}</h3>
                                 <div className="space-y-6">
                                     {questions.map((q) => (
                                         <div key={q.id} className="space-y-2.5">
@@ -3676,7 +3959,7 @@
                         <div className="lg:col-span-1 space-y-6">
                             {/* Equation Visualization */}
                             <Card className={`border ${borderGlow} transition-all duration-300`}>
-                                <h3 className="font-serif text-lg text-white mb-4">The Trust Equation</h3>
+                                <h3 className="font-serif text-lg text-white mb-4">{t('trust_eq_title', lang)}</h3>
                                 
                                 <div className="flex flex-col items-center justify-center py-6 bg-surface2/30 border border-border/40 rounded-lg">
                                     <div className="flex items-center gap-6 font-serif text-xl md:text-3xl text-white">
@@ -3715,7 +3998,7 @@
 
                             {/* Trust score explanation and guide card */}
                             <Card className="space-y-4">
-                                <h3 className="font-serif text-base text-gold">Trust Equation Improvement Guide</h3>
+                                <h3 className="font-serif text-base text-gold">{t('trust_eq_guide', lang)}</h3>
                                 <div className="grid grid-cols-1 gap-4 text-xs font-sans text-textMid leading-relaxed">
                                     <div className="p-3 bg-surface2/50 rounded-lg border border-border/40 space-y-1.5">
                                         <h4 className="font-semibold text-white">Credibility & Reliability Actions</h4>
@@ -4146,7 +4429,7 @@
                         {/* Advisor Trust Scorecard Section */}
                         {session?.role === 'advisor' && trustScores && (
                             <div className="border-t border-border/60 pt-6 space-y-4">
-                                <h3 className="font-serif text-lg text-gold font-semibold uppercase tracking-wider">Advisor Relationship Trust Scorecard</h3>
+                                <h3 className="font-serif text-lg text-gold font-semibold uppercase tracking-wider">{t('advisor_relationship_trust_scorecard', lang)}</h3>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-sans text-textMid bg-surface2/30 border border-border/60 p-4 rounded-lg">
                                     <div>
                                         <span className="text-textDim block uppercase font-medium">Credibility (C)</span>
@@ -4167,7 +4450,7 @@
                                 </div>
                                 <div className="flex justify-between items-center bg-goldDim/30 border border-gold/20 p-3 rounded-lg text-xs font-sans">
                                     <div className="font-serif">
-                                        <span className="text-gold font-bold">TRUST EQUATION RESULT:</span>{' '}
+                                        <span className="text-gold font-bold">{t('trust_eq_result', lang)}:</span>{' '}
                                         <span className="text-white">T = (C + R + I) / S =</span>{' '}
                                         <strong className="text-gold text-sm font-sans">{((trustScores.credibility + trustScores.reliability + trustScores.intimacy) / Math.max(0.1, trustScores.selfOrientation)).toFixed(1)}</strong>
                                     </div>
