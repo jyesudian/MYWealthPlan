@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MY Wealth Portrait — Financial Portrait Platform</title>
+    <link rel="icon" href="data:,">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -213,6 +214,14 @@
             }
             .border-gold {
                 border-color: #d4a853 !important;
+            }
+            
+            /* Pagination control */
+            .page-break-after {
+                page-break-after: always !important;
+            }
+            .page-break-inside-avoid {
+                page-break-inside: avoid !important;
             }
         }
     </style>
@@ -4378,6 +4387,521 @@
         };
 
         /* =========================================================================
+           FINANCIAL REPORT SUB-COMPONENTS
+           ========================================================================= */
+        // Recharts visual analytics removed per user request
+
+        const ReportCover = ({ clientData }) => (
+            <div className="flex flex-col items-center justify-center min-h-[900px] page-break-after relative overflow-hidden print-card">
+                <div className="absolute top-0 right-0 w-96 h-96 bg-gold/5 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
+                <div className="absolute bottom-0 left-0 w-96 h-96 bg-gold/5 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2"></div>
+                
+                <div className="w-32 h-32 bg-goldDim rounded-full flex items-center justify-center border border-gold/30 mb-12 shadow-[0_0_50px_rgba(212,168,83,0.15)] relative z-10">
+                    <span className="text-5xl font-serif text-gold">M</span>
+                </div>
+                <h1 className="text-6xl font-serif text-white uppercase tracking-widest text-center mb-6 relative z-10">My Wealth Portrait</h1>
+                <p className="text-gold tracking-[0.3em] uppercase text-sm mb-32 font-semibold relative z-10">Confidential Financial Planning Report</p>
+                
+                <div className="text-center space-y-10 relative z-10 w-full max-w-md">
+                    <div className="border-b border-border/40 pb-6">
+                        <p className="text-textDim text-xs uppercase tracking-widest mb-2">Prepared For</p>
+                        <h2 className="text-3xl text-white font-serif">{clientData.fullName}</h2>
+                        <p className="text-textDim mt-2">{clientData.nric}</p>
+                    </div>
+                    <div className="border-b border-border/40 pb-6">
+                        <p className="text-textDim text-xs uppercase tracking-widest mb-2">Date Prepared</p>
+                        <p className="text-xl text-white font-serif">{new Date().toLocaleDateString('en-MY', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    </div>
+                    <div>
+                        <p className="text-textDim text-xs uppercase tracking-widest mb-2">Prepared By</p>
+                        <p className="text-xl text-white font-serif">Stanley Tan & Team TSA</p>
+                        <p className="text-gold text-xs mt-2 uppercase tracking-wider font-semibold">Certified Financial Planner</p>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const ReportTOC = () => (
+            <div className="page-break-after p-12 bg-surface print-card min-h-[900px]">
+                <h2 className="text-4xl font-serif text-white uppercase tracking-wide border-b border-gold pb-6 mb-12">Table of Contents</h2>
+                <div className="max-w-2xl mx-auto">
+                    <ul className="space-y-6 text-base font-sans">
+                        <li className="flex justify-between items-end border-b border-border/40 pb-2"><span className="text-white font-medium uppercase tracking-wider">1. Executive Summary</span><span className="text-gold font-serif text-xl">03</span></li>
+                        <li className="flex justify-between items-end border-b border-border/40 pb-2"><span className="text-white font-medium uppercase tracking-wider">2. Client Profile & Goals</span><span className="text-gold font-serif text-xl">04</span></li>
+                        <li className="flex justify-between items-end border-b border-border/40 pb-2"><span className="text-white font-medium uppercase tracking-wider">3. Current Financial Situation</span><span className="text-gold font-serif text-xl">05</span></li>
+                        <li className="flex justify-between items-end border-b border-border/40 pb-2"><span className="text-white font-medium uppercase tracking-wider">4. Financial Health Assessment</span><span className="text-gold font-serif text-xl">06</span></li>
+                        <li className="flex justify-between items-end border-b border-border/40 pb-2"><span className="text-white font-medium uppercase tracking-wider">5. Observations & Strategies</span><span className="text-gold font-serif text-xl">07</span></li>
+                        <li className="flex justify-between items-end border-b border-border/40 pb-2"><span className="text-white font-medium uppercase tracking-wider">6. Risk Management & Insurance</span><span className="text-gold font-serif text-xl">08</span></li>
+                        <li className="flex justify-between items-end border-b border-border/40 pb-2"><span className="text-white font-medium uppercase tracking-wider">7. Investment Planning</span><span className="text-gold font-serif text-xl">09</span></li>
+                        <li className="flex justify-between items-end border-b border-border/40 pb-2"><span className="text-white font-medium uppercase tracking-wider">8. Action Plan & Conclusion</span><span className="text-gold font-serif text-xl">10</span></li>
+                    </ul>
+                </div>
+            </div>
+        );
+
+        const ReportDisclaimer = () => (
+            <div className="page-break-after p-12 bg-surface print-card min-h-[900px] flex flex-col justify-center">
+                <div className="max-w-3xl mx-auto bg-surface2/30 border border-border p-10 rounded-xl relative">
+                    <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-surface px-4">
+                        <i className="fas fa-balance-scale text-3xl text-gold"></i>
+                    </div>
+                    <h2 className="text-2xl font-serif text-center text-white uppercase tracking-wide pb-2 mb-8 mt-4">Disclaimer & Notice</h2>
+                    <div className="space-y-6 text-sm text-textDim leading-relaxed text-justify">
+                        <p>This Financial Portrait summary has been compiled based on self-reported assets, liabilities, income, and expenses. The accuracy of this report is dependent solely on the information provided by the client during the data gathering process.</p>
+                        <p>Indicators such as the Debt Service Ratio (DSR), recommended Life Cover, and projection models are estimates provided for advisor reference under standard financial planning frameworks. They do not constitute formal banking offers, guaranteed investment returns, or binding insurance contracts.</p>
+                        <p>All personal data collected and presented within this document is governed strictly under the <strong>Malaysian Personal Data Protection Act (PDPA) 2010</strong> guidelines. This document is highly confidential and intended solely for the use of the named client and their authorized financial advisor.</p>
+                        <p className="text-center font-serif italic text-gold mt-8">For professional advisory use only.</p>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const ReportExecutiveSummary = ({ clientData, calculated }) => (
+            <div className="page-break-after p-12 bg-surface print-card min-h-[900px]">
+                <h2 className="text-3xl font-serif text-white uppercase tracking-wide border-b border-gold pb-4 mb-8">1. Executive Summary</h2>
+                <div className="space-y-6 text-base text-textDim leading-relaxed">
+                    <p>Dear <strong className="text-white font-serif text-xl">{clientData.fullName}</strong>,</p>
+                    <p>Thank you for entrusting us with the review of your financial situation. Based on our analysis of your provided data, your current holistic financial health score is a <strong className="text-gold text-xl font-serif bg-goldDim/20 px-2 py-0.5 rounded">{calculated.healthScore} out of 100</strong>.</p>
+                    <p>You have accumulated an estimated net worth of <strong className="text-white">{fmt(calculated.netWorth)}</strong>. Your monthly cash flow currently shows a surplus of <strong className={`${calculated.monthlySurplus >= 0 ? 'text-green' : 'text-red'}`}>{fmt(calculated.monthlySurplus)}</strong>, which indicates a {calculated.monthlySurplus >= 0 ? 'healthy capacity to save, protect, and invest for future goals' : 'critical need to restructure expenses or increase income streams to avoid debt accumulation'}.</p>
+                    
+                    <div className="bg-surface2/50 border border-border p-6 rounded-lg mt-8">
+                        <h3 className="text-xl font-serif text-gold mb-4 uppercase tracking-wider">Key Highlights</h3>
+                        <ul className="space-y-4">
+                            <li className="flex gap-4">
+                                <div className="text-gold mt-1"><i className="fas fa-tint"></i></div>
+                                <div>
+                                    <strong className="text-white block uppercase text-xs tracking-wider mb-1">Liquidity & Reserves</strong>
+                                    <span>Your emergency liquid funds are {clientData.savings > clientData.monthlyExpenses * 3 ? 'adequate, meeting the standard 3-6 months buffer.' : 'currently below the recommended 3-6 months of expenses and should be prioritized.'}</span>
+                                </div>
+                            </li>
+                            <li className="flex gap-4">
+                                <div className="text-gold mt-1"><i className="fas fa-balance-scale-left"></i></div>
+                                <div>
+                                    <strong className="text-white block uppercase text-xs tracking-wider mb-1">Debt Management</strong>
+                                    <span>Your Debt Service Ratio is estimated at <strong className="text-white">{((calculated.loansMonthly / clientData.monthlyIncome) * 100).toFixed(1)}%</strong>, which is {calculated.loansMonthly / clientData.monthlyIncome > 0.4 ? <span className="text-red font-semibold">concerningly high and requires immediate attention to prevent cash flow crunches.</span> : 'within healthy manageable limits.'}</span>
+                                </div>
+                            </li>
+                            <li className="flex gap-4">
+                                <div className="text-gold mt-1"><i className="fas fa-chart-line"></i></div>
+                                <div>
+                                    <strong className="text-white block uppercase text-xs tracking-wider mb-1">Wealth Accumulation</strong>
+                                    <span>A significant portion of your net worth is tied to {parseFloat(clientData.epf) > (parseFloat(clientData.stocks) || 0) ? 'illiquid retirement accounts (EPF) and real estate. Diversification into more liquid investments may be required.' : 'liquid investment portfolios, providing good flexibility.'}</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const ReportClientProfile = ({ clientData }) => (
+            <div className="page-break-after p-12 bg-surface print-card min-h-[900px]">
+                <h2 className="text-3xl font-serif text-white uppercase tracking-wide border-b border-gold pb-4 mb-8">2. Client Profile & Goals</h2>
+                
+                <h3 className="text-xl font-serif text-gold mb-4 uppercase tracking-wider">Personal Information</h3>
+                <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-sm bg-surface2/30 border border-border p-6 rounded-lg mb-8">
+                    <div><span className="text-textDim block text-[11px] uppercase tracking-wider mb-1 font-semibold">Full Name</span><strong className="text-white text-base">{clientData.fullName}</strong></div>
+                    <div><span className="text-textDim block text-[11px] uppercase tracking-wider mb-1 font-semibold">NRIC / Passport</span><strong className="text-white text-base">{clientData.nric}</strong></div>
+                    <div><span className="text-textDim block text-[11px] uppercase tracking-wider mb-1 font-semibold">Date of Birth</span><strong className="text-white text-base">Sample DOB (38 Years)</strong></div>
+                    <div><span className="text-textDim block text-[11px] uppercase tracking-wider mb-1 font-semibold">Marital Status</span><strong className="text-white text-base">{clientData.marital}</strong></div>
+                    <div><span className="text-textDim block text-[11px] uppercase tracking-wider mb-1 font-semibold">Contact Number</span><strong className="text-white text-base">+60 12-345 6789</strong></div>
+                    <div><span className="text-textDim block text-[11px] uppercase tracking-wider mb-1 font-semibold">Email Address</span><strong className="text-white text-base">{clientData.fullName.toLowerCase().replace(' ', '.')}@email.com</strong></div>
+                </div>
+
+                <h3 className="text-xl font-serif text-gold mb-4 uppercase tracking-wider mt-10">Employment Details</h3>
+                <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-sm bg-surface2/30 border border-border p-6 rounded-lg mb-8">
+                    <div><span className="text-textDim block text-[11px] uppercase tracking-wider mb-1 font-semibold">Current Occupation</span><strong className="text-white text-base">Senior Executive / Professional</strong></div>
+                    <div><span className="text-textDim block text-[11px] uppercase tracking-wider mb-1 font-semibold">Employer / Company</span><strong className="text-white text-base">MNC Corporation Malaysia</strong></div>
+                    <div><span className="text-textDim block text-[11px] uppercase tracking-wider mb-1 font-semibold">Retirement Age Target</span><strong className="text-white text-base">60 Years Old</strong></div>
+                    <div><span className="text-textDim block text-[11px] uppercase tracking-wider mb-1 font-semibold">Risk Profile</span><strong className="text-gold font-bold uppercase tracking-wider text-xs border border-gold/40 px-2 py-0.5 rounded bg-goldDim/20 inline-block mt-1">Moderate Aggressive</strong></div>
+                </div>
+
+                <h3 className="text-xl font-serif text-gold mb-4 uppercase tracking-wider mt-10">Financial Goals & Objectives</h3>
+                <div className="space-y-4">
+                    <div className="border border-border/60 p-5 rounded-lg bg-surface2/20 flex items-start gap-5">
+                        <div className="text-gold mt-1 text-2xl"><i className="fas fa-bullseye"></i></div>
+                        <div>
+                            <strong className="text-white block uppercase text-sm tracking-wider mb-2 font-serif text-lg">Primary: Retirement Accumulation</strong>
+                            <p className="text-sm text-textDim leading-relaxed">To accumulate sufficient wealth to generate a passive income of <strong className="text-white">{fmt(clientData.monthlyExpenses * 1.5)} per month</strong>, adjusted for 4% inflation, upon reaching age 60.</p>
+                        </div>
+                    </div>
+                    <div className="border border-border/60 p-5 rounded-lg bg-surface2/20 flex items-start gap-5">
+                        <div className="text-gold mt-1 text-2xl"><i className="fas fa-graduation-cap"></i></div>
+                        <div>
+                            <strong className="text-white block uppercase text-sm tracking-wider mb-2 font-serif text-lg">Secondary: Children's Education Funding</strong>
+                            <p className="text-sm text-textDim leading-relaxed">To secure RM 350,000 in present value for tertiary education funding over the next 10-15 years, utilizing safe-harbor growth assets.</p>
+                        </div>
+                    </div>
+                    <div className="border border-border/60 p-5 rounded-lg bg-surface2/20 flex items-start gap-5">
+                        <div className="text-gold mt-1 text-2xl"><i className="fas fa-shield-alt"></i></div>
+                        <div>
+                            <strong className="text-white block uppercase text-sm tracking-wider mb-2 font-serif text-lg">Tertiary: Estate Planning & Wealth Transfer</strong>
+                            <p className="text-sm text-textDim leading-relaxed">To establish a valid Wasiat/Will and nominate beneficiaries for all existing policies to ensure smooth transition of assets to dependents.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const ReportCurrentFinancials = ({ clientData, calculated }) => {
+            const liquidAssets = parseFloat(clientData.savings) + parseFloat(clientData.epf) + (parseFloat(clientData.stocks)||0) + (parseFloat(clientData.unitTrusts)||0);
+            const totalInflows = parseFloat(clientData.monthlyIncome) + parseFloat(clientData.otherIncome || 0) + (clientData.properties || []).reduce((sum, p) => sum + (parseFloat(p.rental) || 0), 0);
+            return (
+                <div className="page-break-after p-12 bg-surface print-card min-h-[900px]">
+                    <h2 className="text-3xl font-serif text-white uppercase tracking-wide border-b border-gold pb-4 mb-8">3. Current Financial Situation</h2>
+                    
+                    <div className="grid grid-cols-1 gap-12">
+                        {/* Net Worth Statement */}
+                        <div>
+                            <h3 className="text-xl font-serif text-gold mb-4 uppercase tracking-wider">Statement of Net Worth</h3>
+                            <table className="w-full text-base text-left border-collapse bg-surface2/10 border border-border/60 rounded-lg overflow-hidden">
+                                <thead>
+                                    <tr className="bg-surface2/50 border-b border-border/80">
+                                        <th className="p-4 font-serif uppercase tracking-wider text-white w-2/3">Assets</th>
+                                        <th className="p-4 font-serif uppercase tracking-wider text-right text-white w-1/3">Value (RM)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr className="border-b border-border/40"><td className="p-4 text-textDim pl-8">Cash & Savings</td><td className="p-4 text-right text-white font-medium">{fmt(clientData.savings)}</td></tr>
+                                    <tr className="border-b border-border/40"><td className="p-4 text-textDim pl-8">EPF / Retirement Funds</td><td className="p-4 text-right text-white font-medium">{fmt(clientData.epf)}</td></tr>
+                                    <tr className="border-b border-border/40"><td className="p-4 text-textDim pl-8">Unit Trusts & Equities</td><td className="p-4 text-right text-white font-medium">{fmt((parseFloat(clientData.stocks)||0)+(parseFloat(clientData.unitTrusts)||0))}</td></tr>
+                                    <tr className="border-b border-gold/30 bg-surface2/30"><td className="p-4 text-white font-medium pl-8 font-serif italic">Total Liquid Assets</td><td className="p-4 text-right text-white font-bold">{fmt(liquidAssets)}</td></tr>
+                                    <tr className="border-b border-border/40"><td className="p-4 text-textDim pl-8">Real Estate Properties</td><td className="p-4 text-right text-white font-medium">{fmt((clientData.properties || []).reduce((sum, p) => sum + (parseFloat(p.value) || 0), 0))}</td></tr>
+                                </tbody>
+                                <thead>
+                                    <tr className="bg-surface2/50 border-y border-border/80">
+                                        <th className="p-4 font-serif uppercase tracking-wider text-white">Liabilities</th>
+                                        <th className="p-4 font-serif uppercase tracking-wider text-right text-white">Balance (RM)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr className="border-b border-border/40"><td className="p-4 text-textDim pl-8">Property / Term Loans</td><td className="p-4 text-right text-red font-medium">-{fmt((clientData.loans || []).reduce((sum, l) => sum + (parseFloat(l.balance) || 0), 0))}</td></tr>
+                                    <tr className="border-b border-border/40"><td className="p-4 text-textDim pl-8">Credit Cards & Short-term</td><td className="p-4 text-right text-red font-medium">-{fmt(clientData.creditCard)}</td></tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr className="bg-goldDim/20 border-t border-gold">
+                                        <td className="p-5 font-serif text-xl text-gold font-bold uppercase tracking-wide">Estimated Net Worth</td>
+                                        <td className="p-5 text-right text-green text-xl font-bold">{fmt(calculated.netWorth)}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        {/* Cash Flow Statement */}
+                        <div>
+                            <h3 className="text-xl font-serif text-gold mb-4 uppercase tracking-wider">Statement of Cash Flow (Monthly)</h3>
+                            <table className="w-full text-base text-left border-collapse bg-surface2/10 border border-border/60 rounded-lg overflow-hidden">
+                                <thead>
+                                    <tr className="bg-surface2/50 border-b border-border/80">
+                                        <th className="p-4 font-serif uppercase tracking-wider text-white w-2/3">Inflows</th>
+                                        <th className="p-4 font-serif uppercase tracking-wider text-right text-white w-1/3">Amount (RM)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr className="border-b border-border/40"><td className="p-4 text-textDim pl-8">Base Employment Income</td><td className="p-4 text-right text-white font-medium">{fmt(clientData.monthlyIncome)}</td></tr>
+                                    <tr className="border-b border-border/40"><td className="p-4 text-textDim pl-8">Business / Other Incomes</td><td className="p-4 text-right text-white font-medium">{fmt(clientData.otherIncome)}</td></tr>
+                                    <tr className="border-b border-border/40"><td className="p-4 text-textDim pl-8">Property Rental Yield</td><td className="p-4 text-right text-white font-medium">{fmt((clientData.properties || []).reduce((sum, p) => sum + (parseFloat(p.rental) || 0), 0))}</td></tr>
+                                    <tr className="border-b border-gold/30 bg-surface2/30"><td className="p-4 text-white font-medium pl-8 font-serif italic">Total Monthly Inflows</td><td className="p-4 text-right text-green font-bold">{fmt(totalInflows)}</td></tr>
+                                </tbody>
+                                <thead>
+                                    <tr className="bg-surface2/50 border-y border-border/80">
+                                        <th className="p-4 font-serif uppercase tracking-wider text-white">Outflows</th>
+                                        <th className="p-4 font-serif uppercase tracking-wider text-right text-white">Amount (RM)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr className="border-b border-border/40"><td className="p-4 text-textDim pl-8">Living Expenses & Commitments</td><td className="p-4 text-right text-red font-medium">-{fmt(clientData.monthlyExpenses)}</td></tr>
+                                    <tr className="border-b border-border/40"><td className="p-4 text-textDim pl-8">Loan Repayments (Mortgage/Hire Purchase)</td><td className="p-4 text-right text-red font-medium">-{fmt(calculated.loansMonthly)}</td></tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr className="bg-goldDim/20 border-t border-gold">
+                                        <td className="p-5 font-serif text-xl text-gold font-bold uppercase tracking-wide">Monthly Cash Surplus</td>
+                                        <td className={`p-5 text-right text-xl font-bold ${calculated.monthlySurplus >= 0 ? 'text-green' : 'text-red'}`}>{fmt(calculated.monthlySurplus)}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const ReportHealthAssessment = ({ clientData, calculated }) => {
+            const dsr = ((calculated.loansMonthly / clientData.monthlyIncome) * 100).toFixed(1);
+            const savingsRatio = ((calculated.monthlySurplus / clientData.monthlyIncome) * 100).toFixed(1);
+            const liquidRatio = (parseFloat(clientData.savings) / parseFloat(clientData.monthlyExpenses)).toFixed(1);
+
+            return (
+                <div className="page-break-after p-12 bg-surface print-card min-h-[900px]">
+                    <h2 className="text-3xl font-serif text-white uppercase tracking-wide border-b border-gold pb-4 mb-8">4. Financial Health Assessment</h2>
+                    
+                    <div className="grid grid-cols-2 gap-8 mb-10">
+                        <div className="bg-surface2/30 border border-border p-6 rounded-lg text-center relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-gold/10 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2"></div>
+                            <p className="text-textDim text-sm uppercase tracking-wider mb-2 font-semibold">Overall Portrait Score</p>
+                            <div className="text-6xl font-serif text-gold font-bold">{calculated.healthScore}</div>
+                            <p className="text-white text-sm mt-2">Out of 100 Points</p>
+                        </div>
+                        <div className="bg-surface2/30 border border-border p-6 rounded-lg flex flex-col justify-center">
+                            <h3 className="text-lg font-serif text-white mb-2">Score Interpretation</h3>
+                            <p className="text-sm text-textDim leading-relaxed">Your financial health score reflects a holistic view of your liquidity, debt management, risk protection, and wealth accumulation. A score above 70 indicates a strong foundation, while scores below 50 require immediate restructuring of cash flows or liabilities.</p>
+                        </div>
+                    </div>
+
+                    <h3 className="text-xl font-serif text-gold mb-6 uppercase tracking-wider">Key Financial Ratios</h3>
+                    <div className="space-y-6">
+                        <div className="border border-border/40 p-6 rounded-lg bg-surface2/20">
+                            <div className="flex justify-between items-center mb-4">
+                                <strong className="text-white text-base font-serif uppercase tracking-wider">1. Liquidity Ratio (Emergency Buffer)</strong>
+                                <span className={`px-3 py-1 rounded text-xs font-bold uppercase tracking-wider ${liquidRatio >= 3 ? 'bg-green/20 text-green border border-green/30' : 'bg-red/20 text-red border border-red/30'}`}>{liquidRatio >= 3 ? 'Healthy' : 'Below Target'}</span>
+                            </div>
+                            <div className="flex justify-between items-end mb-3">
+                                <span className="text-4xl font-bold text-white">{liquidRatio} <span className="text-xl text-textDim font-normal font-serif">Months</span></span>
+                                <span className="text-textDim text-sm uppercase tracking-wider font-semibold">Target: 3 - 6 Months</span>
+                            </div>
+                            <div className="w-full bg-surface2 h-2.5 rounded-full overflow-hidden">
+                                <div className={`h-full ${liquidRatio >= 3 ? 'bg-green' : 'bg-red'}`} style={{ width: `${Math.min(100, (liquidRatio/6)*100)}%` }}></div>
+                            </div>
+                            <p className="text-sm text-textDim mt-5 leading-relaxed">Measures how many months of living expenses your liquid cash can cover. You currently have <strong className="text-white">{fmt(clientData.savings)}</strong> in liquid cash against monthly expenses of <strong className="text-white">{fmt(clientData.monthlyExpenses)}</strong>.</p>
+                        </div>
+
+                        <div className="border border-border/40 p-6 rounded-lg bg-surface2/20">
+                            <div className="flex justify-between items-center mb-4">
+                                <strong className="text-white text-base font-serif uppercase tracking-wider">2. Debt Service Ratio (DSR)</strong>
+                                <span className={`px-3 py-1 rounded text-xs font-bold uppercase tracking-wider ${dsr <= 40 ? 'bg-green/20 text-green border border-green/30' : 'bg-red/20 text-red border border-red/30'}`}>{dsr <= 40 ? 'Healthy' : 'High Risk'}</span>
+                            </div>
+                            <div className="flex justify-between items-end mb-3">
+                                <span className="text-4xl font-bold text-white">{dsr}%</span>
+                                <span className="text-textDim text-sm uppercase tracking-wider font-semibold">Target: &lt; 40%</span>
+                            </div>
+                            <div className="w-full bg-surface2 h-2.5 rounded-full overflow-hidden flex">
+                                <div className={`h-full ${dsr <= 40 ? 'bg-green' : 'bg-red'}`} style={{ width: `${Math.min(100, dsr)}%` }}></div>
+                            </div>
+                            <p className="text-sm text-textDim mt-5 leading-relaxed">Measures the percentage of your gross monthly income used to pay debt obligations. A lower DSR provides better borrowing capacity and cash flow flexibility.</p>
+                        </div>
+
+                        <div className="border border-border/40 p-6 rounded-lg bg-surface2/20">
+                            <div className="flex justify-between items-center mb-4">
+                                <strong className="text-white text-base font-serif uppercase tracking-wider">3. Savings & Investment Ratio</strong>
+                                <span className={`px-3 py-1 rounded text-xs font-bold uppercase tracking-wider ${savingsRatio >= 20 ? 'bg-green/20 text-green border border-green/30' : 'bg-goldDim/20 text-gold border border-gold/30'}`}>{savingsRatio >= 20 ? 'Optimal' : 'Needs Improvement'}</span>
+                            </div>
+                            <div className="flex justify-between items-end mb-3">
+                                <span className="text-4xl font-bold text-white">{savingsRatio}%</span>
+                                <span className="text-textDim text-sm uppercase tracking-wider font-semibold">Target: &gt; 20%</span>
+                            </div>
+                            <div className="w-full bg-surface2 h-2.5 rounded-full overflow-hidden">
+                                <div className={`h-full ${savingsRatio >= 20 ? 'bg-green' : 'bg-gold'}`} style={{ width: `${Math.min(100, savingsRatio)}%` }}></div>
+                            </div>
+                            <p className="text-sm text-textDim mt-5 leading-relaxed">Represents the portion of your income that is retained as surplus for future goals. Based on your monthly surplus of <strong className="text-white">{fmt(calculated.monthlySurplus)}</strong>.</p>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const ReportObservations = ({ calculated }) => (
+            <div className="page-break-after p-12 bg-surface print-card min-h-[900px]">
+                <h2 className="text-3xl font-serif text-white uppercase tracking-wide border-b border-gold pb-4 mb-8">5. Observations & Strategies</h2>
+                
+                <h3 className="text-xl font-serif text-red mb-4 uppercase tracking-wider">Potential Problems & Risks</h3>
+                <div className="space-y-4 mb-12">
+                    <div className="border-l-4 border-red bg-red/5 p-6 rounded-r-lg">
+                        <strong className="text-white block mb-2 font-serif text-xl">1. Inflation Risk on Cash Holdings</strong>
+                        <p className="text-sm text-textDim leading-relaxed">Holding excessive amounts of cash in low-yield savings accounts exposes your wealth to inflation risk. With core inflation averaging 3-4%, cash equivalents lose purchasing power over time. A strategy is needed to deploy surplus cash into inflation-beating assets.</p>
+                    </div>
+                    <div className="border-l-4 border-red bg-red/5 p-6 rounded-r-lg">
+                        <strong className="text-white block mb-2 font-serif text-xl">2. Income Replacement Gap</strong>
+                        <p className="text-sm text-textDim leading-relaxed">In the event of premature death, critical illness, or total permanent disability, the current liquid assets may not be sufficient to replace your income and sustain your family's lifestyle, potentially forcing the liquidation of illiquid assets like property at sub-optimal prices.</p>
+                    </div>
+                    {calculated.healthScore < 60 && (
+                        <div className="border-l-4 border-red bg-red/5 p-6 rounded-r-lg">
+                            <strong className="text-white block mb-2 font-serif text-xl">3. Cash Flow Constraints</strong>
+                            <p className="text-sm text-textDim leading-relaxed">Your current commitments absorb a significant portion of your income, leaving limited room for wealth accumulation or maneuvering during economic downturns.</p>
+                        </div>
+                    )}
+                </div>
+
+                <h3 className="text-xl font-serif text-green mb-4 uppercase tracking-wider">Opportunities & Strengths</h3>
+                <div className="space-y-4">
+                    <div className="border-l-4 border-green bg-green/5 p-6 rounded-r-lg">
+                        <strong className="text-white block mb-2 font-serif text-xl">1. Consistent Accumulation in EPF</strong>
+                        <p className="text-sm text-textDim leading-relaxed">Your mandatory contributions to the Employees Provident Fund (EPF) provide a strong compounding base for your retirement. The historical dividend yield of 5-6% creates a reliable safe-harbor growth engine.</p>
+                    </div>
+                    <div className="border-l-4 border-green bg-green/5 p-6 rounded-r-lg">
+                        <strong className="text-white block mb-2 font-serif text-xl">2. Time Horizon Advantage</strong>
+                        <p className="text-sm text-textDim leading-relaxed">Assuming a retirement age of 60, you have a solid runway of two decades to leverage compound interest. Even moderate monthly investments in diversified equities can yield substantial results over this timeframe.</p>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const ReportRiskManagement = () => (
+            <div className="page-break-after p-12 bg-surface print-card min-h-[900px]">
+                <h2 className="text-3xl font-serif text-white uppercase tracking-wide border-b border-gold pb-4 mb-8">6. Risk Management & Insurance</h2>
+                
+                <p className="text-sm text-textDim leading-relaxed mb-8">Insurance is the foundation of any solid financial plan. It ensures that in the event of unforeseen circumstances, your wealth and your family's lifestyle are protected from catastrophic depletion.</p>
+                
+                <div className="grid grid-cols-2 gap-6">
+                    <div className="border border-border/60 p-6 rounded-lg bg-surface2/20">
+                        <div className="flex justify-between items-center mb-4 border-b border-border/40 pb-3">
+                            <h4 className="font-serif text-lg text-white uppercase tracking-wider"><i className="fas fa-heartbeat text-red mr-2"></i> Life Coverage</h4>
+                            <span className="text-xs uppercase tracking-wider font-bold bg-goldDim/20 text-gold px-2 py-1 rounded">Required</span>
+                        </div>
+                        <div className="space-y-3">
+                            <div className="flex justify-between"><span className="text-textDim text-sm">Estimated Need:</span><strong className="text-white">RM 1,500,000</strong></div>
+                            <div className="flex justify-between"><span className="text-textDim text-sm">Current Coverage:</span><strong className="text-white">RM 500,000</strong></div>
+                            <div className="flex justify-between pt-2 border-t border-border/40"><span className="text-textDim text-sm uppercase tracking-wider font-semibold">Shortfall Gap:</span><strong className="text-red">RM 1,000,000</strong></div>
+                        </div>
+                    </div>
+                    
+                    <div className="border border-border/60 p-6 rounded-lg bg-surface2/20">
+                        <div className="flex justify-between items-center mb-4 border-b border-border/40 pb-3">
+                            <h4 className="font-serif text-lg text-white uppercase tracking-wider"><i className="fas fa-procedures text-blue-500 mr-2"></i> Critical Illness</h4>
+                            <span className="text-xs uppercase tracking-wider font-bold bg-goldDim/20 text-gold px-2 py-1 rounded">Required</span>
+                        </div>
+                        <div className="space-y-3">
+                            <div className="flex justify-between"><span className="text-textDim text-sm">Estimated Need:</span><strong className="text-white">RM 500,000</strong></div>
+                            <div className="flex justify-between"><span className="text-textDim text-sm">Current Coverage:</span><strong className="text-white">RM 150,000</strong></div>
+                            <div className="flex justify-between pt-2 border-t border-border/40"><span className="text-textDim text-sm uppercase tracking-wider font-semibold">Shortfall Gap:</span><strong className="text-red">RM 350,000</strong></div>
+                        </div>
+                    </div>
+
+                    <div className="border border-border/60 p-6 rounded-lg bg-surface2/20">
+                        <div className="flex justify-between items-center mb-4 border-b border-border/40 pb-3">
+                            <h4 className="font-serif text-lg text-white uppercase tracking-wider"><i className="fas fa-briefcase-medical text-green mr-2"></i> Medical Card</h4>
+                            <span className="text-xs uppercase tracking-wider font-bold bg-green/20 text-green px-2 py-1 rounded border border-green/30">Adequate</span>
+                        </div>
+                        <div className="space-y-3">
+                            <div className="flex justify-between"><span className="text-textDim text-sm">Annual Limit:</span><strong className="text-white">RM 1,500,000</strong></div>
+                            <div className="flex justify-between"><span className="text-textDim text-sm">Room & Board:</span><strong className="text-white">RM 300 / day</strong></div>
+                            <div className="flex justify-between pt-2 border-t border-border/40"><span className="text-textDim text-sm uppercase tracking-wider font-semibold">Status:</span><strong className="text-green">Sufficient</strong></div>
+                        </div>
+                    </div>
+
+                    <div className="border border-border/60 p-6 rounded-lg bg-surface2/20">
+                        <div className="flex justify-between items-center mb-4 border-b border-border/40 pb-3">
+                            <h4 className="font-serif text-lg text-white uppercase tracking-wider"><i className="fas fa-file-contract text-gold mr-2"></i> Estate Planning</h4>
+                            <span className="text-xs uppercase tracking-wider font-bold bg-red/20 text-red px-2 py-1 rounded border border-red/30">Action Needed</span>
+                        </div>
+                        <div className="space-y-3">
+                            <div className="flex justify-between"><span className="text-textDim text-sm">Wasiat / Will:</span><strong className="text-red">Not Drafted</strong></div>
+                            <div className="flex justify-between"><span className="text-textDim text-sm">Trust Setup:</span><strong className="text-textDim">None</strong></div>
+                            <div className="flex justify-between pt-2 border-t border-border/40"><span className="text-textDim text-sm uppercase tracking-wider font-semibold">Recommendation:</span><strong className="text-gold">Draft Will ASAP</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const ReportInvestmentPlanning = ({ clientData }) => {
+            const liquidAssets = parseFloat(clientData.savings) + parseFloat(clientData.epf) + (parseFloat(clientData.stocks)||0) + (parseFloat(clientData.unitTrusts)||0);
+            const cashPct = ((parseFloat(clientData.savings) / Math.max(1, liquidAssets)) * 100).toFixed(1);
+            const epfPct = ((parseFloat(clientData.epf) / Math.max(1, liquidAssets)) * 100).toFixed(1);
+            const eqPct = ((((parseFloat(clientData.stocks)||0) + (parseFloat(clientData.unitTrusts)||0)) / Math.max(1, liquidAssets)) * 100).toFixed(1);
+
+            return (
+                <div className="page-break-after p-12 bg-surface print-card min-h-[900px]">
+                    <h2 className="text-3xl font-serif text-white uppercase tracking-wide border-b border-gold pb-4 mb-8">7. Investment Planning</h2>
+                    
+                    <p className="text-sm text-textDim leading-relaxed mb-8">Asset allocation is the primary driver of investment returns. Based on your 'Moderate Aggressive' risk profile, your current portfolio leans heavily towards conservative/guaranteed assets (EPF & Cash), which may underperform inflation over a 20-year horizon.</p>
+                    
+                    <div className="bg-surface2/20 border border-border/60 rounded-lg p-8 mb-8">
+                        <h3 className="text-xl font-serif text-gold mb-6 uppercase tracking-wider">Current Liquid Asset Allocation</h3>
+                        <div className="space-y-6">
+                            <div>
+                                <div className="flex justify-between text-sm mb-2">
+                                    <span className="text-white font-semibold uppercase tracking-wider text-xs"><i className="fas fa-money-bill-wave text-green mr-2 text-base"></i>Cash & Equivalents</span>
+                                    <span className="text-white font-bold">{cashPct}%</span>
+                                </div>
+                                <div className="w-full bg-surface2 h-3 rounded-full overflow-hidden">
+                                    <div className="bg-green h-full" style={{ width: `${cashPct}%` }}></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="flex justify-between text-sm mb-2">
+                                    <span className="text-white font-semibold uppercase tracking-wider text-xs"><i className="fas fa-piggy-bank text-blue-500 mr-2 text-base"></i>EPF / Fixed Income</span>
+                                    <span className="text-white font-bold">{epfPct}%</span>
+                                </div>
+                                <div className="w-full bg-surface2 h-3 rounded-full overflow-hidden">
+                                    <div className="bg-blue-500 h-full" style={{ width: `${epfPct}%` }}></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="flex justify-between text-sm mb-2">
+                                    <span className="text-white font-semibold uppercase tracking-wider text-xs"><i className="fas fa-chart-pie text-gold mr-2 text-base"></i>Equities & Unit Trusts</span>
+                                    <span className="text-white font-bold">{eqPct}%</span>
+                                </div>
+                                <div className="w-full bg-surface2 h-3 rounded-full overflow-hidden">
+                                    <div className="bg-gold h-full" style={{ width: `${eqPct}%` }}></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="border border-gold/30 bg-goldDim/10 p-8 rounded-lg mt-12 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-gold/10 rounded-full blur-2xl transform translate-x-1/3 -translate-y-1/3"></div>
+                        <h4 className="font-serif text-xl text-gold uppercase tracking-wider mb-4 relative z-10"><i className="fas fa-lightbulb mr-2"></i> Strategic Recommendation</h4>
+                        <p className="text-base text-white leading-relaxed relative z-10">Consider reallocating excess cash reserves (above the 6-month emergency buffer) into diversified global equities or managed unit trust portfolios. Dollar-cost averaging (DCA) RM 1,500 monthly into a moderate-aggressive portfolio could potentially increase your annualized blended yield from an estimated 4.5% to 7.5% over the next 15 years.</p>
+                    </div>
+                </div>
+            );
+        };
+
+        // ReportVisualAnalytics component removed
+
+        const ReportActionPlan = () => (
+            <div className="page-break-after p-12 bg-surface print-card min-h-[900px] flex flex-col">
+                <h2 className="text-3xl font-serif text-white uppercase tracking-wide border-b border-gold pb-4 mb-10">8. Action Plan & Conclusion</h2>
+                
+                <h3 className="text-xl font-serif text-gold mb-8 uppercase tracking-wider">Implementation Roadmap</h3>
+                
+                <div className="relative border-l-2 border-border/60 ml-4 space-y-10 mb-auto">
+                    <div className="relative pl-10">
+                        <div className="absolute w-5 h-5 bg-red rounded-full -left-[11px] top-1 border-4 border-surface shadow-[0_0_10px_rgba(183,28,28,0.5)]"></div>
+                        <h4 className="text-lg font-serif text-white uppercase tracking-wider">Phase 1: Immediate Action (0 - 3 Months)</h4>
+                        <p className="text-sm text-textDim mb-4">Address critical vulnerabilities and establish basic wealth protection.</p>
+                        <ul className="list-disc pl-5 space-y-3 text-sm text-white bg-surface2/30 p-5 rounded-lg border border-border/60">
+                            <li>Draft and legally execute Wasiat / Will to protect legacy.</li>
+                            <li>Upgrade Life and Critical Illness insurance to mitigate the identified shortfall.</li>
+                            <li>Establish a dedicated high-yield savings account purely for emergency buffering.</li>
+                        </ul>
+                    </div>
+                    
+                    <div className="relative pl-10">
+                        <div className="absolute w-5 h-5 bg-gold rounded-full -left-[11px] top-1 border-4 border-surface shadow-[0_0_10px_rgba(212,168,83,0.5)]"></div>
+                        <h4 className="text-lg font-serif text-white uppercase tracking-wider">Phase 2: Medium-Term Build (3 - 12 Months)</h4>
+                        <p className="text-sm text-textDim mb-4">Optimize cash flow and initiate consistent wealth accumulation engines.</p>
+                        <ul className="list-disc pl-5 space-y-3 text-sm text-white bg-surface2/30 p-5 rounded-lg border border-border/60">
+                            <li>Setup automated RM 1,500 monthly investment into a globally diversified equity portfolio.</li>
+                            <li>Review and aggressively consolidate any high-interest credit card debt.</li>
+                            <li>Establish a dedicated education fund for children via SSPN or similar instruments.</li>
+                        </ul>
+                    </div>
+                    
+                    <div className="relative pl-10">
+                        <div className="absolute w-5 h-5 bg-green rounded-full -left-[11px] top-1 border-4 border-surface shadow-[0_0_10px_rgba(27,94,32,0.5)]"></div>
+                        <h4 className="text-lg font-serif text-white uppercase tracking-wider">Phase 3: Long-Term Monitoring (Annual)</h4>
+                        <p className="text-sm text-textDim mb-4">Track performance and course-correct as life circumstances evolve.</p>
+                        <ul className="list-disc pl-5 space-y-3 text-sm text-white bg-surface2/30 p-5 rounded-lg border border-border/60">
+                            <li>Conduct a comprehensive annual review of portfolio performance against the 7.5% target.</li>
+                            <li>Reassess insurance coverage limits based on income growth and inflation.</li>
+                            <li>Update Will beneficiaries if family structure or assets change.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div className="border-t border-border/60 pt-10 text-center mt-16 pb-8">
+                    <div className="w-20 h-20 bg-gold/5 rounded-full mx-auto flex items-center justify-center mb-6 border border-gold/20 shadow-[0_0_30px_rgba(212,168,83,0.1)]">
+                        <i className="fas fa-handshake text-3xl text-gold"></i>
+                    </div>
+                    <h3 className="text-3xl font-serif text-white mb-4 tracking-wider">Conclusion</h3>
+                    <p className="text-base text-textDim leading-relaxed max-w-2xl mx-auto">Financial planning is not a final destination, but a continuous journey of optimization. By taking disciplined action on the recommendations provided in this report, you are building a resilient financial fortress for your family's future.</p>
+                    <p className="text-gold font-serif text-xl italic mt-8 tracking-wide">"Planning is bringing the future into the present so that you can do something about it now."</p>
+                </div>
+            </div>
+        );
+
+        /* =========================================================================
            FINANCIAL REPORT VIEW (PRINT FRIENDLY)
            ========================================================================= */
         const ReportView = ({ clientData, calculated, trustScores, session }) => {
@@ -4391,8 +4915,8 @@
                                 <i className="fas fa-file-pdf"></i>
                             </div>
                             <div>
-                                <h2 className="text-xl font-serif text-white">Financial Summary Statement</h2>
-                                <p className="text-textDim text-xs mt-1">Review the holistic report. Click the button to export as PDF.</p>
+                                <h2 className="text-xl font-serif text-white">Comprehensive Financial Report</h2>
+                                <p className="text-textDim text-xs mt-1">Review the holistic report. Click the button to export as a professional PDF.</p>
                             </div>
                         </div>
                         <button 
@@ -4403,160 +4927,19 @@
                         </button>
                     </div>
 
-                    {/* Statement Wrapper - optimized for browser printing */}
-                    <div className="bg-surface border border-border p-8 rounded-lg space-y-8 print-card">
-                        {/* Report Header */}
-                        <div className="flex justify-between items-start border-b border-border pb-6">
-                            <div>
-                                <h1 className="text-3xl font-serif text-white uppercase tracking-wide">Financial Portrait Statement</h1>
-                                <p className="text-xs text-textDim mt-1">Holistic financial health assessment prepared for client review.</p>
-                            </div>
-                            <div className="text-right text-xs">
-                                <p className="font-serif text-base text-gold font-bold">MY Wealth Portrait</p>
-                                <p className="text-textDim mt-1">{new Date().toLocaleDateString('en-MY', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                            </div>
-                        </div>
-
-                        {/* Customer Info Grid */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs bg-surface2/30 border border-border/80 p-4 rounded-lg">
-                            <div>
-                                <span className="text-textDim block uppercase font-medium">Client Full Name</span>
-                                <strong className="text-white mt-1 block">{clientData.fullName}</strong>
-                            </div>
-                            <div>
-                                <span className="text-textDim block uppercase font-medium">NRIC / Passport</span>
-                                <strong className="text-white mt-1 block">{clientData.nric}</strong>
-                            </div>
-                            <div>
-                                <span className="text-textDim block uppercase font-medium">Age & Status</span>
-                                <strong className="text-white mt-1 block">38 Years / {clientData.marital}</strong>
-                            </div>
-                            <div>
-                                <span className="text-textDim block uppercase font-medium">Calculated score</span>
-                                <strong className="text-gold mt-1 block font-bold">{calculated.healthScore} / 100</strong>
-                            </div>
-                        </div>
-
-                        {/* Detailed Statements Tabular data */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            {/* Assets vs Liabilities */}
-                            <div className="space-y-4">
-                                <h3 className="font-serif text-base text-white border-b border-border pb-1.5 uppercase tracking-wide">Net Worth Statement</h3>
-                                <table className="w-full text-xs text-left border-collapse">
-                                    <tbody>
-                                        <tr className="border-b border-border/40 py-2.5 block">
-                                            <td className="text-textDim">Cash Savings & Liquid Funds:</td>
-                                            <td className="text-right text-white font-semibold">{fmt(clientData.savings)}</td>
-                                        </tr>
-                                        <tr className="border-b border-border/40 py-2.5 block">
-                                            <td className="text-textDim">EPF balances:</td>
-                                            <td className="text-right text-white font-semibold">{fmt(clientData.epf)}</td>
-                                        </tr>
-                                        <tr className="border-b border-border/40 py-2.5 block">
-                                            <td className="text-textDim">Investment holdings (Stocks/Trusts):</td>
-                                            <td className="text-right text-white font-semibold">{fmt((parseFloat(clientData.stocks)||0)+(parseFloat(clientData.unitTrusts)||0))}</td>
-                                        </tr>
-                                        <tr className="border-b border-border/40 py-2.5 block">
-                                            <td className="text-textDim">Real Estate Property Valuation:</td>
-                                            <td className="text-right text-white font-semibold">
-                                                {fmt((clientData.properties || []).reduce((sum, p) => sum + (parseFloat(p.value) || 0), 0))}
-                                            </td>
-                                        </tr>
-                                        <tr className="border-b border-border/40 py-2.5 block">
-                                            <td className="text-textDim">Outstanding Loan Liabilities:</td>
-                                            <td className="text-right text-red font-semibold">
-                                                -{fmt((clientData.loans || []).reduce((sum, l) => sum + (parseFloat(l.balance) || 0), 0))}
-                                            </td>
-                                        </tr>
-                                        <tr className="border-b border-border/40 py-2.5 block">
-                                            <td className="text-textDim">Credit Card Outstanding:</td>
-                                            <td className="text-right text-red font-semibold">-{fmt(clientData.creditCard)}</td>
-                                        </tr>
-                                        <tr className="py-3 block flex justify-between border-t border-gold mt-2 font-serif text-sm">
-                                            <td className="text-gold font-semibold">TOTAL NET WORTH:</td>
-                                            <td className="text-right text-green font-bold">{fmt(calculated.netWorth)}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            {/* Inflows vs Outflows */}
-                            <div className="space-y-4">
-                                <h3 className="font-serif text-base text-white border-b border-border pb-1.5 uppercase tracking-wide">Cash Flow Statement</h3>
-                                <table className="w-full text-xs text-left border-collapse">
-                                    <tbody>
-                                        <tr className="border-b border-border/40 py-2.5 block">
-                                            <td className="text-textDim">Base Employment salary:</td>
-                                            <td className="text-right text-white font-semibold">{fmt(clientData.monthlyIncome)}</td>
-                                        </tr>
-                                        <tr className="border-b border-border/40 py-2.5 block">
-                                            <td className="text-textDim">Alternative Business/Other incomes:</td>
-                                            <td className="text-right text-white font-semibold">{fmt(clientData.otherIncome)}</td>
-                                        </tr>
-                                        <tr className="border-b border-border/40 py-2.5 block">
-                                            <td className="text-textDim">Property Rental inflows:</td>
-                                            <td className="text-right text-white font-semibold">
-                                                {fmt((clientData.properties || []).reduce((sum, p) => sum + (parseFloat(p.rental) || 0), 0))}
-                                            </td>
-                                        </tr>
-                                        <tr className="border-b border-border/40 py-2.5 block">
-                                            <td className="text-textDim">Monthly Loan Repayments:</td>
-                                            <td className="text-right text-red font-semibold">-{fmt(calculated.loansMonthly)}</td>
-                                        </tr>
-                                        <tr className="border-b border-border/40 py-2.5 block">
-                                            <td className="text-textDim">Estimated Living Expenses:</td>
-                                            <td className="text-right text-red font-semibold">-{fmt(clientData.monthlyExpenses)}</td>
-                                        </tr>
-                                        <tr className="py-3 block flex justify-between border-t border-gold mt-2 font-serif text-sm">
-                                            <td className="text-gold font-semibold">MONTHLY CASH SURPLUS:</td>
-                                            <td className={`text-right font-bold ${calculated.monthlySurplus >= 0 ? 'text-green' : 'text-red'}`}>
-                                                {fmt(calculated.monthlySurplus)}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        {/* Advisor Trust Scorecard Section */}
-                        {session?.role === 'advisor' && trustScores && (
-                            <div className="border-t border-border/60 pt-6 space-y-4">
-                                <h3 className="font-serif text-lg text-gold font-semibold uppercase tracking-wider">{t('advisor_relationship_trust_scorecard', lang)}</h3>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-sans text-textMid bg-surface2/30 border border-border/60 p-4 rounded-lg">
-                                    <div>
-                                        <span className="text-textDim block uppercase font-medium">Credibility (C)</span>
-                                        <span className="text-sm font-bold text-white">{trustScores.credibility}/10</span>
-                                    </div>
-                                    <div>
-                                        <span className="text-textDim block uppercase font-medium">Reliability (R)</span>
-                                        <span className="text-sm font-bold text-white">{trustScores.reliability}/10</span>
-                                    </div>
-                                    <div>
-                                        <span className="text-textDim block uppercase font-medium">Intimacy (I)</span>
-                                        <span className="text-sm font-bold text-white">{trustScores.intimacy}/10</span>
-                                    </div>
-                                    <div>
-                                        <span className="text-textDim block uppercase font-medium">Self-Orientation (S)</span>
-                                        <span className={`text-sm font-bold ${trustScores.selfOrientation > 4 ? 'text-red' : 'text-green'}`}>{trustScores.selfOrientation}/10</span>
-                                    </div>
-                                </div>
-                                <div className="flex justify-between items-center bg-goldDim/30 border border-gold/20 p-3 rounded-lg text-xs font-sans">
-                                    <div className="font-serif">
-                                        <span className="text-gold font-bold">{t('trust_eq_result', lang)}:</span>{' '}
-                                        <span className="text-white">T = (C + R + I) / S =</span>{' '}
-                                        <strong className="text-gold text-sm font-sans">{((trustScores.credibility + trustScores.reliability + trustScores.intimacy) / Math.max(0.1, trustScores.selfOrientation)).toFixed(1)}</strong>
-                                    </div>
-                                    <div className="text-[10px] uppercase font-bold text-textDim tracking-wider">
-                                        Trust-Based Advisory System
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Regulatory disclaimer */}
-                        <div className="border-t border-border/60 pt-6 text-[10px] text-textDim leading-relaxed">
-                            <p><strong>Disclaimer:</strong> This Financial Portrait summary has been compiled based on self-reported assets and liabilities. Indicators like Debt Service Ratio (DSR) and recommended Life Cover are estimates provided for advisor reference under standard planning frameworks. This is not formal banking offer or insurance contract. All personal data is governed under the <strong>Malaysian Personal Data Protection Act (PDPA) 2010</strong> guidelines.</p>
-                        </div>
+                    {/* Report Wrapper */}
+                    <div className="report-container space-y-12 print:space-y-0">
+                        <ReportCover clientData={clientData} />
+                        <ReportTOC />
+                        <ReportExecutiveSummary clientData={clientData} calculated={calculated} />
+                        <ReportClientProfile clientData={clientData} />
+                        <ReportCurrentFinancials clientData={clientData} calculated={calculated} />
+                        <ReportHealthAssessment clientData={clientData} calculated={calculated} />
+                        <ReportObservations calculated={calculated} />
+                        <ReportRiskManagement />
+                        <ReportInvestmentPlanning clientData={clientData} />
+                        <ReportActionPlan />
+                        <ReportDisclaimer />
                     </div>
                 </div>
             );
