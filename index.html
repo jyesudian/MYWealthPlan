@@ -10,6 +10,129 @@
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- ElevenLabs Conversational AI Lifecycle Manager (Registered synchronously before the widget script) -->
+    <script>
+        (function() {
+            const IS_DEV = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '::1';
+            
+            let originalWebSocket = window.WebSocket;
+            let activeTimers = [];
+            let isWaitingForFinalResponse = false;
+            
+            function registerTimer(timerId) {
+                activeTimers.push(timerId);
+            }
+            
+            function cleanupTimers() {
+                if (IS_DEV && activeTimers.length > 0) {
+                    console.log('[ElevenLabs Lifecycle] Cleaning up active timers:', activeTimers.length);
+                }
+                activeTimers.forEach(t => clearTimeout(t));
+                activeTimers = [];
+                isWaitingForFinalResponse = false;
+            }
+
+            // Monkey-patch WebSocket to intercept transcripts before the widget script is fetched/runs
+            window.WebSocket = function(url, protocols) {
+                const ws = new originalWebSocket(url, protocols);
+                if (url.includes('elevenlabs.io') && url.includes('convai')) {
+                    if (IS_DEV) console.log('[ElevenLabs Lifecycle] Intercepted WebSocket connection:', url);
+                    
+                    ws.addEventListener('message', (event) => {
+                        try {
+                            const data = JSON.parse(event.data);
+                            
+                            // User Transcript detection
+                            if (data.type === 'user_transcript' && data.user_transcription_event) {
+                                const text = data.user_transcription_event.user_transcript || '';
+                                if (IS_DEV) console.log('[ElevenLabs Lifecycle] User Transcript:', text);
+                                
+                                if (checkClosingIntent(text)) {
+                                    if (IS_DEV) console.log('[ElevenLabs Lifecycle] Closing intent phrase detected. Waiting for final response...');
+                                    isWaitingForFinalResponse = true;
+                                }
+                            }
+                            
+                            // Agent Response detection
+                            if (data.type === 'agent_response' && data.agent_response_event) {
+                                const response = data.agent_response_event.agent_response || '';
+                                if (IS_DEV) console.log('[ElevenLabs Lifecycle] Agent Response:', response);
+                                
+                                if (isWaitingForFinalResponse) {
+                                    isWaitingForFinalResponse = false;
+                                    if (IS_DEV) console.log('[ElevenLabs Lifecycle] Final response received. Scheduling auto-close in 3.5 seconds...');
+                                    
+                                    const timer = setTimeout(() => {
+                                        closeAiAssistant('closing_intent');
+                                    }, 3500);
+                                    registerTimer(timer);
+                                }
+                            }
+                        } catch (e) {
+                            // Ignore binary audio chunk frames
+                        }
+                    });
+                }
+                return ws;
+            };
+            
+            // Preserve WebSocket prototype and static methods
+            window.WebSocket.prototype = originalWebSocket.prototype;
+            for (let key in originalWebSocket) {
+                if (originalWebSocket.hasOwnProperty(key)) {
+                    window.WebSocket[key] = originalWebSocket[key];
+                }
+            }
+
+            // Intent checker
+            const CLOSING_PHRASES = [
+                "thank you", "thanks", "goodbye", "bye", "see you", 
+                "that's all", "no more questions"
+            ];
+            function checkClosingIntent(text) {
+                const cleaned = text.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "").trim();
+                return CLOSING_PHRASES.some(phrase => {
+                    const regex = new RegExp(`\\b${phrase}\\b`, 'i');
+                    return regex.test(cleaned);
+                });
+            }
+
+            // Global Assistant Closer
+            window.closeAiAssistant = function(reason) {
+                if (IS_DEV) console.log(`[ElevenLabs Lifecycle] closeAiAssistant called with reason: ${reason}`);
+                
+                const widget = document.querySelector('elevenlabs-convai');
+                if (widget) {
+                    // Try official terminate API if present
+                    if (typeof widget.endConversation === 'function') {
+                        widget.endConversation();
+                    } else if (typeof widget.disconnect === 'function') {
+                        widget.disconnect();
+                    }
+                    
+                    // Trigger minimize/collapse event
+                    document.dispatchEvent(new CustomEvent('elevenlabs-agent:expand', {
+                        detail: { action: 'collapse', _convaiEventHandled: false }
+                    }));
+                }
+                
+                if (document.activeElement) {
+                    document.activeElement.blur();
+                }
+                window.focus();
+                cleanupTimers();
+            };
+
+            // Window Unload Listeners
+            const handlePageUnload = () => {
+                window.closeAiAssistant('page_unload');
+            };
+            window.addEventListener('beforeunload', handlePageUnload);
+            window.addEventListener('pagehide', handlePageUnload);
+        })();
+    </script>
+    <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <script>
@@ -133,6 +256,14 @@
         input[type=range] {
             accent-color: var(--gold);
             cursor: pointer;
+        }
+
+        /* Floating AI Assistant Widget styling */
+        elevenlabs-convai {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
         }
 
         /* Printing configuration */
@@ -1185,6 +1316,22 @@
                     document.documentElement.style.fontSize = '112.5%'; // Scales font-size up by 1 size on logged in views
                 }
             }, [session]);
+            
+            // ElevenLabs AI Assistant Lifecycle Effects
+            
+            // 1. Close/minimize on tab/route changes
+            useEffect(() => {
+                if (activeTab && typeof window.closeAiAssistant === 'function') {
+                    window.closeAiAssistant('navigation');
+                }
+            }, [activeTab]);
+
+            // 2. Close/minimize on booking modal close
+            useEffect(() => {
+                if (!showBookingModal && typeof window.closeAiAssistant === 'function') {
+                    window.closeAiAssistant('user_requested');
+                }
+            }, [showBookingModal]);
 
             // Save Draft to LocalStorage
             const saveDraft = () => {
@@ -1490,6 +1637,29 @@
                             calculated={calculated} 
                             onClose={() => setShowBookingModal(false)} 
                         />
+                    )}
+
+                    {/* ElevenLabs Conversational AI Widget (Ask Stan For Hire)
+                        Only renders when session is not null (logged in) to avoid showing on landing page */}
+                    {session && (
+                        <elevenlabs-convai
+                            ref={(el) => {
+                                if (el) {
+                                    el.addEventListener('conversationEnded', () => {
+                                        if (typeof window.closeAiAssistant === 'function') {
+                                            window.closeAiAssistant('user_requested');
+                                        }
+                                    });
+                                }
+                            }}
+                            agent-id="agent_8501kv4r7ft9fj3tj90x2tdmwdda"
+                            action-text="Ask Stan For Hire - Your AI Consultant"
+                            avatar-image-url="/resources/ask-stan-ai.jpeg"
+                            avatar-orb-color-1="#d4a853"
+                            avatar-orb-color-2="#1a1d26"
+                            dismissible="true"
+                            class="no-print"
+                        ></elevenlabs-convai>
                     )}
                 </div>
             );
