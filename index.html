@@ -10,6 +10,12 @@
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script>
+        Babel.registerPlugin("custom-jsx", [
+            Babel.availablePlugins["transform-react-jsx"],
+            { runtime: "classic" }
+        ]);
+    </script>
     
     <!-- ElevenLabs Conversational AI Lifecycle Manager (Registered synchronously before the widget script) -->
     <script>
@@ -360,7 +366,7 @@
 <body>
     <div id="root"></div>
 
-    <script type="text/babel" data-type="module">
+    <script type="text/babel" data-presets="env" data-plugins="custom-jsx">
         const { useState, useEffect } = React;
 
         const LANG_DICT = {
