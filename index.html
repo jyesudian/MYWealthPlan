@@ -1116,9 +1116,85 @@
         };
 
         // Advisor Practice Dashboard View Component
-        const AdvisorDashboardView = ({ advisorId, loadClientProfile }) => {
+        const AdvisorDashboardView = ({ advisorId, loadClientProfile, reviewRequests, setReviewRequests }) => {
             const advisor = ADVISORS_DB.find(a => a.id === advisorId);
             if (!advisor) return <div className="p-6 text-red">Advisor profile not found.</div>;
+
+            const [activeRequestId, setActiveRequestId] = useState(null);
+            const [advisorActionType, setAdvisorActionType] = useState('none'); // 'none' | 'alternative' | 'reject'
+            const [altDate, setAltDate] = useState('2026-06-16');
+            const [altTime, setAltTime] = useState('10:00');
+            const [altRemarks, setAltRemarks] = useState('');
+            const [rejectReason, setRejectReason] = useState('');
+            const [rejectSuggested, setRejectSuggested] = useState('');
+
+            const handleAcceptRequest = (reqId) => {
+                setReviewRequests(prev => prev.map(r => {
+                    if (r.id === reqId) {
+                        return {
+                            ...r,
+                            status: 'Accepted',
+                            isNewForClient: true,
+                            isNewForAdvisor: false
+                        };
+                    }
+                    return r;
+                }));
+                setActiveRequestId(null);
+                setAdvisorActionType('none');
+            };
+
+            const handleProposeAlternativeSubmit = (reqId) => {
+                setReviewRequests(prev => prev.map(r => {
+                    if (r.id === reqId) {
+                        return {
+                            ...r,
+                            status: 'Alternative Date Proposed',
+                            advisorRemarks: altRemarks,
+                            advisorSuggestedDate: altDate,
+                            advisorSuggestedTime: altTime,
+                            isNewForClient: true,
+                            isNewForAdvisor: false
+                        };
+                    }
+                    return r;
+                }));
+                setActiveRequestId(null);
+                setAdvisorActionType('none');
+                setAltRemarks('');
+            };
+
+            const handleRejectSubmit = (reqId) => {
+                setReviewRequests(prev => prev.map(r => {
+                    if (r.id === reqId) {
+                        return {
+                            ...r,
+                            status: 'Rejected',
+                            rejectionReason: rejectReason,
+                            advisorRemarks: rejectSuggested,
+                            isNewForClient: true,
+                            isNewForAdvisor: false
+                        };
+                    }
+                    return r;
+                }));
+                setActiveRequestId(null);
+                setAdvisorActionType('none');
+                setRejectReason('');
+                setRejectSuggested('');
+            };
+
+            const handleDismissAdvisorNotification = (reqId) => {
+                setReviewRequests(prev => prev.map(r => {
+                    if (r.id === reqId) {
+                        return {
+                            ...r,
+                            isNewForAdvisor: false
+                        };
+                    }
+                    return r;
+                }));
+            };
             
             // Calculate advisor pipeline metrics
             let totalAum = 0;
@@ -1144,6 +1220,9 @@
                 };
             });
             const avgScore = advisor.clients.length > 0 ? Math.round(sumScore / advisor.clients.length) : 0;
+
+            const practiceClientIds = advisor.clients;
+            const practiceRequests = reviewRequests ? reviewRequests.filter(r => practiceClientIds.includes(r.clientId)) : [];
 
             return (
                 <div className="space-y-8 animate-fade-in">
@@ -1173,6 +1252,275 @@
                             <ProgressBar progress={avgScore} colorClass="from-green to-emerald-400" />
                         </Card>
                     </div>
+
+                    {/* Client Review Requests Queue */}
+                    <Card className="p-0 overflow-visible" overflow="overflow-visible">
+                        <div className="px-6 py-4 bg-surface2/30 border-b border-border flex justify-between items-center">
+                            <div>
+                                <h3 className="font-serif text-lg text-white">Client Review Requests</h3>
+                                <p className="text-xs text-textDim">Manage incoming review requests, accept appointments, or propose alternatives.</p>
+                            </div>
+                            {practiceRequests.filter(r => r.status === 'Pending Advisor Review').length > 0 && (
+                                <span className="text-[10px] bg-goldDim text-gold border border-gold/30 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">
+                                    {practiceRequests.filter(r => r.status === 'Pending Advisor Review').length} Action Needed
+                                </span>
+                            )}
+                        </div>
+                        
+                        <div className="p-6 space-y-4">
+                            {practiceRequests.length === 0 ? (
+                                <div className="p-8 border border-dashed border-border rounded-lg text-center text-textDim text-sm">
+                                    <i className="fas fa-calendar-check text-2xl text-border mb-2 block"></i>
+                                    No review requests received from your client practice yet.
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {practiceRequests.map((req) => {
+                                        const isExpanded = activeRequestId === req.id;
+                                        const hasNewBadge = req.isNewForAdvisor;
+                                        
+                                        return (
+                                            <div 
+                                                key={req.id} 
+                                                className={`border rounded-lg p-4 transition-all duration-300 ${
+                                                    req.status === 'Pending Advisor Review' 
+                                                        ? 'bg-surface2/40 border-border/80 hover:border-gold/30' 
+                                                        : 'bg-surface2/15 border-border/40'
+                                                }`}
+                                            >
+                                                <div className="flex flex-wrap justify-between items-start gap-4">
+                                                    <div className="space-y-1">
+                                                        <div className="flex items-center gap-2">
+                                                            <strong className="text-white text-sm">{req.clientName}</strong>
+                                                            {hasNewBadge && (
+                                                                <span className="text-[8px] bg-red text-white px-1.5 py-0.5 rounded font-bold font-sans uppercase tracking-wider animate-pulse">
+                                                                    New Request
+                                                                </span>
+                                                            )}
+                                                            <span className={`text-[9px] px-2 py-0.5 rounded font-sans uppercase font-bold tracking-wider ${
+                                                                req.urgency === 'Urgent' ? 'bg-red/15 text-red border border-red/30' :
+                                                                req.urgency === 'Important' ? 'bg-amber/15 text-amber border border-amber/30' :
+                                                                'bg-blue/15 text-blue border border-blue/30'
+                                                            }`}>
+                                                                {req.urgency}
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-xs text-textDim">
+                                                            Requested Date: <strong className="text-white">{req.appointmentDate}</strong> | Time: <strong className="text-white">{req.appointmentTime}</strong> ({req.meetingType})
+                                                        </p>
+                                                        <div className="flex flex-wrap gap-1 mt-1.5">
+                                                            {req.categories.map((c, idx) => (
+                                                                <span key={idx} className="text-[9px] bg-bg border border-border/50 text-textMid px-2 py-0.5 rounded">
+                                                                    {c}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="text-right">
+                                                            <span className="text-[10px] text-textDim uppercase tracking-wider block">Current Status</span>
+                                                            <span className={`text-xs font-semibold ${
+                                                                req.status === 'Accepted' ? 'text-green' :
+                                                                req.status === 'Alternative Date Proposed' ? 'text-amber' :
+                                                                req.status === 'Rejected' ? 'text-red' :
+                                                                'text-gold'
+                                                            }`}>
+                                                                {req.status}
+                                                            </span>
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                if (isExpanded) {
+                                                                    setActiveRequestId(null);
+                                                                    setAdvisorActionType('none');
+                                                                } else {
+                                                                    setActiveRequestId(req.id);
+                                                                    setAdvisorActionType('none');
+                                                                    if (req.isNewForAdvisor) {
+                                                                        handleDismissAdvisorNotification(req.id);
+                                                                    }
+                                                                }
+                                                            }}
+                                                            className="text-textDim hover:text-white p-1 transition-colors"
+                                                        >
+                                                            <i className={`fas ${isExpanded ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                {/* Expanded Actions & Details */}
+                                                {isExpanded && (
+                                                    <div className="mt-4 pt-4 border-t border-border/40 space-y-4 animate-fade-in font-sans">
+                                                        <div className="bg-bg/40 p-3 rounded border border-border/30">
+                                                            <span className="text-[10px] text-textDim uppercase tracking-wider block font-semibold mb-1">Client Remarks</span>
+                                                            <p className="text-xs text-textMid italic leading-relaxed">{req.remarks || 'No remarks provided.'}</p>
+                                                        </div>
+
+                                                        {req.status === 'Pending Advisor Review' && advisorActionType === 'none' && (
+                                                            <div className="flex flex-wrap gap-2 pt-2">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleAcceptRequest(req.id)}
+                                                                    className="bg-green/25 hover:bg-green/45 text-green border border-green/30 text-xs font-bold py-2 px-4 rounded-lg transition-colors flex items-center gap-1.5"
+                                                                >
+                                                                    <i className="fas fa-check"></i> Accept Request
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        setAdvisorActionType('alternative');
+                                                                        setAltDate(req.appointmentDate);
+                                                                        setAltTime(req.appointmentTime);
+                                                                    }}
+                                                                    className="bg-amber/15 hover:bg-amber/25 text-amber border border-amber/30 text-xs font-bold py-2 px-4 rounded-lg transition-colors flex items-center gap-1.5"
+                                                                >
+                                                                    <i className="fas fa-clock"></i> Propose Alternative
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setAdvisorActionType('reject')}
+                                                                    className="bg-red/15 hover:bg-red/25 text-red border border-red/30 text-xs font-bold py-2 px-4 rounded-lg transition-colors flex items-center gap-1.5"
+                                                                >
+                                                                    <i className="fas fa-times"></i> Reject Request
+                                                                </button>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Propose Alternative Sub-form */}
+                                                        {isExpanded && advisorActionType === 'alternative' && (
+                                                            <div className="p-4 bg-surface2/60 border border-amber/30 rounded-lg space-y-4">
+                                                                <h4 className="text-xs font-bold text-amber uppercase tracking-wider flex items-center gap-1.5">
+                                                                    <i className="fas fa-clock"></i> Propose Alternative Slots
+                                                                </h4>
+                                                                
+                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                                    <div className="space-y-1">
+                                                                        <label className="text-[10px] text-textDim uppercase font-semibold">Available Date</label>
+                                                                        <input 
+                                                                            type="date"
+                                                                            value={altDate}
+                                                                            onChange={(e) => setAltDate(e.target.value)}
+                                                                            className="w-full bg-surface border border-border rounded px-2.5 py-1.5 text-xs text-white outline-none focus:border-amber/50"
+                                                                        />
+                                                                    </div>
+                                                                    <div className="space-y-1">
+                                                                        <label className="text-[10px] text-textDim uppercase font-semibold">Available Time</label>
+                                                                        <input 
+                                                                            type="text"
+                                                                            value={altTime}
+                                                                            placeholder="e.g. 11:30 AM"
+                                                                            onChange={(e) => setAltTime(e.target.value)}
+                                                                            className="w-full bg-surface border border-border rounded px-2.5 py-1.5 text-xs text-white outline-none focus:border-amber/50"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+
+                                                                <div className="space-y-1">
+                                                                    <label className="text-[10px] text-textDim uppercase font-semibold">Advisor Remarks / Notes</label>
+                                                                    <textarea 
+                                                                        rows={3}
+                                                                        value={altRemarks}
+                                                                        onChange={(e) => setAltRemarks(e.target.value)}
+                                                                        placeholder="Explain why the alternative is proposed, or list other available slots..."
+                                                                        className="w-full bg-surface border border-border rounded px-2.5 py-1.5 text-xs text-white outline-none focus:border-amber/50 font-sans"
+                                                                    />
+                                                                </div>
+
+                                                                <div className="flex gap-2">
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => handleProposeAlternativeSubmit(req.id)}
+                                                                        className="bg-gold text-bg text-xs font-bold py-2 px-4 rounded transition-colors hover:bg-yellow-600"
+                                                                    >
+                                                                        Send Alternative Slot
+                                                                    </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => setAdvisorActionType('none')}
+                                                                        className="border border-border text-textDim hover:text-white text-xs py-2 px-4 rounded transition-colors"
+                                                                    >
+                                                                        Cancel
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Reject Sub-form */}
+                                                        {isExpanded && advisorActionType === 'reject' && (
+                                                            <div className="p-4 bg-surface2/60 border border-red/30 rounded-lg space-y-4">
+                                                                <h4 className="text-xs font-bold text-red uppercase tracking-wider flex items-center gap-1.5">
+                                                                    <i className="fas fa-ban"></i> Reject Review Request
+                                                                </h4>
+                                                                
+                                                                <div className="space-y-1">
+                                                                    <label className="text-[10px] text-textDim uppercase font-semibold">Reason for Rejection (Required)</label>
+                                                                    <input 
+                                                                        type="text"
+                                                                        value={rejectReason}
+                                                                        onChange={(e) => setRejectReason(e.target.value)}
+                                                                        placeholder="e.g. Fully booked this week / Out of office"
+                                                                        className="w-full bg-surface border border-border rounded px-2.5 py-1.5 text-xs text-white outline-none focus:border-red/50"
+                                                                    />
+                                                                </div>
+
+                                                                <div className="space-y-1">
+                                                                    <label className="text-[10px] text-textDim uppercase font-semibold">Suggested Future Availability (Optional)</label>
+                                                                    <input 
+                                                                        type="text"
+                                                                        value={rejectSuggested}
+                                                                        onChange={(e) => setRejectSuggested(e.target.value)}
+                                                                        placeholder="e.g. Please book from 28th June onwards"
+                                                                        className="w-full bg-surface border border-border rounded px-2.5 py-1.5 text-xs text-white outline-none focus:border-red/50"
+                                                                    />
+                                                                </div>
+
+                                                                <div className="flex gap-2">
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => handleRejectSubmit(req.id)}
+                                                                        disabled={!rejectReason.trim()}
+                                                                        className="bg-red hover:bg-red-600 disabled:opacity-50 text-white text-xs font-bold py-2 px-4 rounded transition-colors"
+                                                                    >
+                                                                        Confirm Rejection
+                                                                    </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => setAdvisorActionType('none')}
+                                                                        className="border border-border text-textDim hover:text-white text-xs py-2 px-4 rounded transition-colors"
+                                                                    >
+                                                                        Cancel
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Non-Pending Feedback Details (Read Only) */}
+                                                        {req.status === 'Alternative Date Proposed' && (
+                                                            <div className="p-3 bg-amber/5 border border-amber/20 rounded-lg text-xs text-textMid space-y-1">
+                                                                <span className="font-bold text-amber">Proposed Alternative Slot:</span>
+                                                                <div>Date & Time: <strong className="text-white">{req.advisorSuggestedDate} @ {req.advisorSuggestedTime}</strong></div>
+                                                                {req.advisorRemarks && <div>Note: <span className="italic text-text">"{req.advisorRemarks}"</span></div>}
+                                                            </div>
+                                                        )}
+
+                                                        {req.status === 'Rejected' && (
+                                                            <div className="p-3 bg-red/5 border border-red/20 rounded-lg text-xs text-textMid space-y-1">
+                                                                <span className="font-bold text-red">Rejection Details:</span>
+                                                                <div>Reason: <span className="italic text-text">"{req.rejectionReason}"</span></div>
+                                                                {req.advisorRemarks && <div>Suggested Future slots: <strong className="text-white">{req.advisorRemarks}</strong></div>}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    </Card>
 
                     {/* Client Pipeline directory */}
                     <Card className="p-0 overflow-hidden">
@@ -1274,6 +1622,57 @@
             const [formMode, setFormMode] = useState('guided'); // 'guided' or 'advisor'
             const [guidedStep, setGuidedStep] = useState(0);
             const [showBookingModal, setShowBookingModal] = useState(false);
+            
+            const [reviewRequests, setReviewRequests] = useState(() => {
+                const saved = localStorage.getItem('mywealth_review_requests');
+                if (saved) return JSON.parse(saved);
+                return [
+                    {
+                        id: 'req_1',
+                        clientName: 'Sarah Lim',
+                        clientId: 'client_2',
+                        meetingType: 'Zoom / Video Meeting',
+                        appointmentDate: '2026-06-25',
+                        appointmentTime: '10:00',
+                        categories: ['Investment Planning', 'Retirement Planning'],
+                        urgency: 'Important',
+                        remarks: 'I would like to discuss adjusting my asset allocation for retirement.',
+                        status: 'Pending Advisor Review',
+                        requestDate: '2026-06-15',
+                        advisorRemarks: '',
+                        rejectionReason: '',
+                        advisorSuggestedDate: '',
+                        advisorSuggestedTime: '',
+                        isNewForClient: false,
+                        isNewForAdvisor: true
+                    }
+                ];
+            });
+
+            useEffect(() => {
+                localStorage.setItem('mywealth_review_requests', JSON.stringify(reviewRequests));
+            }, [reviewRequests]);
+
+            // Auto-archive/complete past-due review requests whose scheduled date is in the past
+            useEffect(() => {
+                const todayStr = new Date().toISOString().split('T')[0];
+                let changed = false;
+                const updatedRequests = reviewRequests.map(r => {
+                    if (r.appointmentDate < todayStr && r.status !== 'Completed') {
+                        changed = true;
+                        return {
+                            ...r, 
+                            status: 'Completed',
+                            isNewForClient: false,
+                            isNewForAdvisor: false
+                        };
+                    }
+                    return r;
+                });
+                if (changed) {
+                    setReviewRequests(updatedRequests);
+                }
+            }, [reviewRequests]);
             
             // Theme, Customizable Guides & Trust scorecard states
             const [theme, setTheme] = useState(() => localStorage.getItem('fin_theme') || 'dark');
@@ -1421,17 +1820,33 @@
                         
                         <nav className="flex-1 overflow-y-auto py-6">
                             <ul className="space-y-1 px-4">
-                                {visibleNavItems.map(item => (
-                                    <li key={item.id}>
-                                        <button 
-                                            onClick={() => { setActiveTab(item.id); setMobileMenuOpen(false); }}
-                                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${activeTab === item.id ? 'bg-goldDim text-gold font-medium border border-gold/30 shadow-[0_0_15px_rgba(212,168,83,0.1)]' : 'text-textDim hover:bg-surface2 hover:text-text'}`}
-                                        >
-                                            <i className={`fas ${item.icon} w-5 text-center text-sm ${activeTab === item.id ? 'text-gold' : 'text-textDim'}`}></i>
-                                            <span className="text-sm">{item.label}</span>
-                                        </button>
-                                    </li>
-                                ))}
+                                {visibleNavItems.map(item => {
+                                    let badgeCount = 0;
+                                    if (session && session.role === 'client' && item.id === 'support') {
+                                        badgeCount = reviewRequests.filter(r => r.clientId === session.id && r.isNewForClient).length;
+                                    } else if (session && session.role === 'advisor' && item.id === 'dashboard') {
+                                        badgeCount = reviewRequests.filter(r => r.status === 'Pending Advisor Review').length;
+                                    }
+
+                                    return (
+                                        <li key={item.id}>
+                                            <button 
+                                                onClick={() => { setActiveTab(item.id); setMobileMenuOpen(false); }}
+                                                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all duration-200 ${activeTab === item.id ? 'bg-goldDim text-gold font-medium border border-gold/30 shadow-[0_0_15px_rgba(212,168,83,0.1)]' : 'text-textDim hover:bg-surface2 hover:text-text'}`}
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <i className={`fas ${item.icon} w-5 text-center text-sm ${activeTab === item.id ? 'text-gold' : 'text-textDim'}`}></i>
+                                                    <span className="text-sm">{item.label}</span>
+                                                </div>
+                                                {badgeCount > 0 && (
+                                                    <span className="text-[10px] bg-red text-white px-2 py-0.5 rounded-full font-bold font-sans">
+                                                        {badgeCount}
+                                                    </span>
+                                                )}
+                                            </button>
+                                        </li>
+                                    );
+                                })}
                             </ul>
                         </nav>
                         
@@ -1538,6 +1953,8 @@
                                                 setFormMode('advisor');
                                                 setActiveTab('discovery');
                                             }} 
+                                            reviewRequests={reviewRequests}
+                                            setReviewRequests={setReviewRequests}
                                         />
                                     ) : (
                                         <DashboardView 
@@ -1547,6 +1964,8 @@
                                             setShowBookingModal={setShowBookingModal} 
                                             session={session}
                                             lang={lang}
+                                            reviewRequests={reviewRequests}
+                                            setReviewRequests={setReviewRequests}
                                         />
                                     )
                                 )}
@@ -1625,6 +2044,9 @@
                                     <SupportView 
                                         session={session}
                                         lang={lang}
+                                        clientData={clientData}
+                                        reviewRequests={reviewRequests}
+                                        setReviewRequests={setReviewRequests}
                                     />
                                 )}
                             </div>
@@ -1668,12 +2090,14 @@
         /* =========================================================================
            DASHBOARD VIEW
            ========================================================================= */
-        const DashboardView = ({ clientData, calculated, setActiveTab, setShowBookingModal, session, lang }) => {
+        const DashboardView = ({ clientData, calculated, setActiveTab, setShowBookingModal, session, lang, reviewRequests, setReviewRequests }) => {
             const hasShortfalls = calculated.lifeGap > 0 || calculated.dsr > 40 || calculated.emergencyFundPct < 100;
             
             // Find mapped advisor
             const clientRecord = CLIENT_DB.find(c => c.name === clientData.fullName);
             const advisor = clientRecord ? ADVISORS_DB.find(a => a.id === clientRecord.advisorId) : null;
+
+            const clientResponses = reviewRequests ? reviewRequests.filter(r => r.clientId === session.id && r.isNewForClient) : [];
 
             return (
                 <div className="space-y-8 animate-fade-in">
@@ -1690,6 +2114,29 @@
                             <i className="fas fa-file-invoice-dollar mr-2"></i> {t('view_full_statement', lang)}
                         </button>
                     </div>
+
+                    {clientResponses.length > 0 && (
+                        <div className="bg-goldDim/20 border border-gold/40 rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 animate-fade-in font-sans">
+                            <div className="flex gap-3 items-start">
+                                <div className="w-8 h-8 bg-goldDim/30 border border-gold/20 text-gold rounded-full flex items-center justify-center text-sm flex-shrink-0 mt-0.5">
+                                    <i className="fas fa-bell animate-pulse"></i>
+                                </div>
+                                <div>
+                                    <h4 className="font-serif text-sm font-semibold text-white">Advisor Review Update</h4>
+                                    <p className="text-xs text-textMid mt-0.5">
+                                        Your advisor has updated {clientResponses.length === 1 ? 'your' : clientResponses.length} financial review request(s). 
+                                        Click below to review the proposed slot, status, or remarks.
+                                    </p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setActiveTab('support')}
+                                className="bg-gold hover:bg-yellow-600 text-bg text-xs font-bold px-4 py-2 rounded transition-colors whitespace-nowrap"
+                            >
+                                Track Status
+                            </button>
+                        </div>
+                    )}
 
                     {/* Top Stats Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -5189,8 +5636,353 @@
         /* =========================================================================
            HELP & SUPPORT VIEW
            ========================================================================= */
-        const SupportView = ({ session, lang }) => {
+        const FINANCIAL_DICTIONARY = {
+            "Asset": {
+                term: "Asset",
+                definition: "Anything of value owned by an individual or corporation that can be converted into cash.",
+                simpleExplanation: "What you own. This includes cash in your bank account, properties, investments, and retirement funds like EPF.",
+                example: "Your house, money in your savings account, and shares in mutual funds."
+            },
+            "Liability": {
+                term: "Liability",
+                definition: "A financial obligation or debt owed to another entity, requiring future settlement through transfer of assets.",
+                simpleExplanation: "What you owe to others. These are debts that drain your cash flow over time.",
+                example: "Your mortgage, outstanding credit card balances, car loans, and student loans."
+            },
+            "Net Worth": {
+                term: "Net Worth",
+                definition: "The total value of an individual's or entity's assets minus their total liabilities.",
+                simpleExplanation: "A snapshot of your overall wealth. It is what is left over if you sold all your assets and paid off all your debts.",
+                example: "If you have RM 500,000 in assets and RM 300,000 in liabilities, your Net Worth is RM 200,000."
+            },
+            "Cash Flow": {
+                term: "Cash Flow",
+                definition: "The net amount of cash and cash-equivalents being transferred into and out of a household or business.",
+                simpleExplanation: "The movement of money in and out of your pocket. Positive cash flow means you earn more than you spend; negative cash flow means you are spending more than you earn.",
+                example: "Receiving your monthly salary (inflow) and using it to pay for rent, groceries, and bills (outflow)."
+            },
+            "Emergency Fund": {
+                term: "Emergency Fund",
+                definition: "An easily accessible reserve of cash earmarked for covering unexpected financial expenses or income disruptions.",
+                simpleExplanation: "A safety net of cash saved specifically for emergencies so you don't have to borrow money or sell investments in a hurry.",
+                example: "Keeping 3 to 6 months of living expenses in a high-yield savings account or money market fund to cover unexpected medical bills or job loss."
+            },
+            "Insurance": {
+                term: "Insurance",
+                definition: "A contract (policy) in which an individual receives financial protection or reimbursement against losses from an insurance company.",
+                simpleExplanation: "A way to manage risk by paying a small fee (premium) to a company so they cover big, unexpected costs if something goes wrong.",
+                example: "Paying a monthly premium for car insurance so that the insurer pays for repairs if you get into an accident."
+            },
+            "Life Insurance": {
+                term: "Life Insurance",
+                definition: "A contract between an insurer and a policyholder, guaranteeing payment of a death benefit to named beneficiaries upon the death of the insured.",
+                simpleExplanation: "A policy that pays a sum of money to your family or loved ones if you pass away, helping them cover living expenses, debts, or education.",
+                example: "A father purchasing a RM 500,000 term life policy to ensure his children can afford university if he is no longer around."
+            },
+            "Critical Illness": {
+                term: "Critical Illness",
+                definition: "An insurance policy that pays a lump-sum cash benefit if the policyholder is diagnosed with a specific severe illness.",
+                simpleExplanation: "A type of cover that gives you a one-off lump sum of cash if you are diagnosed with a major disease like cancer, stroke, or heart attack, to help pay for treatment or replace lost income while recovering.",
+                example: "Receiving RM 100,000 upon a cancer diagnosis, which you can use for alternative treatments or daily living expenses while on medical leave."
+            },
+            "Retirement Planning": {
+                term: "Retirement Planning",
+                definition: "The process of determining retirement income goals and the actions and decisions necessary to achieve those goals.",
+                simpleExplanation: "Preparing today for your financial future so you can live comfortably without working. It involves estimating future expenses and building an investment nest egg.",
+                example: "Calculating that you need RM 1.2 million to retire comfortably at age 60 and setting aside RM 1,500 monthly to reach that target."
+            },
+            "Investment": {
+                term: "Investment",
+                definition: "An asset or item acquired with the goal of generating income or appreciation in value in the future.",
+                simpleExplanation: "Putting your money to work in assets that you expect will grow in value or pay you regular income over time.",
+                example: "Buying stocks, bonds, mutual funds, or real estate to grow your wealth over the long term."
+            },
+            "Asset Allocation": {
+                term: "Asset Allocation",
+                definition: "An investment strategy that aims to balance risk and reward by apportioning a portfolio's assets according to an individual's goals, risk tolerance, and investment horizon.",
+                simpleExplanation: "Deciding how to divide your money among different types of investments (like stocks, bonds, property, and cash) based on your risk comfort level and goals.",
+                example: "Allocating 60% of your portfolio to equities for growth, 30% to bonds for stability, and 10% to cash for liquidity."
+            },
+            "Diversification": {
+                term: "Diversification",
+                definition: "A risk management strategy that mixes a wide variety of investments within a portfolio to limit exposure to any single asset or risk.",
+                simpleExplanation: "Not putting all your eggs in one basket. By spreading your investments, a drop in one asset won't wipe out your entire savings.",
+                example: "Investing in a global mutual fund that holds shares in hundreds of companies across different countries and industries, rather than buying stock in just one company."
+            },
+            "Inflation": {
+                term: "Inflation",
+                definition: "The gradual increase in prices and fall in the purchasing value of money over time.",
+                simpleExplanation: "How prices rise over time, making your money buy less than it used to. It's the silent killer of cash savings.",
+                example: "If a bowl of noodles cost RM 5 ten years ago and costs RM 8 today, that is the effect of inflation."
+            },
+            "Compound Interest": {
+                term: "Compound Interest",
+                definition: "Interest calculated on the initial principal, which also includes all of the accumulated interest from previous periods on a deposit or loan.",
+                simpleExplanation: "Interest on interest. It means your money earns interest, and then that interest earns interest too, causing your savings to grow faster and faster over time.",
+                example: "Investing RM 10,000 at a 6% annual return. In year one you make RM 600. In year two, you earn 6% on RM 10,600, which is RM 636, and so on."
+            },
+            "Estate Planning": {
+                term: "Estate Planning",
+                definition: "The preparation of tasks that serve to manage an individual's asset base in the event of their incapacitation or death.",
+                simpleExplanation: "Deciding who will get your assets and how they should be managed when you pass away or if you become unable to make decisions.",
+                example: "Writing a will (Wasiat) or setting up a trust to specify how your property and savings will be distributed among your children."
+            },
+            "Risk Profile": {
+                term: "Risk Profile",
+                definition: "An evaluation of an individual's willingness and ability to take on investment risks.",
+                simpleExplanation: "How comfortable you are with the value of your investments going up and down, and how much risk you can financially afford to take.",
+                example: "A conservative investor who prefers fixed deposits because they hate seeing temporary losses, versus an aggressive investor who buys shares for long-term growth."
+            },
+            "Trust Score": {
+                term: "Trust Score",
+                definition: "A metric used in relationship-based planning to evaluate a client's transparency, reliability, and long-term advisory commitment.",
+                simpleExplanation: "In financial planning, it measures how open, reliable, and committed you are to working with your financial planner to build a secure future.",
+                example: "Providing complete, verified paperwork to your advisor quickly raises your trust score, enabling more accurate and tailored advice."
+            },
+            "Financial Independence": {
+                term: "Financial Independence",
+                definition: "The state of having sufficient personal wealth to live, without having to work actively for basic necessities.",
+                simpleExplanation: "Having enough passive income (from investments, rent, etc.) to cover all your living expenses so that working becomes optional.",
+                example: "Having RM 1.5 million in investments yielding 5% annually (RM 75,000/year), which fully covers your living cost of RM 60,000/year."
+            },
+            "Financial Wellness": {
+                term: "Financial Wellness",
+                definition: "A state of overall financial health characterized by effective management of expenses, preparation for emergencies, and progress toward future goals.",
+                simpleExplanation: "A state of mind and wallet where you feel in control of your daily finances, can handle a financial emergency, and are on track to achieve your life goals.",
+                example: "Having zero high-interest debt, maintaining an active emergency fund, and feeling confident about your path to retirement."
+            }
+        };
+
+        const SupportView = ({ session, lang, clientData, reviewRequests, setReviewRequests }) => {
             const isClient = session?.role === 'client';
+
+            const [searchQuery, setSearchQuery] = useState('');
+            const [selectedTerm, setSelectedTerm] = useState(null);
+            const [suggestions, setSuggestions] = useState([]);
+            const [showSuggestions, setShowSuggestions] = useState(false);
+            const [searchError, setSearchError] = useState(false);
+
+            // States for "Request a Financial Review"
+            const [meetingType, setMeetingType] = useState('Zoom / Video Meeting');
+            const [notificationModal, setNotificationModal] = useState({ isOpen: false, title: '', message: '', type: 'success' });
+            const [appointmentDate, setAppointmentDate] = useState('2026-06-16');
+            const [appointmentTime, setAppointmentTime] = useState('10:00');
+            const [selectedCategories, setSelectedCategories] = useState([]);
+            const [remarks, setRemarks] = useState('');
+            const [urgency, setUrgency] = useState('Normal');
+
+            const reviewCategoriesList = [
+                "Investment Planning",
+                "Retirement Planning",
+                "Insurance Planning",
+                "Education Planning",
+                "Estate Planning",
+                "Cash Flow Management",
+                "Debt Management",
+                "Financial Health Review",
+                "Other"
+            ];
+
+            const handleCategoryChange = (category) => {
+                if (selectedCategories.includes(category)) {
+                    setSelectedCategories(selectedCategories.filter(c => c !== category));
+                } else {
+                    setSelectedCategories([...selectedCategories, category]);
+                }
+            };
+
+            // Look up advisor assigned to the client profile from CLIENT_DB
+            const clientRecord = clientData ? CLIENT_DB.find(c => c.name === clientData.fullName) : null;
+            const mappedAdvisor = clientRecord ? ADVISORS_DB.find(a => a.id === clientRecord.advisorId) : null;
+            const advisorName = mappedAdvisor ? `${mappedAdvisor.name} (${mappedAdvisor.role})` : 'Farah Hashim (CFP)';
+            const advisorEmail = mappedAdvisor ? mappedAdvisor.email : 'farah.hashim@mywealth.com.my';
+
+            const handleSendRequest = () => {
+                const clientName = clientData?.fullName || 'Client';
+                const newRequest = {
+                    id: 'req_' + Date.now(),
+                    clientId: session.id || 'client_unknown',
+                    clientName: clientName,
+                    meetingType: meetingType,
+                    appointmentDate: appointmentDate,
+                    appointmentTime: appointmentTime,
+                    categories: selectedCategories.length > 0 ? selectedCategories : ['Other'],
+                    urgency: urgency,
+                    remarks: remarks,
+                    status: 'Pending Advisor Review',
+                    requestDate: new Date().toISOString().split('T')[0],
+                    advisorRemarks: '',
+                    rejectionReason: '',
+                    advisorSuggestedDate: '',
+                    advisorSuggestedTime: '',
+                    isNewForClient: false,
+                    isNewForAdvisor: true
+                };
+
+                setReviewRequests(prev => [newRequest, ...prev]);
+                setNotificationModal({
+                    isOpen: true,
+                    title: 'Request Submitted Successfully',
+                    message: 'Your financial review request has been submitted successfully within MyWealthPortrait!',
+                    type: 'success'
+                });
+                
+                // Clear form inputs
+                setRemarks('');
+                setSelectedCategories([]);
+            };
+
+            const handleAcceptAlternativeSlot = (reqId, date, time) => {
+                setReviewRequests(prev => prev.map(r => {
+                    if (r.id === reqId) {
+                        return {
+                            ...r,
+                            status: 'Accepted',
+                            appointmentDate: date,
+                            appointmentTime: time,
+                            isNewForClient: false
+                        };
+                    }
+                    return r;
+                }));
+                setNotificationModal({
+                    isOpen: true,
+                    title: 'Alternative Slot Accepted',
+                    message: 'You have accepted the advisor\'s proposed alternative slot!',
+                    type: 'success'
+                });
+            };
+
+            const handleResubmitRevisedRequest = (req) => {
+                setMeetingType(req.meetingType);
+                setAppointmentDate(req.appointmentDate);
+                setAppointmentTime(req.appointmentTime);
+                setSelectedCategories(req.categories);
+                setRemarks(req.remarks);
+                setUrgency(req.urgency);
+                
+                setReviewRequests(prev => prev.map(r => {
+                    if (r.id === req.id) {
+                        return {
+                            ...r,
+                            status: 'Completed',
+                            isNewForClient: false
+                        };
+                    }
+                    return r;
+                }));
+                setNotificationModal({
+                    isOpen: true,
+                    title: 'Form Re-populated',
+                    message: 'Form populated with your previous request. Please adjust the details and click "Send Request to Advisor" to submit your revised request.',
+                    type: 'info'
+                });
+            };
+
+            const handleDismissClientNotification = (reqId) => {
+                setReviewRequests(prev => prev.map(r => {
+                    if (r.id === reqId) {
+                        return {
+                            ...r,
+                            isNewForClient: false
+                        };
+                    }
+                    return r;
+                }));
+            };
+
+            const popularTerms = [
+                "Net Worth", 
+                "Compound Interest", 
+                "Asset Allocation", 
+                "Inflation", 
+                "Emergency Fund", 
+                "Financial Independence"
+            ];
+
+            const handleInputChange = (e) => {
+                const query = e.target.value;
+                setSearchQuery(query);
+                
+                if (query.trim() === '') {
+                    setSuggestions([]);
+                    return;
+                }
+                
+                const cleanedQuery = query.toLowerCase();
+                const matched = Object.keys(FINANCIAL_DICTIONARY).filter(k => 
+                    k.toLowerCase().includes(cleanedQuery)
+                );
+                setSuggestions(matched);
+                setShowSuggestions(true);
+            };
+
+            const handleSuggestionClick = (term) => {
+                setSearchQuery(term);
+                setSuggestions([]);
+                setShowSuggestions(false);
+                
+                const match = FINANCIAL_DICTIONARY[term];
+                if (match) {
+                    setSelectedTerm(match);
+                    setSearchError(false);
+                } else {
+                    setSelectedTerm(null);
+                    setSearchError(true);
+                }
+            };
+
+            const handleSearchSubmit = () => {
+                setShowSuggestions(false);
+                if (searchQuery.trim() === '') {
+                    setSelectedTerm(null);
+                    setSearchError(false);
+                    return;
+                }
+                
+                const cleanedQuery = searchQuery.trim().toLowerCase();
+                const keys = Object.keys(FINANCIAL_DICTIONARY);
+                
+                const exactKey = keys.find(k => k.toLowerCase() === cleanedQuery);
+                if (exactKey) {
+                    setSelectedTerm(FINANCIAL_DICTIONARY[exactKey]);
+                    setSearchQuery(exactKey);
+                    setSearchError(false);
+                    return;
+                }
+                
+                const partialKey = keys.find(k => k.toLowerCase().includes(cleanedQuery));
+                if (partialKey) {
+                    setSelectedTerm(FINANCIAL_DICTIONARY[partialKey]);
+                    setSearchQuery(partialKey);
+                    setSearchError(false);
+                    return;
+                }
+                
+                setSelectedTerm(null);
+                setSearchError(true);
+            };
+
+            const handlePopularTermClick = (term) => {
+                setSearchQuery(term);
+                setSuggestions([]);
+                setShowSuggestions(false);
+                
+                const match = FINANCIAL_DICTIONARY[term];
+                if (match) {
+                    setSelectedTerm(match);
+                    setSearchError(false);
+                } else {
+                    setSelectedTerm(null);
+                    setSearchError(true);
+                }
+            };
+
+            const handleKeyDown = (e) => {
+                if (e.key === 'Enter') {
+                    handleSearchSubmit();
+                }
+            };
 
             const books = [
                 {
@@ -5369,6 +6161,524 @@
                                 </div>
                             </div>
                         </Card>
+                    )}
+
+                    {/* Financial Terms Dictionary Section (Available to both clients and advisors) */}
+                    <Card className="space-y-6" overflow="overflow-visible">
+                        <div>
+                            <h2 className="text-2xl font-serif text-gold font-light tracking-wide border-b border-border pb-3 mb-2">Financial Terms Dictionary</h2>
+                            <p className="text-xs text-textDim">Quick reference for common financial planning, insurance, and investment terminology.</p>
+                        </div>
+                        
+                        <div className="space-y-4">
+                            {/* Search Input Box */}
+                            <div className="relative flex flex-col sm:flex-row gap-2 max-w-lg">
+                                <div className="relative flex-1">
+                                    <input 
+                                        type="text"
+                                        placeholder="Search a financial term..."
+                                        value={searchQuery}
+                                        onChange={handleInputChange}
+                                        onFocus={() => setShowSuggestions(true)}
+                                        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                                        onKeyDown={handleKeyDown}
+                                        className="w-full bg-surface2 border border-border rounded-lg px-4 py-2.5 text-sm text-white placeholder-textDim focus:outline-none focus:border-gold/50 transition-colors"
+                                    />
+                                    {showSuggestions && suggestions.length > 0 && (
+                                        <div className="absolute z-50 left-0 right-0 mt-1 bg-surface border border-border rounded-lg shadow-xl max-h-60 overflow-y-auto">
+                                            {suggestions.map((term, index) => (
+                                                <button
+                                                    key={index}
+                                                    type="button"
+                                                    onClick={() => handleSuggestionClick(term)}
+                                                    className="w-full text-left px-4 py-2 hover:bg-surface2 text-xs text-white hover:text-gold transition-colors duration-150 border-b border-border/30 last:border-b-0 block"
+                                                >
+                                                    {term}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                                <button 
+                                    type="button"
+                                    onClick={handleSearchSubmit}
+                                    className="bg-gold hover:bg-yellow-600 text-bg font-bold px-6 py-2.5 rounded-lg text-sm transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
+                                >
+                                    <i className="fas fa-search"></i> Search
+                                </button>
+                            </div>
+
+                            {/* Popular Terms */}
+                            <div className="space-y-2">
+                                <span className="text-[10px] text-textDim uppercase tracking-wider font-semibold">Popular Terms:</span>
+                                <div className="flex flex-wrap gap-2">
+                                    {popularTerms.map((term, i) => (
+                                        <button
+                                            key={i}
+                                            type="button"
+                                            onClick={() => handlePopularTermClick(term)}
+                                            className="text-xs bg-surface2 border border-border hover:border-gold/50 hover:bg-surface2/80 text-textMid hover:text-gold px-3 py-1.5 rounded-full transition-all duration-200"
+                                        >
+                                            {term}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Results Panel */}
+                            <div className="pt-4 border-t border-border/40 min-h-[120px]">
+                                {selectedTerm ? (
+                                    <div className="space-y-4 animate-fade-in">
+                                        <div>
+                                            <span className="text-[10px] text-gold uppercase tracking-wider font-semibold font-sans">Term Definition</span>
+                                            <h3 className="text-2xl font-serif text-white font-light mt-0.5">{selectedTerm.term}</h3>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="p-4 bg-surface2/35 border border-border/50 rounded-lg">
+                                                <span className="text-[10px] text-textDim uppercase tracking-wider font-semibold block mb-1">Standard Definition</span>
+                                                <p className="text-sm text-text font-serif leading-relaxed italic">{selectedTerm.definition}</p>
+                                            </div>
+                                            <div className="p-4 bg-surface2/35 border border-border/50 rounded-lg">
+                                                <span className="text-[10px] text-textDim uppercase tracking-wider font-semibold block mb-1">In Simple Terms</span>
+                                                <p className="text-sm text-textMid leading-relaxed">{selectedTerm.simpleExplanation}</p>
+                                            </div>
+                                        </div>
+                                        
+                                        {selectedTerm.example && (
+                                            <div className="p-4 bg-goldDim/10 border border-gold/20 rounded-lg flex gap-3 items-start">
+                                                <div className="w-8 h-8 bg-goldDim/30 border border-gold/20 text-gold rounded-full flex items-center justify-center text-xs flex-shrink-0 mt-0.5">
+                                                    <i className="fas fa-lightbulb"></i>
+                                                </div>
+                                                <div>
+                                                    <span className="text-[10px] text-gold uppercase tracking-wider font-semibold block mb-0.5">Example / Scenario</span>
+                                                    <p className="text-xs text-textMid leading-relaxed">{selectedTerm.example}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : searchError ? (
+                                    <div className="p-6 bg-red/5 border border-red/20 rounded-lg text-center animate-fade-in">
+                                        <div className="w-12 h-12 bg-red/10 border border-red/20 text-red rounded-full flex items-center justify-center text-lg mx-auto mb-3">
+                                            <i className="fas fa-exclamation-circle"></i>
+                                        </div>
+                                        <p className="text-sm text-textMid font-medium">No matching financial term found. Please try another keyword.</p>
+                                    </div>
+                                ) : (
+                                    <div className="p-8 border border-dashed border-border rounded-lg text-center text-textDim text-sm">
+                                        <i className="fas fa-book-open text-2xl text-border mb-2 block"></i>
+                                        Select a popular term or search above to view definitions.
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </Card>
+
+                    {/* Request a Financial Review Section */}
+                    <Card className="space-y-6 border-l-4 border-l-gold" overflow="overflow-visible">
+                        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-3">
+                            <div>
+                                <h2 className="text-2xl font-serif text-gold font-light tracking-wide mb-1">Request a Financial Review</h2>
+                                <p className="text-xs text-textDim">Schedule a direct review session with your assigned advisor.</p>
+                            </div>
+                            <span className="text-[10px] bg-goldDim/40 text-gold border border-gold/30 px-3 py-1 rounded font-sans uppercase font-bold tracking-wider">
+                                Client Service Request
+                            </span>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                            {/* Left Side: Form Fields */}
+                            <div className="lg:col-span-7 space-y-6">
+                                
+                                {/* Meeting Type */}
+                                <div className="space-y-2">
+                                    <label className="text-[10px] text-textDim uppercase tracking-wider font-semibold">Meeting Type</label>
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                        {[
+                                            { id: 'Face-to-Face Meeting', label: 'Face-to-Face', icon: 'fa-handshake' },
+                                            { id: 'Phone Call', label: 'Phone Call', icon: 'fa-phone' },
+                                            { id: 'Zoom / Video Meeting', label: 'Zoom / Video', icon: 'fa-video' }
+                                        ].map((t) => (
+                                            <button
+                                                key={t.id}
+                                                type="button"
+                                                onClick={() => setMeetingType(t.id)}
+                                                className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg border text-xs font-medium transition-all duration-200 ${
+                                                    meetingType === t.id 
+                                                        ? 'bg-goldDim text-gold border-gold' 
+                                                        : 'bg-surface2/50 border-border text-textMid hover:text-white hover:bg-surface2'
+                                                }`}
+                                            >
+                                                <i className={`fas ${t.icon}`}></i>
+                                                {t.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Date and Time */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] text-textDim uppercase tracking-wider font-semibold">Preferred Appointment Date</label>
+                                        <input 
+                                            type="date"
+                                            value={appointmentDate}
+                                            onChange={(e) => setAppointmentDate(e.target.value)}
+                                            className="w-full bg-surface2 border border-border rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-gold/50 transition-colors"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] text-textDim uppercase tracking-wider font-semibold">Preferred Appointment Time</label>
+                                        <select
+                                            value={appointmentTime}
+                                            onChange={(e) => setAppointmentTime(e.target.value)}
+                                            className="w-full bg-surface2 border border-border rounded-lg px-3 py-2.5 text-xs text-white outline-none focus:border-gold/50 transition-colors"
+                                        >
+                                            <option value="09:00">09:00 AM</option>
+                                            <option value="09:30">09:30 AM</option>
+                                            <option value="10:00">10:00 AM</option>
+                                            <option value="10:30">10:30 AM</option>
+                                            <option value="11:00">11:00 AM</option>
+                                            <option value="11:30">11:30 AM</option>
+                                            <option value="12:00">12:00 PM</option>
+                                            <option value="14:00">02:00 PM</option>
+                                            <option value="14:30">02:30 PM</option>
+                                            <option value="15:00">03:00 PM</option>
+                                            <option value="15:30">03:30 PM</option>
+                                            <option value="16:00">04:00 PM</option>
+                                            <option value="16:30">04:30 PM</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {/* Review Category */}
+                                <div className="space-y-2">
+                                    <label className="text-[10px] text-textDim uppercase tracking-wider font-semibold">Review Category (Select one or more)</label>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                                        {reviewCategoriesList.map((cat, idx) => (
+                                            <label 
+                                                key={idx}
+                                                className={`flex items-center gap-2.5 p-2.5 rounded-lg border text-xs cursor-pointer select-none transition-all duration-200 ${
+                                                    selectedCategories.includes(cat)
+                                                        ? 'bg-goldDim/20 border-gold/40 text-white'
+                                                        : 'bg-surface2/30 border-border/60 text-textMid hover:border-border hover:bg-surface2/50'
+                                                }`}
+                                            >
+                                                <input 
+                                                    type="checkbox"
+                                                    checked={selectedCategories.includes(cat)}
+                                                    onChange={() => handleCategoryChange(cat)}
+                                                    className="accent-gold h-3.5 w-3.5 rounded border-border"
+                                                />
+                                                <span>{cat}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Urgency Indicator */}
+                                <div className="space-y-2">
+                                    <label className="text-[10px] text-textDim uppercase tracking-wider font-semibold">Urgency Indicator</label>
+                                    <div className="grid grid-cols-3 gap-2 max-w-sm">
+                                        {[
+                                            { id: 'Normal', color: 'blue', border: 'border-blue/30', active: 'bg-blue/10 border-blue text-blue-400' },
+                                            { id: 'Important', color: 'amber', border: 'border-amber/30', active: 'bg-amber/10 border-amber text-amber' },
+                                            { id: 'Urgent', color: 'red', border: 'border-red/30', active: 'bg-red/10 border-red text-red' }
+                                        ].map((u) => (
+                                            <button
+                                                key={u.id}
+                                                type="button"
+                                                onClick={() => setUrgency(u.id)}
+                                                className={`py-2 px-3 rounded-lg border text-xs font-semibold text-center transition-all duration-200 ${
+                                                    urgency === u.id 
+                                                        ? u.active 
+                                                        : `bg-surface2/50 ${u.border} text-textDim hover:text-text`
+                                                }`}
+                                            >
+                                                {u.id}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Remarks (ruled notebook background) */}
+                                <div className="space-y-2">
+                                    <label className="text-[10px] text-textDim uppercase tracking-wider font-semibold">Remarks / Discussion Topics</label>
+                                    <textarea
+                                        rows={6}
+                                        value={remarks}
+                                        onChange={(e) => setRemarks(e.target.value)}
+                                        placeholder="Please describe the topics you would like to discuss with your advisor."
+                                        style={{
+                                            background: 'linear-gradient(transparent, transparent 27px, var(--border) 27px, var(--border) 28px)',
+                                            backgroundSize: '100% 28px',
+                                            lineHeight: '28px',
+                                            paddingTop: '6px'
+                                        }}
+                                        className="w-full bg-surface2 border border-border rounded-lg px-4 py-1.5 text-xs text-white placeholder-textDim focus:outline-none focus:border-gold/50 transition-colors font-sans"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Right Side: Live Request Summary & Action */}
+                            <div className="lg:col-span-5 flex flex-col justify-between font-sans">
+                                <div className="bg-surface2/40 border border-border/80 rounded-lg p-5 space-y-4">
+                                    <div className="flex items-center justify-between border-b border-border/50 pb-2">
+                                        <h3 className="font-serif text-sm font-semibold text-white">Request Summary</h3>
+                                        <span className={`text-[9px] px-2 py-0.5 rounded font-sans uppercase font-bold tracking-wider ${
+                                            urgency === 'Urgent' ? 'bg-red/15 text-red border border-red/30' :
+                                            urgency === 'Important' ? 'bg-amber/15 text-amber border border-amber/30' :
+                                            'bg-blue/15 text-blue border border-blue/30'
+                                        }`}>
+                                            {urgency} Priority
+                                        </span>
+                                    </div>
+
+                                    <div className="space-y-3.5 text-xs">
+                                        {/* Assigned Advisor Info */}
+                                        <div className="flex justify-between items-start">
+                                            <span className="text-textDim">Assigned Advisor:</span>
+                                            <span className="text-right text-gold font-medium">{advisorName}</span>
+                                        </div>
+
+                                        {/* Meeting Type */}
+                                        <div className="flex justify-between">
+                                            <span className="text-textDim">Meeting Type:</span>
+                                            <span className="text-right text-white font-medium">{meetingType}</span>
+                                        </div>
+
+                                        {/* Appointment Slot */}
+                                        <div className="flex justify-between">
+                                            <span className="text-textDim">Preferred Date/Time:</span>
+                                            <span className="text-right text-white font-medium">{appointmentDate} @ {appointmentTime}</span>
+                                        </div>
+
+                                        {/* Categories */}
+                                        <div className="space-y-1">
+                                            <span className="text-textDim block">Review Categories:</span>
+                                            <div className="flex flex-wrap gap-1">
+                                                {selectedCategories.length > 0 ? (
+                                                    selectedCategories.map((c, i) => (
+                                                        <span key={i} className="text-[9px] bg-surface2 border border-border text-white px-2 py-0.5 rounded">
+                                                            {c}
+                                                        </span>
+                                                    ))
+                                                ) : (
+                                                    <span className="text-[10px] text-textDim italic">No categories selected</span>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Remarks Summary */}
+                                        <div className="space-y-1 pt-1 border-t border-border/30">
+                                            <span className="text-textDim block">Remarks Summary:</span>
+                                            <p className="text-[11px] text-textMid italic line-clamp-3 bg-bg/40 p-2 rounded border border-border/30 min-h-[50px] leading-relaxed">
+                                                {remarks || "No remarks written yet."}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="pt-2 text-[10px] text-textDim italic leading-normal font-sans">
+                                        <i className="fas fa-info-circle text-gold mr-1"></i>
+                                        Clicking the button will submit this request to your advisor's queue within MyWealthPortrait.
+                                    </div>
+                                </div>
+
+                                <div className="mt-4">
+                                    <button
+                                        type="button"
+                                        onClick={handleSendRequest}
+                                        className="w-full bg-gold hover:bg-yellow-600 text-bg font-bold py-3 px-6 rounded-lg text-sm transition-colors flex items-center justify-center gap-2 shadow-lg shadow-gold/5 uppercase tracking-wider"
+                                    >
+                                        <i className="fas fa-paper-plane"></i> Send Request to Advisor
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </Card>
+
+                    {/* My Review Requests Tracking Section (Only visible for client role) */}
+                    {isClient && (
+                        <Card className="space-y-6" overflow="overflow-visible">
+                            <div>
+                                <h2 className="text-2xl font-serif text-gold font-light tracking-wide border-b border-border pb-3 mb-2">My Review Requests</h2>
+                                <p className="text-xs text-textDim">Track status and respond to advisor suggestions for your requested review sessions.</p>
+                            </div>
+                            
+                            <div className="space-y-4">
+                                {(reviewRequests ? reviewRequests.filter(r => r.clientId === session.id) : []).length === 0 ? (
+                                    <div className="p-8 border border-dashed border-border rounded-lg text-center text-textDim text-sm">
+                                        <i className="fas fa-history text-2xl text-border mb-2 block"></i>
+                                        You have not submitted any review requests yet.
+                                    </div>
+                                ) : (
+                                    <div className="overflow-x-auto font-sans">
+                                        <table className="w-full text-xs text-left border-collapse min-w-[600px]">
+                                            <thead>
+                                                <tr className="border-b border-border/80 text-textDim uppercase text-[10px] tracking-wider bg-surface2/30">
+                                                    <th className="py-3 px-4 font-semibold">Request Date</th>
+                                                    <th className="py-3 px-4 font-semibold">Requested Meeting</th>
+                                                    <th className="py-3 px-4 font-semibold">Meeting Type</th>
+                                                    <th className="py-3 px-4 font-semibold">Categories</th>
+                                                    <th className="py-3 px-4 font-semibold">Status</th>
+                                                    <th className="py-3 px-4 font-semibold text-right">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-border/40 text-textMid">
+                                                {(reviewRequests ? reviewRequests.filter(r => r.clientId === session.id) : []).map((req) => {
+                                                    const hasUpdate = req.isNewForClient;
+                                                    
+                                                    return (
+                                                        <React.Fragment key={req.id}>
+                                                            <tr className={`hover:bg-surface2/20 transition-colors ${hasUpdate ? 'bg-goldDim/5 font-medium' : ''}`}>
+                                                                <td className="py-3.5 px-4 text-textDim">
+                                                                    <div className="flex items-center gap-1.5">
+                                                                        {hasUpdate && <span className="w-2 h-2 rounded-full bg-gold animate-pulse flex-shrink-0"></span>}
+                                                                        {req.requestDate}
+                                                                    </div>
+                                                                </td>
+                                                                <td className="py-3.5 px-4 text-white font-medium">{req.appointmentDate} @ {req.appointmentTime}</td>
+                                                                <td className="py-3.5 px-4 text-textMid">{req.meetingType}</td>
+                                                                <td className="py-3.5 px-4">
+                                                                    <div className="flex flex-wrap gap-1">
+                                                                        {req.categories.map((c, i) => (
+                                                                            <span key={i} className="text-[9px] bg-surface2 border border-border text-white px-1.5 py-0.5 rounded">
+                                                                                {c}
+                                                                            </span>
+                                                                        ))}
+                                                                    </div>
+                                                                </td>
+                                                                <td className="py-3.5 px-4">
+                                                                    <span className={`text-[10px] px-2 py-0.5 rounded font-sans uppercase font-bold tracking-wider ${
+                                                                        req.status === 'Accepted' ? 'bg-green/15 text-green border border-green/30' :
+                                                                        req.status === 'Alternative Date Proposed' ? 'bg-amber/15 text-amber border border-amber/30 animate-pulse' :
+                                                                        req.status === 'Rejected' ? 'bg-red/15 text-red border border-red/30' :
+                                                                        req.status === 'Completed' ? 'bg-surface2 border border-border text-textDim' :
+                                                                        'bg-goldDim text-gold border border-gold/30'
+                                                                    }`}>
+                                                                        {req.status}
+                                                                    </span>
+                                                                </td>
+                                                                <td className="py-3.5 px-4 text-right">
+                                                                    {hasUpdate && (
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => handleDismissClientNotification(req.id)}
+                                                                            className="text-[10px] bg-surface2 text-textDim hover:text-white px-2.5 py-1 rounded transition-colors mr-2 border border-border/80"
+                                                                        >
+                                                                            Mark Read
+                                                                        </button>
+                                                                    )}
+                                                                    
+                                                                    {(req.status === 'Alternative Date Proposed' || req.status === 'Rejected') && (
+                                                                        <span className="text-[10px] text-textDim italic">Action available below</span>
+                                                                    )}
+                                                                    
+                                                                    {req.status === 'Accepted' && (
+                                                                        <span className="text-[10px] text-green font-semibold"><i className="fas fa-check-circle"></i> Confirmed</span>
+                                                                    )}
+                                                                </td>
+                                                            </tr>
+                                                            
+                                                            {/* Nested Proposal details for client response */}
+                                                            {(req.status === 'Alternative Date Proposed' || req.status === 'Rejected') && (
+                                                                <tr>
+                                                                    <td colSpan="6" className="bg-surface2/10 px-4 py-3 border-t-0">
+                                                                        <div className="p-3 bg-surface2/55 border border-border rounded-lg text-xs space-y-3">
+                                                                            {req.status === 'Alternative Date Proposed' ? (
+                                                                                <>
+                                                                                    <div className="flex items-center gap-1.5">
+                                                                                        <i className="fas fa-clock text-amber"></i>
+                                                                                        <span className="font-bold text-amber">Advisor Proposed Alternative Slot:</span>
+                                                                                    </div>
+                                                                                    <div>Suggested Date & Time: <strong className="text-white">{req.advisorSuggestedDate} @ {req.advisorSuggestedTime}</strong></div>
+                                                                                    {req.advisorRemarks && <div>Advisor Message: <span className="italic text-text">"{req.advisorRemarks}"</span></div>}
+                                                                                    
+                                                                                    <div className="flex gap-2 pt-1.5">
+                                                                                        <button
+                                                                                            type="button"
+                                                                                            onClick={() => handleAcceptAlternativeSlot(req.id, req.advisorSuggestedDate, req.advisorSuggestedTime)}
+                                                                                            className="bg-green/20 hover:bg-green-600 text-green hover:text-white border border-green/30 px-3 py-1.5 rounded text-[10px] font-bold transition-colors"
+                                                                                        >
+                                                                                            Accept Proposal
+                                                                                        </button>
+                                                                                        <button
+                                                                                            type="button"
+                                                                                            onClick={() => handleResubmitRevisedRequest(req)}
+                                                                                            className="bg-gold hover:bg-yellow-600 text-bg px-3 py-1.5 rounded text-[10px] font-bold transition-colors"
+                                                                                        >
+                                                                                            Modify & Resubmit
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </>
+                                                                            ) : (
+                                                                                <>
+                                                                                    <div className="flex items-center gap-1.5">
+                                                                                        <i className="fas fa-ban text-red"></i>
+                                                                                        <span className="font-bold text-red">Advisor Rejection Notes:</span>
+                                                                                    </div>
+                                                                                    <div>Reason: <span className="italic text-text">"{req.rejectionReason}"</span></div>
+                                                                                    {req.advisorRemarks && <div>Advisor Suggestion: <strong className="text-white">{req.advisorRemarks}</strong></div>}
+                                                                                    
+                                                                                    <div className="pt-1.5">
+                                                                                        <button
+                                                                                            type="button"
+                                                                                            onClick={() => handleResubmitRevisedRequest(req)}
+                                                                                            className="bg-gold hover:bg-yellow-600 text-bg px-3 py-1.5 rounded text-[10px] font-bold transition-colors"
+                                                                                        >
+                                                                                            Create New Request Form
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </>
+                                                                            )}
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            )}
+                                                        </React.Fragment>
+                                                    );
+                                                })}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </div>
+                        </Card>
+                    )}
+
+                    {/* Custom Notification Modal */}
+                    {notificationModal.isOpen && (
+                        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center backdrop-blur-sm animate-fade-in p-4">
+                            <Card className="max-w-md w-full border border-gold/30 shadow-2xl relative p-6 bg-surface">
+                                <button 
+                                    onClick={() => setNotificationModal(prev => ({ ...prev, isOpen: false }))} 
+                                    className="absolute top-4 right-4 text-textDim hover:text-white transition-colors"
+                                >
+                                    <i className="fas fa-times text-lg"></i>
+                                </button>
+                                <div className="text-center py-4 space-y-4 font-sans">
+                                    <div className={`w-16 h-16 border rounded-full flex items-center justify-center text-3xl mx-auto ${
+                                        notificationModal.type === 'success' 
+                                            ? 'bg-green/10 border-green/30 text-green animate-bounce' 
+                                            : 'bg-goldDim/10 border-gold/30 text-gold'
+                                    }`}>
+                                        <i className={notificationModal.type === 'success' ? 'fas fa-check-circle' : 'fas fa-info-circle'}></i>
+                                    </div>
+                                    <h3 className="font-serif text-lg text-white">{notificationModal.title}</h3>
+                                    <p className="text-xs text-textMid leading-relaxed max-w-xs mx-auto">
+                                        {notificationModal.message}
+                                    </p>
+                                    <div className="pt-2">
+                                        <button 
+                                            onClick={() => setNotificationModal(prev => ({ ...prev, isOpen: false }))} 
+                                            className="bg-gold hover:bg-yellow-600 text-bg font-bold px-6 py-2 rounded-lg text-xs transition-colors uppercase tracking-wider"
+                                        >
+                                            Dismiss
+                                        </button>
+                                    </div>
+                                </div>
+                            </Card>
+                        </div>
                     )}
                 </div>
             );
