@@ -1030,93 +1030,388 @@
             };
         };
 
-        // Login Gateway Component
-        const LoginScreen = ({ onLogin }) => {
+        // Client Login Screen Component
+        const ClientLoginScreen = ({ onLogin, onBack }) => {
             return (
                 <div className="min-h-screen bg-bg text-text font-sans flex flex-col justify-center items-center p-6 relative overflow-y-auto w-full">
                     <div className="absolute inset-0 pointer-events-none" style={{
                         background: 'radial-gradient(ellipse 60% 40% at 50% 10%, rgba(212, 168, 83, 0.08) 0%, transparent 60%)'
                     }}></div>
 
-                    <div className="max-w-4xl w-full z-10 space-y-8 my-8">
+                    <div className="max-w-xl w-full z-10 space-y-8 my-8 bg-surface border border-border p-8 rounded-xl relative shadow-2xl">
+                        <button onClick={onBack} className="absolute top-4 left-4 text-xs text-textDim hover:text-gold transition-colors flex items-center gap-1.5 font-sans font-medium">
+                            <i className="fas fa-arrow-left"></i> Back to Home
+                        </button>
+                        
                         {/* Title */}
-                        <div className="text-center space-y-3">
-                            <span className="text-xs font-semibold tracking-widest text-gold uppercase">Enterprise Portal Gateway</span>
-                            <h1 className="text-4xl font-serif text-white tracking-wide font-light">MY Wealth <span className="text-gold font-sans font-bold">Portrait</span></h1>
-                            <p className="text-textDim text-sm max-w-lg mx-auto leading-relaxed">
-                                Select a simulated profile below to authenticate. Experience customized portal views matching client goals or advisor workflows under Bank Negara guidelines.
+                        <div className="text-center space-y-3 pt-4">
+                            <span className="text-[10px] font-bold tracking-widest text-gold uppercase bg-goldDim/30 border border-gold/25 px-2.5 py-1 rounded">Client Portal Gateway</span>
+                            <h1 className="text-3xl font-serif text-white tracking-wide font-light">Client <span className="text-gold font-sans font-bold">Login</span></h1>
+                            <p className="text-textDim text-xs leading-relaxed max-w-md mx-auto">
+                                Select a simulated client profile to authenticate and view your personalized wealth portrait.
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
-                            {/* Client Login Options */}
-                            <div className="space-y-4">
-                                <h3 className="font-serif text-lg text-white border-b border-border pb-2 flex items-center gap-2">
-                                    <i className="fas fa-users text-gold text-sm"></i> Access as Client
-                                </h3>
-                                <div className="space-y-3.5">
-                                    {[
-                                        { id: 'client_1', name: 'Ahmad Razali', desc: 'Affluent portfolio. Mapped to Farah Hashim.', goals: 'Comfortable Retirement, Kids\' Education', netWorth: 'RM 1.18M' },
-                                        { id: 'client_2', name: 'Sarah Lim', desc: 'High debt leverage. Mapped to Devi Letchumi.', goals: 'Debt Repayment, Buy a Home', netWorth: 'RM 87K' },
-                                        { id: 'client_3', name: 'Ravi Chandran', desc: 'Ultra High Net Worth. Mapped to Aiman Syazwan.', goals: 'Living Trusts, Legacy, Business Growth', netWorth: 'RM 3.56M' },
-                                        { id: 'client_4', name: 'Nurul Huda', desc: 'Entry-level client. Mapped to Farah Hashim.', goals: 'Emergency Savings Fund', netWorth: 'RM 24K' }
-                                    ].map(c => (
-                                        <div 
-                                            key={c.id}
-                                            onClick={() => onLogin({ role: 'client', id: c.id })}
-                                            className="bg-surface border border-border hover:border-gold/50 p-4 rounded-lg cursor-pointer transition-all duration-300 hover:translate-x-1 group relative overflow-hidden"
-                                        >
-                                            <div className="absolute top-0 right-0 w-24 h-24 bg-gold/5 rounded-full blur-xl transform translate-x-1/2 -translate-y-1/2"></div>
-                                            <div className="flex justify-between items-start">
-                                                <div className="space-y-1">
-                                                    <h4 className="font-serif font-bold text-white group-hover:text-gold transition-colors text-sm">{c.name}</h4>
-                                                    <p className="text-xs text-textDim leading-relaxed">{c.desc}</p>
-                                                    <p className="text-[10px] text-textMid pt-1 font-medium">Goals: {c.goals}</p>
-                                                </div>
-                                                <span className="text-[10px] font-bold text-gold px-2 py-0.5 bg-goldDim/30 border border-gold/25 rounded flex-shrink-0">
-                                                    {c.netWorth}
-                                                </span>
-                                            </div>
+                        {/* Client Login Options */}
+                        <div className="space-y-3 pt-2">
+                            {[
+                                { id: 'client_1', name: 'Ahmad Razali', desc: 'Affluent portfolio. Mapped to Farah Hashim.', goals: 'Comfortable Retirement, Kids\' Education', netWorth: 'RM 1.18M' },
+                                { id: 'client_2', name: 'Sarah Lim', desc: 'High debt leverage. Mapped to Devi Letchumi.', goals: 'Debt Repayment, Buy a Home', netWorth: 'RM 87K' },
+                                { id: 'client_3', name: 'Ravi Chandran', desc: 'Ultra High Net Worth. Mapped to Aiman Syazwan.', goals: 'Living Trusts, Legacy, Business Growth', netWorth: 'RM 3.56M' },
+                                { id: 'client_4', name: 'Nurul Huda', desc: 'Entry-level client. Mapped to Farah Hashim.', goals: 'Emergency Savings Fund', netWorth: 'RM 24K' }
+                            ].map(c => (
+                                <div 
+                                    key={c.id}
+                                    onClick={() => onLogin({ role: 'client', id: c.id })}
+                                    className="bg-surface2/50 border border-border hover:border-gold/50 p-4 rounded-lg cursor-pointer transition-all duration-300 hover:translate-x-1 group relative overflow-hidden"
+                                >
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-gold/5 rounded-full blur-xl transform translate-x-1/2 -translate-y-1/2"></div>
+                                    <div className="flex justify-between items-start">
+                                        <div className="space-y-1">
+                                            <h4 className="font-serif font-bold text-white group-hover:text-gold transition-colors text-sm">{c.name}</h4>
+                                            <p className="text-xs text-textDim leading-relaxed">{c.desc}</p>
+                                            <p className="text-[10px] text-textMid pt-1 font-medium">Goals: {c.goals}</p>
                                         </div>
-                                    ))}
+                                        <span className="text-[10px] font-bold text-gold px-2 py-0.5 bg-goldDim/30 border border-gold/25 rounded flex-shrink-0">
+                                            {c.netWorth}
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
-
-                            {/* Advisor Login Options */}
-                            <div className="space-y-4">
-                                <h3 className="font-serif text-lg text-white border-b border-border pb-2 flex items-center gap-2">
-                                    <i className="fas fa-user-tie text-gold text-sm"></i> Access as CFP Advisor
-                                </h3>
-                                <div className="space-y-3.5">
-                                    {ADVISORS_DB.map(adv => (
-                                        <div 
-                                            key={adv.id}
-                                            onClick={() => onLogin({ role: 'advisor', id: adv.id })}
-                                            className="bg-surface border border-border hover:border-gold/50 p-4 rounded-lg cursor-pointer transition-all duration-300 hover:translate-x-1 group relative overflow-hidden"
-                                        >
-                                            <div className="absolute top-0 right-0 w-24 h-24 bg-blue/5 rounded-full blur-xl transform translate-x-1/2 -translate-y-1/2"></div>
-                                            <div className="flex justify-between items-start">
-                                                <div className="space-y-1">
-                                                    <h4 className="font-serif font-bold text-white group-hover:text-gold transition-colors text-sm">{adv.name} ({adv.role})</h4>
-                                                    <p className="text-xs text-textDim leading-relaxed">{adv.bio}</p>
-                                                    <p className="text-[10px] text-textMid pt-1 font-medium">Specialty: {adv.specialty}</p>
-                                                </div>
-                                                <span className="text-[9px] font-bold text-blue bg-blue/10 border border-blue/20 px-2 py-0.5 rounded uppercase tracking-wider flex-shrink-0">
-                                                    {adv.clients.length} Mapped
-                                                </span>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
+                            ))}
                         </div>
 
-                        <div className="text-center pt-8 border-t border-border/40 text-[10px] text-textDim flex justify-between max-w-2xl mx-auto w-full">
+                        <div className="text-center pt-6 border-t border-border/40 text-[10px] text-textDim flex justify-between w-full">
                             <span>PDPA 2010 Protected Simulation</span>
-                            <span>Bank-Grade Encryption Certified</span>
+                            <span>Bank-Grade Security</span>
                             <span>Secured BNM AML Standards</span>
                         </div>
                     </div>
+                </div>
+            );
+        };
+
+        // Advisor Login Screen Component
+        const AdvisorLoginScreen = ({ onLogin, onBack }) => {
+            return (
+                <div className="min-h-screen bg-bg text-text font-sans flex flex-col justify-center items-center p-6 relative overflow-y-auto w-full">
+                    <div className="absolute inset-0 pointer-events-none" style={{
+                        background: 'radial-gradient(ellipse 60% 40% at 50% 10%, rgba(212, 168, 83, 0.08) 0%, transparent 60%)'
+                    }}></div>
+
+                    <div className="max-w-xl w-full z-10 space-y-8 my-8 bg-surface border border-border p-8 rounded-xl relative shadow-2xl">
+                        <button onClick={onBack} className="absolute top-4 left-4 text-xs text-textDim hover:text-gold transition-colors flex items-center gap-1.5 font-sans font-medium">
+                            <i className="fas fa-arrow-left"></i> Back to Home
+                        </button>
+                        
+                        {/* Title */}
+                        <div className="text-center space-y-3 pt-4">
+                            <span className="text-[10px] font-bold tracking-widest text-gold uppercase bg-goldDim/30 border border-gold/25 px-2.5 py-1 rounded">CFP Advisor Gateway</span>
+                            <h1 className="text-3xl font-serif text-white tracking-wide font-light">Advisor <span className="text-gold font-sans font-bold">Login</span></h1>
+                            <p className="text-textDim text-xs leading-relaxed max-w-md mx-auto">
+                                Select a CFP/IFP licensed advisor profile to access the practice management dashboard.
+                            </p>
+                        </div>
+
+                        {/* Advisor Login Options */}
+                        <div className="space-y-3 pt-2">
+                            {ADVISORS_DB.map(adv => (
+                                <div 
+                                    key={adv.id}
+                                    onClick={() => onLogin({ role: 'advisor', id: adv.id })}
+                                    className="bg-surface2/50 border border-border hover:border-gold/50 p-4 rounded-lg cursor-pointer transition-all duration-300 hover:translate-x-1 group relative overflow-hidden"
+                                >
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-blue/5 rounded-full blur-xl transform translate-x-1/2 -translate-y-1/2"></div>
+                                    <div className="flex justify-between items-start">
+                                        <div className="space-y-1">
+                                            <h4 className="font-serif font-bold text-white group-hover:text-gold transition-colors text-sm">{adv.name} ({adv.role})</h4>
+                                            <p className="text-xs text-textDim leading-relaxed">{adv.bio}</p>
+                                            <p className="text-[10px] text-textMid pt-1 font-medium">Specialty: {adv.specialty}</p>
+                                        </div>
+                                        <span className="text-[9px] font-bold text-blue bg-blue/10 border border-blue/20 px-2 py-0.5 rounded uppercase tracking-wider flex-shrink-0">
+                                            {adv.clients.length} Mapped
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="text-center pt-6 border-t border-border/40 text-[10px] text-textDim flex justify-between w-full">
+                            <span>CFP Certification Verification</span>
+                            <span>Bank-Grade Security</span>
+                            <span>Secured BNM AML Standards</span>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Premium Landing Page Component
+        const LandingPage = ({ onNavClientLogin, onNavAdvisorLogin }) => {
+            const quotes = [
+                "The best time to plan your future is today.",
+                "Financial freedom begins with financial clarity.",
+                "A goal without a plan is only a wish.",
+                "Wealth is not about having a lot of money; it is about having a lot of options.",
+                "The goal isn't more money. The goal is living life on your terms.",
+                "Do not save what is left after spending, but spend what is left after saving.",
+                "An investment in knowledge pays the best interest.",
+                "Planning is bringing the future into the present so that you can do something about it now.",
+                "Rich people invest in time, poor people invest in money.",
+                "Your wealth portrait starts with clear vision and trusted guidance."
+            ];
+
+            const [quote, setQuote] = useState("");
+
+            useEffect(() => {
+                const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+                setQuote(randomQuote);
+            }, []);
+
+            const scrollToSection = (id) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                }
+            };
+
+            return (
+                <div className="min-h-screen bg-bg text-text font-sans flex flex-col w-full relative">
+                    {/* Top Navigation */}
+                    <nav className="sticky top-0 bg-surface/90 backdrop-blur-lg border-b border-border z-50 h-20 px-6 lg:px-12 flex justify-between items-center transition-all">
+                        <div className="flex items-center gap-3">
+                            <i className="fas fa-handshake text-gold text-2xl"></i>
+                            <div>
+                                <span className="font-serif text-2xl font-bold text-gold tracking-wide">MY Wealth <span className="text-white font-sans font-light text-lg">Portrait</span></span>
+                                <span className="block text-[9px] uppercase tracking-widest text-textDim font-bold">Trust-Based Planning</span>
+                            </div>
+                        </div>
+                        <div className="hidden md:flex items-center gap-8 text-sm font-medium">
+                            <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-textDim hover:text-white transition-colors">Home</button>
+                            <button onClick={() => scrollToSection('about')} className="text-textDim hover:text-white transition-colors">About</button>
+                            <button onClick={() => scrollToSection('ask-stan')} className="text-textDim hover:text-gold transition-colors flex items-center gap-1.5">
+                                <i className="fas fa-robot text-gold text-xs"></i> Ask Stan
+                            </button>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <button onClick={onNavClientLogin} className="bg-surface2 hover:bg-goldDim border border-border hover:border-gold/30 text-xs font-semibold px-4 py-2.5 rounded-lg text-text hover:text-gold transition-all duration-200">
+                                Client Login
+                            </button>
+                            <button onClick={onNavAdvisorLogin} className="bg-gold hover:bg-yellow-600 text-bg text-xs font-bold px-4 py-2.5 rounded-lg transition-all duration-200 shadow-lg shadow-gold/10">
+                                Advisor Login
+                            </button>
+                        </div>
+                    </nav>
+
+                    {/* Hero Section */}
+                    <section className="relative py-24 lg:py-32 px-6 lg:px-12 flex flex-col items-center text-center overflow-hidden border-b border-border/40">
+                        <div className="absolute inset-0 pointer-events-none" style={{
+                            background: 'radial-gradient(ellipse 60% 40% at 50% 20%, rgba(212, 168, 83, 0.08) 0%, transparent 60%)'
+                        }}></div>
+                        
+                        <div className="max-w-4xl space-y-6 z-10">
+                            <span className="text-xs font-bold tracking-widest text-gold uppercase bg-goldDim/40 border border-gold/25 px-3 py-1 rounded-full">
+                                Premium Wealth Advisory Portal
+                            </span>
+                            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif text-white tracking-wide font-light leading-tight">
+                                Your Complete Financial Portrait.<br/>
+                                <span className="text-gold font-sans font-bold italic">Your Future. Your Confidence.</span>
+                            </h1>
+                            <p className="text-textDim text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+                                Know Your Financial Future Before You Live It. Get a dynamic assessment of your retirement, portfolio, estate planning, and risk profile under professional Bank Negara standards.
+                            </p>
+                            
+                            {/* Quote Cycler display */}
+                            {quote && (
+                                <div className="py-4 px-6 bg-surface2/30 border border-border/60 rounded-xl max-w-xl mx-auto mt-6 animate-fade-in flex gap-3 items-center justify-center">
+                                    <i className="fas fa-quote-left text-gold/30 text-lg flex-shrink-0"></i>
+                                    <p className="text-xs text-textMid italic font-serif leading-relaxed">"{quote}"</p>
+                                    <i className="fas fa-quote-right text-gold/30 text-lg flex-shrink-0"></i>
+                                </div>
+                            )}
+
+                            <div className="pt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                                <button onClick={onNavClientLogin} className="bg-gold hover:bg-yellow-600 text-bg font-bold py-3 px-8 rounded-lg text-sm transition-all duration-300 shadow-xl shadow-gold/20 flex items-center justify-center gap-2 group uppercase tracking-wider">
+                                    Begin Your Financial Journey <i className="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                                </button>
+                                <button onClick={() => scrollToSection('about')} className="bg-surface2 hover:bg-surface border border-border hover:border-gold/30 text-text hover:text-white font-semibold py-3 px-8 rounded-lg text-sm transition-all">
+                                    Explore Features
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* What You Will Get Section */}
+                    <section id="about" className="py-20 px-6 lg:px-12 max-w-6xl mx-auto w-full space-y-12">
+                        <div className="text-center space-y-2">
+                            <span className="text-xs font-semibold tracking-wider text-gold uppercase">Empowerment</span>
+                            <h2 className="text-3xl font-serif text-white font-light">What You Will Get</h2>
+                            <p className="text-textDim text-xs max-w-md mx-auto">Discover the comprehensive tools and reports generated for you after your assessment.</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {[
+                                { title: 'Comprehensive Financial Health Assessment', icon: 'fa-heartbeat', desc: 'Holistic assessment scoring based on debt ratio, savings metrics, and overall liquidity.' },
+                                { title: 'Retirement Readiness', icon: 'fa-umbrella-beach', desc: 'Calculation models and projections of retirement cash flows and accumulation targets.' },
+                                { title: 'Investment Portfolio Review', icon: 'fa-wallet', desc: 'Asset allocation insights covering cash deposits, EPF, stocks, and unit trusts.' },
+                                { title: 'Insurance Coverage Analysis', icon: 'fa-shield-alt', desc: 'Protection gap analysis utilizing standard income replacement methodology.' },
+                                { title: 'Goal Planning', icon: 'fa-bullseye', desc: 'Dynamic trackers mapping milestones, timelines, and savings requirements.' },
+                                { title: 'Estate & Legacy Planning', icon: 'fa-scroll', desc: 'Guidance and scorecard analysis for wills, LPA, Hibah, and legacy distributions.' },
+                                { title: 'Risk Profile Assessment', icon: 'fa-chart-line', desc: 'Evaluation of investment tolerances, horizons, and behavioral decision trees.' },
+                                { title: 'Personalized Financial Recommendations', icon: 'fa-file-invoice-dollar', desc: 'Dynamic reports generated specifically for your active financial profile parameters.' },
+                                { title: 'AI-assisted Financial Guidance', icon: 'fa-robot', desc: 'Interactive concept clarification, terminological reference lookup, and portal navigation.' }
+                            ].map((w, idx) => (
+                                <Card key={idx} className="border border-border/60 hover:border-gold/40 hover:bg-surface2/20 transition-all duration-300">
+                                    <div className="w-10 h-10 rounded-full bg-goldDim/40 border border-gold/20 flex items-center justify-center text-gold mb-4 text-sm">
+                                        <i className={`fas ${w.icon}`}></i>
+                                    </div>
+                                    <h3 className="font-serif text-base font-semibold text-white mb-2">{w.title}</h3>
+                                    <p className="text-xs text-textDim leading-relaxed">{w.desc}</p>
+                                </Card>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* How It Works Section */}
+                    <section className="py-20 bg-surface2/15 border-y border-border/40 px-6 lg:px-12 w-full">
+                        <div className="max-w-6xl mx-auto space-y-12">
+                            <div className="text-center space-y-2">
+                                <span className="text-xs font-semibold tracking-wider text-gold uppercase">Simple & Systematic</span>
+                                <h2 className="text-3xl font-serif text-white font-light">How It Works</h2>
+                                <p className="text-textDim text-xs max-w-md mx-auto">Follow our intuitive, compliance-backed process flow to map out your portrait.</p>
+                            </div>
+
+                            {/* Timeline Design */}
+                            <div className="grid grid-cols-1 md:grid-cols-6 gap-6 relative">
+                                {[
+                                    { step: 'Step 1', title: 'Register or Login', desc: 'Choose a simulated client or advisor profile to get started.' },
+                                    { step: 'Step 2', title: 'Financial Questionnaire', desc: 'Fill in details regarding income, family structure, and goals.' },
+                                    { step: 'Step 3', title: 'Upload & Enter Portfolio', desc: 'Log assets, current liabilities, and existing insurance plans.' },
+                                    { step: 'Step 4', title: 'Generate Your Portrait Report', desc: 'Review calculated scores, wealth allocations, and gaps.' },
+                                    { step: 'Step 5', title: 'Discuss Recommendations', desc: 'Consult with mapped CFP advisors inside the portal.' },
+                                    { step: 'Step 6', title: 'Regular Reviews & Updates', desc: 'Optimize plans and adjust strategies dynamically over time.' }
+                                ].map((s, idx) => (
+                                    <div key={idx} className="relative flex flex-col items-center text-center p-4 bg-surface border border-border/60 rounded-xl space-y-3">
+                                        <span className="text-[10px] font-bold text-gold bg-goldDim/30 border border-gold/20 px-2.5 py-0.5 rounded-full uppercase">{s.step}</span>
+                                        <h3 className="text-xs font-semibold text-white font-sans">{s.title}</h3>
+                                        <p className="text-[11px] text-textDim leading-normal">{s.desc}</p>
+                                        {idx < 5 && (
+                                            <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-20 text-gold/30">
+                                                <i className="fas fa-chevron-right"></i>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Why Work With A Advisor Section */}
+                    <section className="py-20 px-6 lg:px-12 max-w-6xl mx-auto w-full space-y-12">
+                        <div className="text-center space-y-2">
+                            <span className="text-xs font-semibold tracking-wider text-gold uppercase">Human-Centric Guidance</span>
+                            <h2 className="text-3xl font-serif text-white font-light">Why Work With A Financial Advisor</h2>
+                            <p className="text-textDim text-xs max-w-md mx-auto">Automated calculators provide baseline facts, but a licensed CFP adds customized strategy.</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {[
+                                { title: 'Reviews & Validates', icon: 'fa-check-double', desc: 'Reviews calculated values, cross-checks assumptions, and helps prioritize immediate vs long-term milestones.' },
+                                { title: 'Creates Actionable Plans', icon: 'fa-map-signs', desc: 'Creates tailored restructuring models for debt, tax compliance, or specific estate distributions.' },
+                                { title: 'Monitors Progress Over Time', icon: 'fa-history', desc: 'Monitors goals, updates allocations periodically, and acts as a trusted accountability advisor.' }
+                            ].map((a, idx) => (
+                                <Card key={idx} className="border-l-4 border-l-gold hover:translate-y-[-2px] transition-transform duration-300">
+                                    <div className="flex gap-4 items-start">
+                                        <div className="w-9 h-9 rounded-full bg-goldDim/30 border border-gold/20 flex items-center justify-center text-gold flex-shrink-0 text-xs">
+                                            <i className={`fas ${a.icon}`}></i>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <h3 className="font-serif text-sm font-semibold text-white">{a.title}</h3>
+                                            <p className="text-xs text-textDim leading-relaxed">{a.desc}</p>
+                                        </div>
+                                    </div>
+                                </Card>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* Meet Stan AI Assistant Section */}
+                    <section id="ask-stan" className="py-20 bg-surface2/15 border-y border-border/40 px-6 lg:px-12 w-full">
+                        <div className="max-w-4xl mx-auto text-center space-y-8">
+                            <div className="space-y-2">
+                                <span className="text-xs font-semibold tracking-wider text-gold uppercase">Conversational Assistance</span>
+                                <h2 className="text-3xl font-serif text-white font-light">Meet Stan — Your AI Financial Consultant</h2>
+                            </div>
+                            
+                            <div className="p-6 bg-surface border border-border/80 rounded-xl space-y-6 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 rounded-full blur-xl transform translate-x-1/2 -translate-y-1/2"></div>
+                                
+                                <div className="flex flex-col sm:flex-row gap-6 items-center">
+                                    <img src="resources/ask-stan-ai.jpeg" alt="Stan AI Avatar" className="w-20 h-20 rounded-full border-2 border-gold shadow-lg" onError={(e) => { e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="40" fill="%231c2030"/><text x="40" y="45" font-family="sans-serif" font-size="24" fill="%23d4a853" text-anchor="middle">Stan</text></svg>' }} />
+                                    <div className="text-left space-y-2 flex-1">
+                                        <h4 className="font-serif text-lg text-white font-semibold">How Stan Helps You Navigate</h4>
+                                        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-textMid">
+                                            <li><i className="fas fa-check text-gold mr-1.5 text-[10px]"></i> Answer financial planning queries</li>
+                                            <li><i className="fas fa-check text-gold mr-1.5 text-[10px]"></i> Explain investment concepts</li>
+                                            <li><i className="fas fa-check text-gold mr-1.5 text-[10px]"></i> Clarify planning terminology</li>
+                                            <li><i className="fas fa-check text-gold mr-1.5 text-[10px]"></i> Assist with portal navigation</li>
+                                            <li><i className="fas fa-check text-gold mr-1.5 text-[10px]"></i> Explain report sections</li>
+                                            <li><i className="fas fa-check text-gold mr-1.5 text-[10px]"></i> Provide educational guidance</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div className="p-3 bg-goldDim/10 border border-gold/20 rounded-lg text-[10px] text-textMid leading-normal flex gap-2.5 items-start text-left">
+                                    <i className="fas fa-info-circle text-gold flex-shrink-0 mt-0.5"></i>
+                                    <span>
+                                        <strong>Important Disclaimer:</strong> Stan is a simulated AI assistant designed to educate and assist users in navigation and calculations. Stan does not replace official advice from a licensed financial advisor.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Key Features Section */}
+                    <section className="py-20 px-6 lg:px-12 max-w-6xl mx-auto w-full space-y-12">
+                        <div className="text-center space-y-2">
+                            <span className="text-xs font-semibold tracking-wider text-gold uppercase">High Performance Platform</span>
+                            <h2 className="text-3xl font-serif text-white font-light">Key Features</h2>
+                            <p className="text-textDim text-xs max-w-md mx-auto">Explore features specifically engineered to support wealth planners and retail clients.</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {[
+                                { title: 'AI Assisted Guidance', icon: 'fa-robot', desc: 'Interact with conversational agents and reference calculators in real time.' },
+                                { title: 'Secure Financial Information', icon: 'fa-lock', desc: 'PDPA 2010 bank-grade framework protects stored data and mock credentials.' },
+                                { title: 'Personalized Financial Reports', icon: 'fa-file-alt', desc: 'Export and print holistic summary scorecards and recommended adjustments.' },
+                                { title: 'Advisor Collaboration', icon: 'fa-users', desc: 'Sync dynamically generated assessments straight to CFP CRM queues.' },
+                                { title: 'Goal Tracking', icon: 'fa-flag', desc: 'Establish thresholds, targets, and visualize deficit limits.' },
+                                { title: 'Retirement Planning', icon: 'fa-umbrella-beach', desc: 'Run multi-variable cash-flow sandbox models.' },
+                                { title: 'Portfolio Insights', icon: 'fa-chart-pie', desc: 'Break down assets across properties, EPF, and equity classes.' },
+                                { title: 'Easy-to-understand Recommendations', icon: 'fa-check-circle', desc: 'Translates raw metrics into practical lifestyle targets.' }
+                            ].map((f, idx) => (
+                                <div key={idx} className="bg-surface border border-border p-5 rounded-xl hover:border-gold/30 hover:bg-surface2/10 transition-all duration-300 space-y-3">
+                                    <i className={`fas ${f.icon} text-gold text-sm`}></i>
+                                    <h4 className="font-serif text-sm font-semibold text-white">{f.title}</h4>
+                                    <p className="text-[11px] text-textDim leading-relaxed">{f.desc}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* Call To Action Section */}
+                    <section className="py-20 bg-gradient-to-br from-gold/10 to-transparent border-t border-border/40 text-center px-6">
+                        <div className="max-w-2xl mx-auto space-y-6">
+                            <h2 className="text-3xl font-serif text-white font-light">Ready to Take Control of Your Financial Narrative?</h2>
+                            <p className="text-textDim text-xs leading-relaxed">
+                                Get your personalized financial score, identify insurance protection gaps, and align goals with qualified advisory support today.
+                            </p>
+                            <div className="pt-4">
+                                <button onClick={onNavClientLogin} className="bg-gold hover:bg-yellow-600 text-bg font-bold py-3 px-8 rounded-lg text-sm transition-all duration-300 shadow-xl shadow-gold/25 uppercase tracking-wider">
+                                    Get Started As Client
+                                </button>
+                            </div>
+                        </div>
+                    </section>
                 </div>
             );
         };
@@ -1621,6 +1916,7 @@
         // App Entry Component
         const App = () => {
             const [session, setSession] = useState(null); // Simulated Authentication: { role: 'client'/'advisor', id: '...' }
+            const [landingView, setLandingView] = useState('landing');
             const [activeTab, setActiveTab] = useState('dashboard');
             const [clientData, setClientData] = useState(INITIAL_CLIENT_DATA);
             const [calculated, setCalculated] = useState(calculateFinancials(INITIAL_CLIENT_DATA));
@@ -1802,9 +2098,15 @@
                 return true;
             });
 
-            // Render Login Gate Screen if session is null
+            // Render Landing Page or Login Screens if session is null
             if (!session) {
-                return <LoginScreen onLogin={handleLogin} />;
+                if (landingView === 'landing') {
+                    return <LandingPage onNavClientLogin={() => setLandingView('client-login')} onNavAdvisorLogin={() => setLandingView('advisor-login')} />;
+                } else if (landingView === 'client-login') {
+                    return <ClientLoginScreen onLogin={handleLogin} onBack={() => setLandingView('landing')} />;
+                } else if (landingView === 'advisor-login') {
+                    return <AdvisorLoginScreen onLogin={handleLogin} onBack={() => setLandingView('landing')} />;
+                }
             }
 
             return (
