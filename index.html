@@ -360,6 +360,15 @@
             .page-break-inside-avoid {
                 page-break-inside: avoid !important;
             }
+            
+            /* Quote banner fade-in animation */
+            @keyframes quoteFadeIn {
+                from { opacity: 0; transform: translateY(6px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            .animate-quote-fade-in {
+                animation: quoteFadeIn 0.5s ease-out forwards;
+            }
         }
     </style>
 </head>
@@ -367,7 +376,7 @@
     <div id="root"></div>
 
     <script type="text/babel" data-presets="env" data-plugins="custom-jsx">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useRef } = React;
 
         const LANG_DICT = {
             en: {
@@ -710,6 +719,57 @@
             ];
         };
 
+        // Today's Financial Insight / Wisdom for Today panel component
+        const FinancialInsightPanel = ({ quote }) => {
+            if (!quote) return null;
+
+            const isFinancial = quote.category === 'financial';
+            const headerText = isFinancial ? "Today's Financial Insight" : "Wisdom for Today";
+            const headerIcon = isFinancial ? "fa-lightbulb text-gold" : "fa-book-open text-amber-400";
+            const badgeText = isFinancial ? "Financial Wisdom" : "Inspirational Wisdom";
+            
+            const badgeClass = isFinancial 
+                ? "bg-gold/10 text-gold border-gold/20" 
+                : "bg-amber-500/10 text-amber-300 border-amber-500/20";
+
+            return (
+                <div className="mt-8 mx-auto w-full animate-quote-fade-in">
+                    <div className="bg-surface/50 border border-border/85 rounded-xl p-5 md:p-6 shadow-sm relative overflow-hidden">
+                        {/* Subtle gold line on top */}
+                        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-gold/30 to-transparent"></div>
+                        
+                        <div className="flex flex-col gap-3">
+                            {/* Header Row */}
+                            <div className="flex flex-wrap items-center gap-2">
+                                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-surface2/50 border border-border">
+                                    <i className={`fas ${headerIcon} text-xs`}></i>
+                                </span>
+                                <span className="text-xs font-semibold text-textDim uppercase tracking-wider font-sans">
+                                    {headerText}
+                                </span>
+                                <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium border ${badgeClass}`}>
+                                    {badgeText}
+                                </span>
+                            </div>
+                            
+                            {/* Quote Text */}
+                            <div className="relative pl-6">
+                                <i className="fas fa-quote-left absolute left-0 top-1 text-textDim/20 text-base"></i>
+                                <p className="text-sm md:text-base text-text italic font-serif leading-relaxed pr-4">
+                                    {quote.text}
+                                </p>
+                            </div>
+                            
+                            {/* Author */}
+                            <div className="pl-6 text-xs text-textDim font-medium font-sans">
+                                — {quote.author}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         // Custom UI Card Component
         const Card = ({ children, className = "", style = {}, overflow = "overflow-hidden" }) => (
             <div 
@@ -788,6 +848,67 @@
             { id: 'client_2', name: 'Sarah Lim', score: 45, type: 'Fair', lastReview: '1 month ago', advisorId: 'adv_devi' },
             { id: 'client_3', name: 'Ravi Chandran', score: 92, type: 'Excellent', lastReview: 'Just now', advisorId: 'adv_aiman' },
             { id: 'client_4', name: 'Nurul Huda', score: 30, type: 'Needs Review', lastReview: '2 weeks ago', advisorId: 'adv_farah' },
+        ];
+
+        // Quote collections for Today's Financial Insight Panel
+        const FINANCIAL_WISDOM_QUOTES = [
+            { id: 'f1', text: "Investing in yourself is the best investment you can ever make.", author: "Warren Buffett", category: "financial" },
+            { id: 'f2', text: "Financial freedom is the ability to live life on your own terms.", author: "Unknown", category: "financial" },
+            { id: 'f3', text: "If you're saving, you're succeeding.", author: "Unknown", category: "financial" },
+            { id: 'f4', text: "Wealth is built through discipline, not luck.", author: "Unknown", category: "financial" },
+            { id: 'f5', text: "Small consistent investments create extraordinary long-term results.", author: "Unknown", category: "financial" },
+            { id: 'f6', text: "Do not save what is left after spending, but spend what is left after saving.", author: "Warren Buffett", category: "financial" },
+            { id: 'f7', text: "The individual investor should act consistently as an investor and not as a speculator.", author: "Benjamin Graham", category: "financial" },
+            { id: 'f8', text: "An investment in knowledge pays the best interest.", author: "Benjamin Franklin", category: "financial" },
+            { id: 'f9', text: "The safest way to double your money is to fold it over once and put it in your pocket.", author: "Kin Hubbard", category: "financial" },
+            { id: 'f10', text: "The goal isn't more money. The goal is living life on your terms.", author: "Chris Brogan", category: "financial" },
+            { id: 'f11', text: "It’s not how much money you make, but how much money you keep, how hard it works for you, and how many generations you keep it for.", author: "Robert Kiyosaki", category: "financial" },
+            { id: 'f12', text: "A penny saved is a penny earned.", author: "Benjamin Franklin", category: "financial" },
+            { id: 'f13', text: "Before you speak, listen. Before you write, think. Before you spend, earn. Before you invest, investigate. Before you retire, save.", author: "William A. Ward", category: "financial" },
+            { id: 'f14', text: "Wide diversification is only required when investors do not understand what they are doing.", author: "Warren Buffett", category: "financial" },
+            { id: 'f15', text: "Every time you borrow money, you're robbing your future self.", author: "Nathan W. Morris", category: "financial" },
+            { id: 'f16', text: "Rich people believe 'I create my life.' Poor people believe 'Life happens to me.'", author: "T. Harv Eker", category: "financial" },
+            { id: 'f17', text: "The stock market is filled with individuals who know the price of everything, but the value of nothing.", author: "Philip Fisher", category: "financial" },
+            { id: 'f18', text: "The four most dangerous words in investing are: 'This time it's different.'", author: "Sir John Templeton", category: "financial" },
+            { id: 'f19', text: "Money is a terrible master but an excellent servant.", author: "P.T. Barnum", category: "financial" },
+            { id: 'f20', text: "Wealth is not about having a lot of money; it's about having a lot of options.", author: "Chris Rock", category: "financial" },
+            { id: 'f21', text: "In investing, what is comfortable is rarely profitable.", author: "Robert Arnott", category: "financial" },
+            { id: 'f22', text: "You must gain control over your money or the lack of it will forever control you.", author: "Dave Ramsey", category: "financial" },
+            { id: 'f23', text: "A simple fact that is hard to learn is that the time to save money is when you have some.", author: "Joe Moore", category: "financial" },
+            { id: 'f24', text: "Compound interest is the eighth wonder of the world. He who understands it, earns it... he who doesn't... pays it.", author: "Albert Einstein", category: "financial" },
+            { id: 'f25', text: "Rule No. 1: Never lose money. Rule No. 2: Never forget rule No. 1.", author: "Warren Buffett", category: "financial" },
+            { id: 'f26', text: "The main difference between a rich person and a poor person is how they manage fear.", author: "Robert Kiyosaki", category: "financial" },
+            { id: 'f27', text: "Price is what you pay. Value is what you get.", author: "Warren Buffett", category: "financial" },
+            { id: 'f28', text: "It is not the man who has too little, but the man who craves more, who is poor.", author: "Seneca", category: "financial" },
+            { id: 'f29', text: "Never spend your money before you have earned it.", author: "Thomas Jefferson", category: "financial" },
+            { id: 'f30', text: "Budgeting isn't about limiting yourself; it's about making your money work for you.", author: "Unknown", category: "financial" },
+            { id: 'f31', text: "The key to wealth is to spend less than you make, and do it for a long time.", author: "Unknown", category: "financial" },
+            { id: 'f32', text: "Wealth is the ability to fully experience life.", author: "Henry David Thoreau", category: "financial" },
+            { id: 'f33', text: "Financial peace isn't the acquisition of stuff. It's learning to live on less than you make.", author: "Dave Ramsey", category: "financial" },
+            { id: 'f34', text: "Don't tell me where your priorities are. Show me where you spend your money and I'll tell you what they are.", author: "James W. Frick", category: "financial" },
+            { id: 'f35', text: "A wise person should have money in their head, but not in their heart.", author: "Jonathan Swift", category: "financial" },
+            { id: 'f36', text: "It is thrifty to prepare today for the wants of tomorrow.", author: "Aesop", category: "financial" }
+        ];
+
+        const INSPIRATIONAL_WISDOM_QUOTES = [
+            { id: 'i1', text: "The plans of the diligent lead surely to abundance.", author: "Proverbs 21:5", category: "inspirational" },
+            { id: 'i2', text: "Indeed, Allah loves those who act with excellence.", author: "Quran 2:195", category: "inspirational" },
+            { id: 'i3', text: "Better than a thousand hollow words is one word that brings peace.", author: "Dhammapada", category: "inspirational" },
+            { id: 'i4', text: "The best of people are those who are most beneficial to people.", author: "Hadith", category: "inspirational" },
+            { id: 'i5', text: "For where your treasure is, there your heart will be also.", author: "Matthew 6:21", category: "inspirational" },
+            { id: 'i6', text: "By three methods we may learn wisdom: First, by reflection, which is noblest; Second, by imitation, which is easiest; and third by experience, which is the bitterest.", author: "Confucius", category: "inspirational" },
+            { id: 'i7', text: "He who is faithful in a very little thing is faithful also in much.", author: "Luke 16:10", category: "inspirational" },
+            { id: 'i8', text: "A noble man makes noble plans, and by noble deeds he stands.", author: "Isaiah 32:8", category: "inspirational" },
+            { id: 'i9', text: "A journey of a thousand miles begins with a single step.", author: "Lao Tzu", category: "inspirational" },
+            { id: 'i10', text: "Give, and it will be given to you.", author: "Luke 6:38", category: "inspirational" },
+            { id: 'i11', text: "Knowing others is intelligence; knowing yourself is true wisdom.", author: "Lao Tzu", category: "inspirational" },
+            { id: 'i12', text: "One who is patient achieves what he desires.", author: "Ali ibn Abi Talib", category: "inspirational" },
+            { id: 'i13', text: "Make of yourself a light.", author: "Buddha", category: "inspirational" },
+            { id: 'i14', text: "Patience is the companion of wisdom.", author: "Saint Augustine", category: "inspirational" },
+            { id: 'i15', text: "The modern man is built on diligence; the wise man builds on integrity.", author: "Unknown", category: "inspirational" },
+            { id: 'i16', text: "Riches do not consist in the abundance of goods, but in the contentment of mind.", author: "Hadith", category: "inspirational" },
+            { id: 'i17', text: "The secret of change is to focus all of your energy, not on fighting the old, but on building the new.", author: "Socrates", category: "inspirational" },
+            { id: 'i18', text: "Do not store up for yourselves treasures on earth, where moths and vermin destroy, but store up treasures in heaven.", author: "Matthew 6:19-20", category: "inspirational" }
         ];
 
         // Central Data Schema Structure
@@ -1925,6 +2046,53 @@
             const [guidedStep, setGuidedStep] = useState(0);
             const [showBookingModal, setShowBookingModal] = useState(false);
             
+            // Quote state and rotation logic
+            const [currentQuote, setCurrentQuote] = useState(null);
+            const quoteRotationRef = useRef({
+                financialQueue: [],
+                inspirationalQueue: [],
+                sequenceCounter: 0
+            });
+
+            const getNextQuote = () => {
+                const state = quoteRotationRef.current;
+                const showInspirational = (state.sequenceCounter % 3 === 2);
+                let selected = null;
+
+                const shuffle = (array) => {
+                    const arr = [...array];
+                    for (let i = arr.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [arr[i], arr[j]] = [arr[j], arr[i]];
+                    }
+                    return arr;
+                };
+
+                if (showInspirational) {
+                    if (state.inspirationalQueue.length === 0) {
+                        state.inspirationalQueue = shuffle(INSPIRATIONAL_WISDOM_QUOTES);
+                    }
+                    selected = state.inspirationalQueue.pop();
+                } else {
+                    if (state.financialQueue.length === 0) {
+                        state.financialQueue = shuffle(FINANCIAL_WISDOM_QUOTES);
+                    }
+                    selected = state.financialQueue.pop();
+                }
+
+                state.sequenceCounter = state.sequenceCounter + 1;
+                return selected;
+            };
+
+            useEffect(() => {
+                if (session && session.role !== 'advisor') {
+                    const clientTabs = ['dashboard', 'discovery', 'goals', 'sandbox', 'insurance', 'retirement', 'estate', 'report'];
+                    if (clientTabs.includes(activeTab)) {
+                        setCurrentQuote(getNextQuote());
+                    }
+                }
+            }, [activeTab, session]);
+            
             const [reviewRequests, setReviewRequests] = useState(() => {
                 const saved = localStorage.getItem('mywealth_review_requests');
                 if (saved) return JSON.parse(saved);
@@ -2356,6 +2524,11 @@
                                         reviewRequests={reviewRequests}
                                         setReviewRequests={setReviewRequests}
                                     />
+                                )}
+                                
+                                {/* Today's Financial Insight Panel */}
+                                {session && session.role !== 'advisor' && ['dashboard', 'discovery', 'goals', 'sandbox', 'insurance', 'retirement', 'estate', 'report'].includes(activeTab) && (
+                                    <FinancialInsightPanel key={activeTab} quote={currentQuote} />
                                 )}
                             </div>
                         </main>
@@ -4084,6 +4257,338 @@
         };
 
         /* =========================================================================
+           LIFELINE RULER COMPONENT
+           ========================================================================= */
+        const LifeLineRuler = ({ clientData, calculated }) => {
+            const [activeTooltipAge, setActiveTooltipAge] = useState(null);
+
+            // Close tooltip when clicking outside or pressing Escape
+            useEffect(() => {
+                const handleGlobalClick = (e) => {
+                    const rulerEl = document.getElementById('lifeline-ruler-container');
+                    if (rulerEl && !rulerEl.contains(e.target)) {
+                        setActiveTooltipAge(null);
+                    }
+                };
+                const handleKeyDown = (e) => {
+                    if (e.key === 'Escape') {
+                        setActiveTooltipAge(null);
+                    }
+                };
+                document.addEventListener('click', handleGlobalClick);
+                document.addEventListener('keydown', handleKeyDown);
+                return () => {
+                    document.removeEventListener('click', handleGlobalClick);
+                    document.removeEventListener('keydown', handleKeyDown);
+                };
+            }, []);
+
+            // Helpers for age calculation
+            const getClientAge = (dob) => {
+                if (!dob) return 38; // Default Ahmad Razali
+                const birthDate = new Date(dob);
+                if (isNaN(birthDate.getTime())) return 38;
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const m = today.getMonth() - birthDate.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                return Math.max(0, age);
+            };
+
+            const getEduGoalAge = (edu, kids, parentDob) => {
+                const currentAge = getClientAge(parentDob);
+                const currentYear = new Date().getFullYear();
+                const kid = (kids || []).find(k => k.name.trim().toLowerCase() === edu.name.trim().toLowerCase());
+                if (kid && kid.dob) {
+                    const birthYear = new Date(kid.dob).getFullYear();
+                    const entryAge = edu.level === 'College' ? 18 : 19;
+                    const targetYear = birthYear + entryAge;
+                    return Math.max(currentAge, currentAge + (targetYear - currentYear));
+                }
+                return currentAge + 10;
+            };
+
+            const getMilestoneAge = (p, parentDob) => {
+                const currentAge = getClientAge(parentDob);
+                const currentYear = new Date().getFullYear();
+                const targetYear = parseInt(p.year) || (currentYear + 5);
+                return Math.max(currentAge, currentAge + (targetYear - currentYear));
+            };
+
+            const currentAge = getClientAge(clientData.dob);
+            const retireAge = parseInt(clientData.retireAge) || 60;
+            
+            // Gather and group milestones by age
+            const milestonesByAge = {};
+
+            // 1. Retirement goal (always present)
+            milestonesByAge[retireAge] = milestonesByAge[retireAge] || [];
+            milestonesByAge[retireAge].push({
+                type: 'retirement',
+                category: 'Retirement',
+                title: 'Retirement Goal',
+                icon: 'fas fa-flag-checkered',
+                cost: calculated.retirementCorpusNeed || (parseFloat(clientData.retireIncome) * 12 * 25) || 0,
+                desc: `Target Age: ${retireAge} | Desired Income: ${fmt(clientData.retireIncome || 0)}/mo`,
+                color: 'border-red-500 text-red-500 bg-red-500/10'
+            });
+
+            // 2. Education Goals
+            (clientData.eduGoals || []).forEach(edu => {
+                const age = getEduGoalAge(edu, clientData.kids, clientData.dob);
+                milestonesByAge[age] = milestonesByAge[age] || [];
+                milestonesByAge[age].push({
+                    type: 'education',
+                    category: 'Children Education',
+                    title: `${edu.name}'s Education`,
+                    icon: 'fas fa-graduation-cap',
+                    cost: edu.fund,
+                    desc: `Level: ${edu.level}`,
+                    color: 'border-blue-500 text-blue-500 bg-blue-500/10'
+                });
+            });
+
+            // 3. Purchase / Custom Goals
+            (clientData.purchases || []).forEach(p => {
+                const age = getMilestoneAge(p, clientData.dob);
+                milestonesByAge[age] = milestonesByAge[age] || [];
+                const cat = p.category || '';
+                const iconClass = 
+                    cat === 'Vehicle Purchase' ? 'fas fa-car' :
+                    cat === 'Home Buying' ? 'fas fa-home' :
+                    cat === 'Foreign Trips' ? 'fas fa-plane' :
+                    cat === 'Children Wedding' ? 'fas fa-ring' :
+                    cat === 'Retirement Corpus Creation' ? 'fas fa-umbrella-beach' :
+                    'fas fa-bullseye';
+                milestonesByAge[age].push({
+                    type: 'purchase',
+                    category: cat || 'Milestone',
+                    title: p.type || p.category || 'Milestone',
+                    icon: iconClass,
+                    cost: p.cost,
+                    desc: `Target Year: ${p.year}`,
+                    color: 'border-amber-500 text-amber-500 bg-amber-500/10'
+                });
+            });
+
+            // Render ticks from 0 to 100
+            const tickIntervals = [];
+            for (let i = 0; i <= 100; i += 5) {
+                tickIntervals.push(i);
+            }
+
+            return (
+                <Card id="lifeline-ruler-container" className="border border-border/80 bg-surface/50 backdrop-blur-md p-6 overflow-visible shadow-2xl">
+                    <div className="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 className="font-serif text-lg text-white font-medium flex items-center gap-2">
+                                <i className="fas fa-route text-gold"></i>
+                                LifeLine Ruler
+                            </h2>
+                            <p className="text-textDim text-xs">Visualize your lifetime financial milestones and target goals dynamically.</p>
+                        </div>
+                        <div className="flex gap-4 text-[10px] text-textDim">
+                            <span className="flex items-center gap-1.5">
+                                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                You are here
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                                <span className="w-2.5 h-2.5 rounded-full bg-gold inline-block"></span>
+                                Milestone
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                                <span className="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span>
+                                Retirement
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="overflow-x-auto pb-6 pt-6 select-none scrollbar-thin">
+                        <div className="relative min-w-[900px] h-[300px] px-6">
+                            {/* Base Timeline Track */}
+                            <div className="absolute top-[235px] left-6 right-6 h-1.5 bg-border rounded-full">
+                                {/* Past progress track */}
+                                <div 
+                                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-emerald-500/30 to-emerald-500 rounded-full"
+                                    style={{ width: `${Math.min(100, Math.max(0, currentAge))}%` }}
+                                ></div>
+                                {/* Future progress track (Dotted/Dashed line) */}
+                                <div 
+                                    className="absolute top-0 h-full border-t-2 border-dashed border-gold/40"
+                                    style={{ 
+                                        left: `${Math.min(100, Math.max(0, currentAge))}%`,
+                                        width: `${100 - Math.min(100, Math.max(0, currentAge))}%`
+                                    }}
+                                ></div>
+                            </div>
+
+                            {/* Ruler Tick Marks */}
+                            {tickIntervals.map(tick => {
+                                const isMajor = tick % 10 === 0;
+                                return (
+                                    <div 
+                                        key={'tick_' + tick} 
+                                        className="absolute flex flex-col items-center"
+                                        style={{ 
+                                            left: `calc(${tick}% + 24px - (24px * ${tick} / 100))`,
+                                            top: '257px'
+                                        }}
+                                    >
+                                        <div className={`w-0.5 ${isMajor ? 'h-3 bg-textDim/60' : 'h-1.5 bg-textDim/30'}`}></div>
+                                        {isMajor && (
+                                            <span className="text-[10px] text-textDim mt-1 font-mono font-medium">
+                                                {tick}
+                                            </span>
+                                        )}
+                                    </div>
+                                );
+                            })}
+
+                            {/* Current Age Indicator */}
+                            <div 
+                                className="absolute z-30 flex flex-col items-center"
+                                style={{ 
+                                    left: `calc(${currentAge}% + 24px - (24px * ${currentAge} / 100))`,
+                                    top: '205px'
+                                }}
+                            >
+                                <div className="absolute -top-7 whitespace-nowrap bg-emerald-500 text-bg text-[9px] font-bold px-2 py-0.5 rounded shadow-lg animate-bounce">
+                                    You are here (Age {currentAge})
+                                </div>
+                                <div className="w-5 h-5 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center shadow-lg relative cursor-help">
+                                    <span className="absolute -inset-1 rounded-full border-2 border-emerald-500 animate-ping opacity-75"></span>
+                                    <i className="fas fa-user text-white text-[9px]"></i>
+                                </div>
+                                <div className="w-0.5 h-[30px] bg-emerald-500/80 border-dashed border-emerald-500 mt-0.5"></div>
+                            </div>
+
+                            {/* Milestones Markers */}
+                            {Object.keys(milestonesByAge).map(ageStr => {
+                                const age = parseInt(ageStr);
+                                const list = milestonesByAge[ageStr];
+                                if (!list || list.length === 0) return null;
+                                
+                                // Choose primary milestone info
+                                const isRetGoalOnly = list.length === 1 && list[0].type === 'retirement';
+                                const primaryMilestone = list[0];
+                                
+                                // Color scheme based on type
+                                let markerColor = 'bg-gold hover:bg-yellow-600 border-2 border-white';
+                                if (isRetGoalOnly) {
+                                    markerColor = 'bg-red-500 hover:bg-red-600 border-2 border-white';
+                                } else if (list.some(m => m.type === 'retirement')) {
+                                    markerColor = 'bg-gradient-to-r from-gold to-red-500 hover:from-yellow-600 hover:to-red-600 border-2 border-white';
+                                }
+
+                                const hasMultiple = list.length > 1;
+                                const isTooltipActive = activeTooltipAge === age;
+
+                                if (isTooltipActive) {
+                                    markerColor += ' scale-125 ring-4 ring-gold/45 shadow-[0_0_15px_rgba(212,168,83,0.7)]';
+                                }
+
+                                // Prevent left/right viewport overflow
+                                let tooltipPlacementClass = "left-1/2 -translate-x-1/2 bottom-8 mb-1.5";
+                                let arrowPlacementClass = "left-1/2 -translate-x-1/2";
+                                if (age < 25) {
+                                    tooltipPlacementClass = "left-0 translate-x-0 bottom-8 mb-1.5";
+                                    arrowPlacementClass = "left-[8px]";
+                                } else if (age > 75) {
+                                    tooltipPlacementClass = "right-0 translate-x-0 bottom-8 mb-1.5";
+                                    arrowPlacementClass = "right-[8px]";
+                                }
+
+                                return (
+                                    <div 
+                                        key={'milestone_marker_' + age} 
+                                        className="absolute z-20 flex flex-col items-center"
+                                        style={{ 
+                                            left: `calc(${age}% + 24px - (24px * ${age} / 100))`,
+                                            top: '223px'
+                                        }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setActiveTooltipAge(isTooltipActive ? null : age);
+                                        }}
+                                    >
+                                        {/* Marker Circle */}
+                                        <button 
+                                            className={`w-6 h-6 rounded-full flex items-center justify-center shadow-xl text-white transition-all transform hover:scale-110 ${markerColor}`}
+                                            title={`${primaryMilestone.title} (Age ${age})`}
+                                        >
+                                            {hasMultiple ? (
+                                                <span className="text-[9px] font-bold">+{list.length}</span>
+                                            ) : (
+                                                <i className={`${primaryMilestone.icon} text-[9px]`}></i>
+                                            )}
+                                        </button>
+
+                                        {/* Age Label underneath */}
+                                        <div className="text-[10px] font-semibold text-white/90 mt-5 whitespace-nowrap bg-surface2/80 px-1.5 py-0.5 rounded border border-border/40">
+                                            Age {age}
+                                        </div>
+
+                                        {/* Tooltip Card */}
+                                        {isTooltipActive && (
+                                            <div className={`absolute z-50 bg-surface border border-gold/40 shadow-2xl rounded-xl p-4 w-64 md:w-72 text-xs space-y-3 animate-fade-in text-white ${tooltipPlacementClass}`}>
+                                                {/* Tooltip Arrow pointing to the marker */}
+                                                <div className={`absolute bottom-[-6px] w-2.5 h-2.5 bg-surface border-r border-b border-gold/40 rotate-45 ${arrowPlacementClass}`}></div>
+                                                
+                                                <div className="space-y-3 max-h-[240px] overflow-y-auto pr-1">
+                                                    {list.map((m, idx) => {
+                                                        const isRetirement = m.type === 'retirement';
+                                                        return (
+                                                            <div key={idx} className={`space-y-1.5 ${idx > 0 ? 'border-t border-border/40 pt-3 mt-3' : ''}`}>
+                                                                <div className="flex items-center gap-2 font-bold text-white text-sm">
+                                                                    <span className="text-gold"><i className={m.icon}></i></span>
+                                                                    <span>{m.title}</span>
+                                                                </div>
+                                                                
+                                                                <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-[11px] text-textDim font-sans">
+                                                                    <div>Target Age:</div>
+                                                                    <div className="text-white font-medium">{age}</div>
+                                                                    
+                                                                    {isRetirement ? (
+                                                                        <>
+                                                                            <div>Desired Income:</div>
+                                                                            <div className="text-green font-bold">{fmt(clientData.retireIncome || 0)}/mo</div>
+                                                                            <div>Target Corpus:</div>
+                                                                            <div className="text-green font-bold">{fmt(m.cost)}</div>
+                                                                        </>
+                                                                    ) : (
+                                                                        m.cost > 0 && (
+                                                                            <>
+                                                                                <div>Estimated Cost:</div>
+                                                                                <div className="text-green font-bold">{fmt(m.cost)}</div>
+                                                                            </>
+                                                                        )
+                                                                    )}
+                                                                </div>
+
+                                                                {m.desc && !isRetirement && (
+                                                                    <div className="text-[11px] text-textMid leading-relaxed font-sans pt-1 mt-1 border-t border-border/20">
+                                                                        <span className="text-[10px] text-textDim block uppercase tracking-wider font-semibold mb-0.5">Description:</span>
+                                                                        <p className="whitespace-normal break-words italic">{m.desc}</p>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </Card>
+            );
+        };
+
+        /* =========================================================================
            GOAL PLANNER VIEW
            ========================================================================= */
         const GoalPlannerView = ({ clientData, setClientData, calculated }) => {
@@ -4145,6 +4650,7 @@
                             <i className="fas fa-plus mr-1.5"></i> Add Milestone
                         </button>
                     </div>
+
 
                     {showGoalForm && (
                         <Card className="border border-gold/30 bg-surface2/40 max-w-xl">
@@ -4335,6 +4841,10 @@
                                 </Card>
                             );
                         })}
+                    </div>
+
+                    <div className="mt-8">
+                        <LifeLineRuler clientData={clientData} calculated={calculated} />
                     </div>
                 </div>
             );
