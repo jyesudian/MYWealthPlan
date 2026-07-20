@@ -390,6 +390,10 @@
                 trust: 'Trust Assessment',
                 report: 'Financial Report',
                 advisor: 'Advisor Portal',
+                settings: 'Settings',
+                tax: 'Tax Module',
+                primary_country: 'Primary Country',
+                display_currency: 'Display Currency',
                 
                 holistic_summary: 'Holistic Summary',
                 welcome_back: 'Welcome back',
@@ -442,6 +446,10 @@
                 trust: 'Penilaian Kepercayaan',
                 report: 'Laporan Kewangan',
                 advisor: 'Portal Penasihat',
+                settings: 'Tetapan',
+                tax: 'Modul Cukai',
+                primary_country: 'Negara Utama',
+                display_currency: 'Mata Wang Paparan',
                 
                 holistic_summary: 'Ringkasan Holistik',
                 welcome_back: 'Selamat kembali',
@@ -494,6 +502,10 @@
                 trust: '信任度评估',
                 report: '财务报告',
                 advisor: '顾问门户',
+                settings: '设置',
+                tax: '税务模块',
+                primary_country: '主要国家',
+                display_currency: '显示货币',
                 
                 holistic_summary: '整体摘要',
                 welcome_back: '欢迎回来',
@@ -780,6 +792,139 @@
             </div>
         );
 
+        // Section Notes & Compliance Audit Component
+        const SectionNotes = ({ sectionId, sectionName, sectionNotes, setSectionNotes }) => {
+            const [newNote, setNewNote] = useState('');
+            const [destination, setDestination] = useState('advisor'); // 'personal' or 'advisor'
+            const [showSuccessToast, setShowSuccessToast] = useState(false);
+
+            const filteredNotes = sectionNotes ? sectionNotes.filter(n => n.sectionId === sectionId) : [];
+
+            const handleSaveNote = () => {
+                if (!newNote.trim()) return;
+                const noteEntry = {
+                    id: 'note_' + Date.now(),
+                    sectionId,
+                    sectionName: sectionName || sectionId,
+                    note: newNote.trim(),
+                    destination, // 'personal' | 'advisor'
+                    timestamp: new Date().toLocaleString(),
+                    audited: destination === 'advisor'
+                };
+                setSectionNotes(prev => [noteEntry, ...(prev || [])]);
+                setNewNote('');
+                setShowSuccessToast(true);
+                setTimeout(() => setShowSuccessToast(false), 4000);
+            };
+
+            const handleDeleteNote = (id) => {
+                setSectionNotes(prev => prev.filter(n => n.id !== id));
+            };
+
+            return (
+                <div className="mt-8 border-t border-border/60 pt-6">
+                    <Card className="bg-surface2/30 border-border/80">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-4">
+                            <div className="flex items-center gap-2">
+                                <span className="w-8 h-8 rounded-lg bg-gold/10 border border-gold/30 text-gold flex items-center justify-center text-sm">
+                                    <i className="fas fa-sticky-note"></i>
+                                </span>
+                                <div>
+                                    <h4 className="font-serif text-base text-white font-semibold">{sectionName} Notes & Compliance Link</h4>
+                                    <p className="text-xs text-textDim">Add section-specific observations. Notes sent to advisor are permanently logged for audit trail & support.</p>
+                                </div>
+                            </div>
+                            {showSuccessToast && (
+                                <div className="bg-green/10 border border-green/30 text-green px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 animate-fade-in">
+                                    <i className="fas fa-check-circle"></i> Saved & Linked to Support Portal!
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="space-y-4">
+                            <textarea
+                                className="w-full bg-surface border border-border rounded-lg p-3 text-sm text-text focus:outline-none focus:border-gold placeholder:text-textDim/50 min-h-[80px]"
+                                placeholder={`Write your notes or observations regarding ${sectionName}...`}
+                                value={newNote}
+                                onChange={(e) => setNewNote(e.target.value)}
+                            />
+
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <div className="flex flex-wrap items-center gap-4 text-xs">
+                                    <label className="flex items-center gap-2 cursor-pointer text-text hover:text-white">
+                                        <input 
+                                            type="radio" 
+                                            name={`dest_${sectionId}`} 
+                                            value="personal" 
+                                            checked={destination === 'personal'} 
+                                            onChange={() => setDestination('personal')}
+                                            className="accent-gold"
+                                        />
+                                        <span>Keep as Personal Note</span>
+                                    </label>
+                                    <label className="flex items-center gap-2 cursor-pointer text-text hover:text-white">
+                                        <input 
+                                            type="radio" 
+                                            name={`dest_${sectionId}`} 
+                                            value="advisor" 
+                                            checked={destination === 'advisor'} 
+                                            onChange={() => setDestination('advisor')}
+                                            className="accent-gold"
+                                        />
+                                        <span className="font-medium text-gold flex items-center gap-1">
+                                            <i className="fas fa-paper-plane text-[10px]"></i> Send to Advisor & Audit Trail
+                                        </span>
+                                    </label>
+                                </div>
+
+                                <button
+                                    onClick={handleSaveNote}
+                                    disabled={!newNote.trim()}
+                                    className="bg-gold hover:bg-yellow-600 disabled:opacity-40 text-bg px-4 py-2 rounded-md text-xs font-bold transition-all duration-200 flex items-center gap-2 whitespace-nowrap self-end sm:self-auto"
+                                >
+                                    <i className="fas fa-save"></i> Save Section Note
+                                </button>
+                            </div>
+                        </div>
+
+                        {filteredNotes.length > 0 && (
+                            <div className="mt-6 space-y-3 border-t border-border/40 pt-4">
+                                <h5 className="text-xs font-semibold text-textDim uppercase tracking-wider">Recorded Notes ({filteredNotes.length})</h5>
+                                <div className="space-y-2">
+                                    {filteredNotes.map(n => (
+                                        <div key={n.id} className="bg-surface/80 border border-border/60 rounded-md p-3 text-xs space-y-1.5 relative group">
+                                            <div className="flex justify-between items-center text-textDim text-[11px]">
+                                                <span className="font-mono text-textMid">{n.timestamp}</span>
+                                                <div className="flex items-center gap-2">
+                                                    {n.audited ? (
+                                                        <span className="bg-gold/15 text-gold border border-gold/30 px-2 py-0.5 rounded text-[10px] font-semibold flex items-center gap-1">
+                                                            <i className="fas fa-shield-alt"></i> Sent to Advisor (Audited)
+                                                        </span>
+                                                    ) : (
+                                                        <span className="bg-surface2 text-textDim border border-border px-2 py-0.5 rounded text-[10px]">
+                                                            Personal Note
+                                                        </span>
+                                                    )}
+                                                    <button 
+                                                        onClick={() => handleDeleteNote(n.id)}
+                                                        className="text-textDim hover:text-red transition-colors text-xs ml-1"
+                                                        title="Delete Note"
+                                                    >
+                                                        <i className="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <p className="text-text whitespace-pre-wrap leading-relaxed">{n.note}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </Card>
+                </div>
+            );
+        };
+
         // Custom UI Progress Bar
         const ProgressBar = ({ progress, colorClass = "from-gold to-yellow-500", trackClass = "bg-border" }) => {
             const cleanProgress = Math.min(100, Math.max(0, progress));
@@ -793,19 +938,34 @@
             );
         };
 
-        // Format Currency Helper (RM)
-        const fmt = (n) => {
-            if (n === undefined || n === null || isNaN(n)) return 'RM 0';
+        // Global Currency Model
+        const CURRENCIES = {
+            MYR: { code: 'MYR', symbol: 'RM', rate: 1 },
+            SGD: { code: 'SGD', symbol: 'S$', rate: 3.5 }
+        };
+
+        const getConvertedValue = (amount, fromCurrency = 'MYR', toCurrency = 'MYR') => {
+            if (fromCurrency === toCurrency) return amount;
+            const fromRate = CURRENCIES[fromCurrency]?.rate || 1;
+            const toRate = CURRENCIES[toCurrency]?.rate || 1;
+            return (amount * fromRate) / toRate;
+        };
+
+        // Format Currency Helper
+        const fmt = (n, currencyCode) => {
+            const code = currencyCode || window.myWealthGlobalCurrency || 'MYR';
+            const sym = CURRENCIES[code]?.symbol || 'RM';
+            if (n === undefined || n === null || isNaN(n)) return `${sym} 0`;
             const absoluteValue = Math.abs(n);
             let formattedString = '';
             if (absoluteValue >= 1e6) {
-                formattedString = 'RM ' + (n / 1e6).toFixed(2) + 'M';
+                formattedString = `${sym} ` + (absoluteValue / 1e6).toFixed(2) + 'M';
             } else if (absoluteValue >= 1e3) {
-                formattedString = 'RM ' + (n / 1e3).toFixed(1) + 'K';
+                formattedString = `${sym} ` + (absoluteValue / 1e3).toFixed(1) + 'K';
             } else {
-                formattedString = 'RM ' + Math.round(n).toLocaleString('en-MY');
+                formattedString = `${sym} ` + Math.round(absoluteValue).toLocaleString('en-US');
             }
-            return formattedString;
+            return n < 0 ? `-${formattedString}` : formattedString;
         };
 
         // Mock Advisors Database
@@ -989,7 +1149,15 @@
             hasLpa: 'No',
             hasTrust: 'No',
             hasBeneficiary: 'Some, not all',
-            additionalNotes: 'Looking to optimize tax planning for the upcoming year and review critical illness cover.'
+            additionalNotes: 'Looking to optimize tax planning for the upcoming year and review critical illness cover.',
+            taxProfile: {
+                residency: 'Malaysia',
+                treaties: [],
+                incomeSources: [
+                    { id: 'inc_1', type: 'Primary Employment', amount: 10000, currency: 'MYR', country: 'Malaysia' },
+                    { id: 'inc_2', type: 'Other Income', amount: 1500, currency: 'MYR', country: 'Malaysia' }
+                ]
+            }
         };
 
         // Static Secondary Client Mock data
@@ -1015,7 +1183,14 @@
             creditCard: 8000,
             hasWill: 'No',
             hasBeneficiary: 'Not yet',
-            lifeGoals: ['Debt Repayment', 'Buy a Home', 'Build Emergency Fund']
+            lifeGoals: ['Debt Repayment', 'Buy a Home', 'Build Emergency Fund'],
+            taxProfile: {
+                residency: 'Singapore',
+                treaties: ['Malaysia'],
+                incomeSources: [
+                    { id: 'inc_1', type: 'Primary Employment', amount: 6500, currency: 'SGD', country: 'Singapore' }
+                ]
+            }
         };
 
         const MOCK_CLIENT_RAVI = {
@@ -1036,7 +1211,14 @@
             monthlyExpenses: 12000,
             hasWill: 'Yes',
             hasBeneficiary: 'Yes, all done',
-            lifeGoals: ['Grow My Business', 'Comfortable Retirement', 'Leave a Legacy']
+            lifeGoals: ['Grow My Business', 'Comfortable Retirement', 'Leave a Legacy'],
+            taxProfile: {
+                residency: 'Malaysia',
+                treaties: [],
+                incomeSources: [
+                    { id: 'inc_1', type: 'Primary Employment', amount: 25000, currency: 'MYR', country: 'Malaysia' }
+                ]
+            }
         };
 
         const MOCK_CLIENT_NURUL = {
@@ -1467,7 +1649,7 @@
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 rounded-full blur-xl transform translate-x-1/2 -translate-y-1/2"></div>
                                 
                                 <div className="flex flex-col sm:flex-row gap-6 items-center">
-                                    <img src="resources/ask-stan-ai.jpeg" alt="Stan AI Avatar" className="w-20 h-20 rounded-full border-2 border-gold shadow-lg" onError={(e) => { e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="40" fill="%231c2030"/><text x="40" y="45" font-family="sans-serif" font-size="24" fill="%23d4a853" text-anchor="middle">Stan</text></svg>' }} />
+                                    <img src="resources/ask-stan-fig.jpeg" alt="Stan AI Avatar" className="w-20 h-20 rounded-full border-2 border-gold shadow-lg" onError={(e) => { e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="40" fill="%231c2030"/><text x="40" y="45" font-family="sans-serif" font-size="24" fill="%23d4a853" text-anchor="middle">Stan</text></svg>' }} />
                                     <div className="text-left space-y-2 flex-1">
                                         <h4 className="font-serif text-lg text-white font-semibold">How Stan Helps You Navigate</h4>
                                         <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-textMid">
@@ -2035,11 +2217,153 @@
         };
 
         // App Entry Component
+        // --- NEW SETTINGS & TAX VIEWS ---
+        const SettingsView = ({ globalSettings, setGlobalSettings, lang }) => {
+            return (
+                <div className="space-y-6 animate-fade-in">
+                    <div>
+                        <h2 className="text-3xl font-serif font-light text-white">{t('settings', lang)}</h2>
+                        <p className="text-textDim text-sm mt-1">Manage your application preferences and regional settings.</p>
+                    </div>
+                    <Card>
+                        <div className="space-y-4 max-w-md">
+                            <div>
+                                <label className="block text-sm font-semibold text-text mb-2">{t('primary_country', lang)}</label>
+                                <select 
+                                    className="w-full bg-surface2 border border-border rounded px-4 py-2 text-text focus:outline-none focus:border-gold"
+                                    value={globalSettings.primaryCountry}
+                                    onChange={(e) => setGlobalSettings({...globalSettings, primaryCountry: e.target.value})}
+                                >
+                                    <option value="Malaysia">Malaysia</option>
+                                    <option value="Singapore">Singapore</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-text mb-2">{t('display_currency', lang)}</label>
+                                <select 
+                                    className="w-full bg-surface2 border border-border rounded px-4 py-2 text-text focus:outline-none focus:border-gold"
+                                    value={globalSettings.displayCurrency}
+                                    onChange={(e) => setGlobalSettings({...globalSettings, displayCurrency: e.target.value})}
+                                >
+                                    {Object.keys(CURRENCIES).map(code => (
+                                        <option key={code} value={code}>{code} ({CURRENCIES[code].symbol})</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                    </Card>
+                </div>
+            );
+        };
+
+        const TaxModuleView = ({ clientData, setClientData, lang }) => {
+            const profile = clientData.taxProfile || { residency: 'Malaysia', treaties: [], incomeSources: [] };
+            const updateResidency = (e) => setClientData({...clientData, taxProfile: { ...profile, residency: e.target.value }});
+            const toggleTreaty = (country) => {
+                const treaties = profile.treaties.includes(country) 
+                    ? profile.treaties.filter(c => c !== country) 
+                    : [...profile.treaties, country];
+                setClientData({...clientData, taxProfile: { ...profile, treaties }});
+            };
+            const countries = ['Malaysia', 'Singapore'];
+            return (
+                <div className="space-y-6 animate-fade-in">
+                    <div>
+                        <h2 className="text-3xl font-serif font-light text-white">{t('tax', lang)}</h2>
+                        <p className="text-textDim text-sm mt-1">Manage tax residency, treaties, and income mapping.</p>
+                    </div>
+                    <Card>
+                        <h3 className="text-xl font-serif text-white mb-4">Tax Residency</h3>
+                        <select className="w-full max-w-md bg-surface2 border border-border rounded px-4 py-2 text-text focus:outline-none focus:border-gold" value={profile.residency} onChange={updateResidency}>
+                            {countries.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                    </Card>
+                    <Card>
+                        <h3 className="text-xl font-serif text-white mb-4">Double Taxation / Treaties</h3>
+                        <p className="text-sm text-textDim mb-4">Select countries with active tax treaties for your profile.</p>
+                        <div className="flex gap-4">
+                            {countries.filter(c => c !== profile.residency).map(c => (
+                                <label key={c} className="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" className="accent-gold w-4 h-4" checked={profile.treaties.includes(c)} onChange={() => toggleTreaty(c)} />
+                                    <span className="text-text">{c}</span>
+                                </label>
+                            ))}
+                            {countries.filter(c => c !== profile.residency).length === 0 && <span className="text-sm text-textDim italic">No other available treaty countries for this residency.</span>}
+                        </div>
+                    </Card>
+                    <Card>
+                        <h3 className="text-xl font-serif text-white mb-4">Income Sources Breakdown</h3>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="border-b border-border/60">
+                                        <th className="py-2 text-sm text-textDim">Source</th>
+                                        <th className="py-2 text-sm text-textDim">Country</th>
+                                        <th className="py-2 text-sm text-textDim text-right">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {profile.incomeSources.map(inc => {
+                                        const displayCurrency = profile.residency === 'Singapore' ? 'SGD' : 'MYR';
+                                        const convertedAmount = getConvertedValue(inc.amount, inc.currency, displayCurrency);
+                                        return (
+                                            <tr key={inc.id} className="border-b border-border/30">
+                                                <td className="py-3 text-sm text-text">
+                                                    {inc.type} 
+                                                    <span className="text-[10px] text-textDim block mt-0.5">Original: {fmt(inc.amount, inc.currency)}</span>
+                                                </td>
+                                                <td className="py-3 text-sm text-text">{inc.country}</td>
+                                                <td className="py-3 text-sm text-text text-right">
+                                                    {fmt(convertedAmount, displayCurrency)}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                    {profile.incomeSources.length === 0 && (
+                                        <tr><td colSpan="3" className="py-4 text-center text-sm text-textDim">No income sources mapped.</td></tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </Card>
+                </div>
+            );
+        };
+        // ------------------------------
+
         const App = () => {
             const [session, setSession] = useState(null); // Simulated Authentication: { role: 'client'/'advisor', id: '...' }
             const [landingView, setLandingView] = useState('landing');
             const [activeTab, setActiveTab] = useState('dashboard');
             const [clientData, setClientData] = useState(INITIAL_CLIENT_DATA);
+            const [globalSettings, setGlobalSettings] = useState({
+                primaryCountry: 'Malaysia',
+                displayCurrency: 'MYR'
+            });
+
+            const [sectionNotes, setSectionNotes] = useState(() => {
+                const saved = localStorage.getItem('mywealth_section_notes');
+                if (saved) return JSON.parse(saved);
+                return [
+                    {
+                        id: 'note_tax_1',
+                        sectionId: 'tax',
+                        sectionName: 'Tax Module',
+                        note: 'Client requested review of tax treaty benefits between Malaysia & Singapore for rental and employment income.',
+                        destination: 'advisor',
+                        timestamp: '2026-07-20 11:30 AM',
+                        audited: true
+                    }
+                ];
+            });
+
+            useEffect(() => {
+                localStorage.setItem('mywealth_section_notes', JSON.stringify(sectionNotes));
+            }, [sectionNotes]);
+
+            useEffect(() => {
+                window.myWealthGlobalCurrency = globalSettings.displayCurrency;
+            }, [globalSettings.displayCurrency]);
             const [calculated, setCalculated] = useState(calculateFinancials(INITIAL_CLIENT_DATA));
             const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
             const [formMode, setFormMode] = useState('guided'); // 'guided' or 'advisor'
@@ -2086,7 +2410,7 @@
 
             useEffect(() => {
                 if (session && session.role !== 'advisor') {
-                    const clientTabs = ['dashboard', 'discovery', 'goals', 'sandbox', 'insurance', 'retirement', 'estate', 'report'];
+                    const clientTabs = ['dashboard', 'discovery', 'goals', 'sandbox', 'insurance', 'retirement', 'estate', 'tax', 'settings', 'report'];
                     if (clientTabs.includes(activeTab)) {
                         setCurrentQuote(getNextQuote());
                     }
@@ -2255,6 +2579,8 @@
                 { id: 'sandbox', icon: 'fa-calculator', label: t('sandbox', lang) },
                 { id: 'trust', icon: 'fa-percentage', label: t('trust', lang) },
                 { id: 'report', icon: 'fa-file-invoice-dollar', label: t('report', lang) },
+                { id: 'tax', icon: 'fa-landmark', label: t('tax', lang) },
+                { id: 'settings', icon: 'fa-cog', label: t('settings', lang) },
                 { id: 'advisor', icon: 'fa-users', label: t('advisor', lang) },
                 { id: 'support', icon: 'fa-question-circle', label: t('support', lang) }
             ];
@@ -2523,11 +2849,36 @@
                                         clientData={clientData}
                                         reviewRequests={reviewRequests}
                                         setReviewRequests={setReviewRequests}
+                                        sectionNotes={sectionNotes}
+                                        setSectionNotes={setSectionNotes}
+                                    />
+                                )}
+                                {activeTab === 'tax' && (
+                                    <TaxModuleView 
+                                        clientData={clientData} 
+                                        setClientData={setClientData} 
+                                        lang={lang}
+                                    />
+                                )}
+                                {activeTab === 'settings' && (
+                                    <SettingsView 
+                                        globalSettings={globalSettings} 
+                                        setGlobalSettings={setGlobalSettings} 
+                                        lang={lang}
+                                    />
+                                )}
+                                
+                                {session && session.role !== 'advisor' && ['dashboard', 'discovery', 'goals', 'sandbox', 'insurance', 'retirement', 'estate', 'tax', 'report'].includes(activeTab) && (
+                                    <SectionNotes 
+                                        sectionId={activeTab}
+                                        sectionName={t(activeTab, lang)}
+                                        sectionNotes={sectionNotes}
+                                        setSectionNotes={setSectionNotes}
                                     />
                                 )}
                                 
                                 {/* Today's Financial Insight Panel */}
-                                {session && session.role !== 'advisor' && ['dashboard', 'discovery', 'goals', 'sandbox', 'insurance', 'retirement', 'estate', 'report'].includes(activeTab) && (
+                                {session && session.role !== 'advisor' && ['dashboard', 'discovery', 'goals', 'sandbox', 'insurance', 'retirement', 'estate', 'tax', 'settings', 'report'].includes(activeTab) && (
                                     <FinancialInsightPanel key={activeTab} quote={currentQuote} />
                                 )}
                             </div>
@@ -2557,7 +2908,7 @@
                             }}
                             agent-id="agent_8501kv4r7ft9fj3tj90x2tdmwdda"
                             action-text="Ask Stan For Hire - Your AI Consultant"
-                            avatar-image-url="resources/ask-stan-ai.jpeg"
+                            avatar-image-url="resources/ask-stan-fig.jpeg"
                             avatar-orb-color-1="#d4a853"
                             avatar-orb-color-2="#1a1d26"
                             dismissible="true"
@@ -6571,7 +6922,7 @@
             }
         };
 
-        const SupportView = ({ session, lang, clientData, reviewRequests, setReviewRequests }) => {
+        const SupportView = ({ session, lang, clientData, reviewRequests, setReviewRequests, sectionNotes, setSectionNotes }) => {
             const isClient = session?.role === 'client';
 
             const [searchQuery, setSearchQuery] = useState('');
@@ -7090,6 +7441,53 @@
                                 )}
                             </div>
                         </div>
+                    </Card>
+
+                    {/* Audited Section Notes & Compliance Log */}
+                    <Card className="space-y-4 border-l-4 border-l-gold">
+                        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-3">
+                            <div>
+                                <h2 className="text-2xl font-serif text-gold font-light tracking-wide mb-1">Section Notes & Compliance Audit Trail</h2>
+                                <p className="text-xs text-textDim">All notes submitted across sections are logged here for advisor review and compliance audit compliance.</p>
+                            </div>
+                            <span className="text-[10px] bg-gold/15 text-gold border border-gold/30 px-3 py-1 rounded font-sans uppercase font-bold tracking-wider flex items-center gap-1.5">
+                                <i className="fas fa-shield-alt"></i> Compliance Log
+                            </span>
+                        </div>
+
+                        {(!sectionNotes || sectionNotes.filter(n => n.audited || n.destination === 'advisor').length === 0) ? (
+                            <div className="p-6 text-center text-textDim text-xs italic border border-dashed border-border rounded-lg">
+                                No section notes logged for advisor review yet. You can write notes at the bottom of any section (Dashboard, Discovery, Tax, Goals, etc.) and check "Send to Advisor & Audit Trail".
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                {sectionNotes.filter(n => n.audited || n.destination === 'advisor').map(n => (
+                                    <div key={n.id} className="bg-surface2/40 border border-border/80 rounded-lg p-4 space-y-2 font-sans">
+                                        <div className="flex justify-between items-center text-xs">
+                                            <span className="font-semibold text-gold bg-gold/10 px-2 py-0.5 rounded border border-gold/20">
+                                                {n.sectionName || n.sectionId}
+                                            </span>
+                                            <span className="text-[11px] text-textDim font-mono">{n.timestamp}</span>
+                                        </div>
+                                        <p className="text-xs text-text font-serif italic whitespace-pre-wrap leading-relaxed">"{n.note}"</p>
+                                        <div className="flex justify-between items-center text-[10px] text-textDim border-t border-border/30 pt-2 mt-1">
+                                            <span className="flex items-center gap-1 text-green">
+                                                <i className="fas fa-check-circle"></i> Permanent Audit Logged
+                                            </span>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setRemarks(prev => (prev ? prev + "\n\n" : "") + `[Section Note - ${n.sectionName}]: ${n.note}`);
+                                                }}
+                                                className="text-gold hover:underline font-semibold flex items-center gap-1"
+                                            >
+                                                <i className="fas fa-plus-circle"></i> Append to Review Remarks
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </Card>
 
                     {/* Request a Financial Review Section */}
