@@ -72,11 +72,20 @@ export default function LoginPage() {
       <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl border border-slate-100 relative z-10 animate-fade-in">
         {/* Brand Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 text-2xl font-bold text-slate-800">
-            <svg className="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-            </svg>
-            MY Wealth<span className="text-sky-500">Plan</span>
+          <div className="flex flex-col items-center text-center gap-2">
+            <div className="w-20 h-20 rounded-full border border-slate-200 shadow-md flex items-center justify-center overflow-hidden flex-shrink-0">
+              <img 
+                src="/resources/arrow-logo-light-gpt.png" 
+                alt="AxiomFIQ Logo" 
+                className="w-full h-full object-cover" 
+              />
+            </div>
+            <div className="flex flex-col items-center">
+              <h1 className="font-serif text-3xl font-bold text-slate-800 tracking-wide">AxiomFIQ</h1>
+              <span className="text-[10px] uppercase tracking-[0.18em] text-slate-500 font-bold font-sans mt-1">
+                Empowering Financial Futures with Intellectual Planning
+              </span>
+            </div>
           </div>
           <p className="text-slate-500 text-sm mt-2">
             {isSignUp ? 'Create your secure financial planning profile' : 'Log in to manage your financial portfolio'}
@@ -170,7 +179,7 @@ export default function LoginPage() {
             }}
             className="text-sm font-semibold text-sky-500 hover:text-sky-600 transition-colors"
           >
-            {isSignUp ? 'Already have an account? Log In' : 'New to MY WealthPlan? Create an account'}
+            {isSignUp ? 'Already have an account? Log In' : 'New to AxiomFIQ? Create an account'}
           </button>
         </div>
       </div>

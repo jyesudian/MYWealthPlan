@@ -224,9 +224,20 @@ export default function AppFrame() {
         } lg:relative lg:translate-x-0 transition duration-200 ease-in-out shadow-xl flex flex-col`}
       >
         <div className="p-6 border-b border-slate-800 flex justify-between items-center">
-          <div className="font-bold text-xl flex items-center gap-2">
-            <i className="fas fa-leaf text-secondary"></i>
-            MY Wealth<span className="text-primary">Plan</span>
+          <div className="flex flex-col items-center text-center w-full gap-2">
+            <div className="w-16 h-16 rounded-full border border-slate-700 shadow-md flex items-center justify-center overflow-hidden flex-shrink-0">
+              <img 
+                src="/resources/arrow-logo-dark-gpt.png" 
+                alt="AxiomFIQ Logo" 
+                className="w-full h-full object-cover" 
+              />
+            </div>
+            <div className="flex flex-col items-center">
+              <h1 className="font-serif text-2xl font-bold text-gold tracking-wide">AxiomFIQ</h1>
+              <span className="text-[9px] uppercase tracking-[0.18em] text-slate-400 font-bold font-sans mt-1 leading-tight max-w-[200px]">
+                Empowering Financial Futures with Intellectual Planning
+              </span>
+            </div>
           </div>
           <button className="lg:hidden text-slate-400 hover:text-white" onClick={() => setMobileMenuOpen(false)}>
             <i className="fas fa-times text-xl"></i>

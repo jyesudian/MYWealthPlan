@@ -21,7 +21,7 @@ export default function FinancialReport({ profile, assets, liabilities }) {
   const liabilitiesDash = `${liabilitiesPct}, 100`
 
   const handleDownloadPDF = () => {
-    alert('Generating your comprehensive MY WealthPlan PDF Report. This features dynamic tables of assets, liabilities, retirement trajectories, and protection scoring.')
+    alert('Generating your comprehensive AxiomFIQ PDF Report. This features dynamic tables of assets, liabilities, retirement trajectories, and protection scoring.')
   }
 
   return (

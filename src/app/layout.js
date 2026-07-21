@@ -7,7 +7,7 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "MY WealthPlan | Malaysia Financial Planning Platform",
+  title: "AxiomFIQ | Malaysia Financial Planning Platform",
   description: "Catering to all age groups in Malaysia to promote financial planning, cash flow mapping, goal tracking, and legacy security.",
 };
 
