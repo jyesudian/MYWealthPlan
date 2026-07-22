@@ -1481,17 +1481,20 @@
                 <div className="min-h-screen bg-bg text-text font-sans flex flex-col w-full relative">
                     {/* Top Navigation */}
                     <nav className="sticky top-0 bg-surface/90 backdrop-blur-lg border-b border-border z-50 h-20 px-6 lg:px-12 flex justify-between items-center transition-all">
-                        <div className="flex flex-col items-center text-center py-2 px-3 gap-1">
-                            <div className="w-14 h-14 rounded-full border border-gold/30 shadow-md flex items-center justify-center overflow-hidden flex-shrink-0">
+                        <div className="flex items-center gap-3 py-1 px-2">
+                            <div className="relative w-20 h-20 flex items-center justify-center flex-shrink-0">
+                                {theme === 'dark' && (
+                                    <div className="absolute inset-1 rounded-full bg-gradient-to-r from-cyan-500/25 via-gold/30 to-cyan-500/25 blur-xl pointer-events-none"></div>
+                                )}
                                 <img 
-                                    src={theme === 'light' ? 'resources/arrow-logo-light-gpt.png' : theme === 'pastel' ? 'resources/arrow-logo-pastel-gpt.png' : 'resources/arrow-logo-dark-gpt.png'} 
-                                    alt="AxiomFIQ Logo" 
-                                    className="w-full h-full object-cover" 
+                                    src={theme === 'light' ? 'resources/axiom-fiq-light.png' : theme === 'pastel' ? 'resources/axiom-fiq-pastel.png' : 'resources/axiom-fiq-dark.png'} 
+                                    alt="AxiomFIQ" 
+                                    className="w-full h-full object-contain relative z-10 drop-shadow-[0_4px_14px_rgba(0,0,0,0.35)]" 
                                 />
                             </div>
-                            <div className="flex flex-col items-center">
+                            <div className="flex flex-col text-left">
                                 <span className="font-serif text-2xl font-bold text-gold tracking-wide">AxiomFIQ</span>
-                                <span className="text-[9px] uppercase tracking-[0.18em] text-textDim font-bold mt-0.5">Empowering Financial Futures with Intellectual Planning</span>
+                                <span className="text-[11px] text-textDim font-medium tracking-wide font-sans mt-0.5">Financial Portrait Platform</span>
                             </div>
                         </div>
                         <div className="hidden md:flex items-center gap-8 text-sm font-medium">
@@ -2613,18 +2616,21 @@
                 <div className="flex h-screen overflow-hidden bg-bg text-text selection:bg-gold/30 selection:text-white">
                     {/* Sidebar Navigation */}
                     <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-surface border-r border-border transform ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative lg:translate-x-0 transition duration-300 ease-in-out shadow-2xl flex flex-col no-print`}>
-                        <div className="p-6 border-b border-border flex justify-between items-center bg-bg/50">
-                            <div className="flex flex-col items-center text-center w-full gap-2">
-                                <div className="w-16 h-16 rounded-full border border-gold/30 shadow-md flex items-center justify-center overflow-hidden flex-shrink-0 transition-all">
+                        <div className="p-5 border-b border-border flex justify-between items-center bg-bg/50">
+                            <div className="flex flex-col items-center text-center w-full gap-0.5">
+                                <div className="relative w-28 h-28 flex items-center justify-center flex-shrink-0 transition-all">
+                                    {theme === 'dark' && (
+                                        <div className="absolute inset-2 rounded-full bg-gradient-to-r from-cyan-500/25 via-gold/30 to-cyan-500/25 blur-xl pointer-events-none"></div>
+                                    )}
                                     <img 
-                                        src={theme === 'light' ? 'resources/arrow-logo-light-gpt.png' : theme === 'pastel' ? 'resources/arrow-logo-pastel-gpt.png' : 'resources/arrow-logo-dark-gpt.png'} 
-                                        alt="AxiomFIQ Logo" 
-                                        className="w-full h-full object-cover" 
+                                        src={theme === 'light' ? 'resources/axiom-fiq-light.png' : theme === 'pastel' ? 'resources/axiom-fiq-pastel.png' : 'resources/axiom-fiq-dark.png'} 
+                                        alt="AxiomFIQ" 
+                                        className="w-full h-full object-contain relative z-10 drop-shadow-[0_4px_16px_rgba(0,0,0,0.4)]" 
                                     />
                                 </div>
-                                <div className="flex flex-col items-center">
+                                <div className="flex flex-col items-center mt-0">
                                     <h1 className="font-serif text-2xl font-bold text-gold tracking-wide">AxiomFIQ</h1>
-                                    <span className="text-[9px] uppercase tracking-[0.18em] text-textDim font-bold mt-1 leading-tight max-w-[210px]">Empowering Financial Futures with Intellectual Planning</span>
+                                    <span className="text-[11px] text-textDim font-medium tracking-wide font-sans mt-0.5">Financial Portrait Platform</span>
                                 </div>
                             </div>
                             <button className="lg:hidden text-textDim hover:text-white absolute top-6 right-6" onClick={() => setMobileMenuOpen(false)}>
@@ -6191,26 +6197,29 @@
 
         const ReportCover = ({ clientData, theme = 'dark' }) => {
             const logoSrc = theme === 'light' 
-                ? 'resources/arrow-logo-light-gpt.png' 
+                ? 'resources/axiom-fiq-light.png' 
                 : theme === 'pastel' 
-                ? 'resources/arrow-logo-pastel-gpt.png' 
-                : 'resources/arrow-logo-dark-gpt.png';
+                ? 'resources/axiom-fiq-pastel.png' 
+                : 'resources/axiom-fiq-dark.png';
 
             return (
                 <div className="flex flex-col items-center justify-center min-h-[900px] page-break-after relative overflow-hidden print-card text-center px-6">
                     <div className="absolute top-0 right-0 w-96 h-96 bg-gold/5 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
                     <div className="absolute bottom-0 left-0 w-96 h-96 bg-gold/5 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2"></div>
                     
-                    <div className="flex flex-col items-center gap-2 mb-12 relative z-10">
-                        <div className="w-24 h-24 rounded-full border border-gold/30 shadow-[0_0_50px_rgba(212,168,83,0.15)] flex items-center justify-center overflow-hidden flex-shrink-0">
+                    <div className="flex flex-col items-center gap-1 mb-10 relative z-10">
+                        <div className="relative w-36 h-36 flex items-center justify-center flex-shrink-0">
+                            {theme === 'dark' && (
+                                <div className="absolute inset-3 rounded-full bg-gradient-to-r from-cyan-500/25 via-gold/30 to-cyan-500/25 blur-2xl pointer-events-none"></div>
+                            )}
                             <img 
                                 src={logoSrc} 
-                                alt="AxiomFIQ Logo" 
-                                className="w-full h-full object-cover" 
+                                alt="AxiomFIQ" 
+                                className="w-full h-full object-contain relative z-10 drop-shadow-[0_6px_20px_rgba(0,0,0,0.4)]" 
                             />
                         </div>
-                        <h1 className="text-5xl font-serif text-gold tracking-wide font-bold mt-3">AxiomFIQ</h1>
-                        <p className="text-textDim tracking-[0.2em] uppercase text-xs font-bold mt-2 max-w-md">Empowering Financial Futures with Intellectual Planning</p>
+                        <h1 className="text-5xl font-serif text-gold tracking-wide font-bold mt-1">AxiomFIQ</h1>
+                        <p className="text-textDim text-sm font-medium tracking-wide mt-1 font-sans">Financial Portrait Platform</p>
                     </div>
                 <p className="text-gold tracking-[0.3em] uppercase text-sm mb-32 font-semibold relative z-10">Confidential Financial Planning Report</p>
                 

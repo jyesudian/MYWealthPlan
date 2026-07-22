@@ -224,19 +224,18 @@ export default function AppFrame() {
         } lg:relative lg:translate-x-0 transition duration-200 ease-in-out shadow-xl flex flex-col`}
       >
         <div className="p-6 border-b border-slate-800 flex justify-between items-center">
-          <div className="flex flex-col items-center text-center w-full gap-2">
-            <div className="w-16 h-16 rounded-full border border-slate-700 shadow-md flex items-center justify-center overflow-hidden flex-shrink-0">
+          <div className="flex flex-col items-center text-center w-full gap-0.5">
+            <div className="relative w-28 h-28 flex items-center justify-center flex-shrink-0">
+              <div className="absolute inset-2 rounded-full bg-gradient-to-r from-cyan-500/25 via-amber-500/30 to-cyan-500/25 blur-xl pointer-events-none"></div>
               <img 
-                src="/resources/arrow-logo-dark-gpt.png" 
-                alt="AxiomFIQ Logo" 
-                className="w-full h-full object-cover" 
+                src="/resources/axiom-fiq-dark.png" 
+                alt="AxiomFIQ" 
+                className="w-full h-full object-contain relative z-10 drop-shadow-[0_4px_16px_rgba(0,0,0,0.4)]" 
               />
             </div>
-            <div className="flex flex-col items-center">
-              <h1 className="font-serif text-2xl font-bold text-gold tracking-wide">AxiomFIQ</h1>
-              <span className="text-[9px] uppercase tracking-[0.18em] text-slate-400 font-bold font-sans mt-1 leading-tight max-w-[200px]">
-                Empowering Financial Futures with Intellectual Planning
-              </span>
+            <div className="flex flex-col items-center mt-0">
+              <h1 className="font-serif text-2xl font-bold text-amber-400 tracking-wide">AxiomFIQ</h1>
+              <span className="text-[11px] text-slate-400 font-medium tracking-wide mt-0.5">Financial Portrait Platform</span>
             </div>
           </div>
           <button className="lg:hidden text-slate-400 hover:text-white" onClick={() => setMobileMenuOpen(false)}>

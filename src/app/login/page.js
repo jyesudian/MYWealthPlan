@@ -72,19 +72,17 @@ export default function LoginPage() {
       <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl border border-slate-100 relative z-10 animate-fade-in">
         {/* Brand Header */}
         <div className="text-center mb-8">
-          <div className="flex flex-col items-center text-center gap-2">
-            <div className="w-20 h-20 rounded-full border border-slate-200 shadow-md flex items-center justify-center overflow-hidden flex-shrink-0">
+          <div className="flex flex-col items-center text-center gap-0.5">
+            <div className="w-32 h-32 flex items-center justify-center flex-shrink-0">
               <img 
-                src="/resources/arrow-logo-light-gpt.png" 
-                alt="AxiomFIQ Logo" 
-                className="w-full h-full object-cover" 
+                src="/resources/axiom-fiq-light.png" 
+                alt="AxiomFIQ" 
+                className="w-full h-full object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.15)]" 
               />
             </div>
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center mt-0">
               <h1 className="font-serif text-3xl font-bold text-slate-800 tracking-wide">AxiomFIQ</h1>
-              <span className="text-[10px] uppercase tracking-[0.18em] text-slate-500 font-bold font-sans mt-1">
-                Empowering Financial Futures with Intellectual Planning
-              </span>
+              <span className="text-xs text-slate-500 font-medium tracking-wide mt-0.5">Financial Portrait Platform</span>
             </div>
           </div>
           <p className="text-slate-500 text-sm mt-2">
